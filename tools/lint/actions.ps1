@@ -17,7 +17,9 @@ $ErrorActionPreference = 'Stop'
 $repo = Get-RepoRoot
 
 # jactionlint（= actionlint 相当）が担当するルールは sisakulint 側で無効化する（重複報告を避ける）
-$sisakuIgnore = @('expression', 'cond', 'job-needs', 'env-var', 'workflow-call', 'deprecated-commands')
+# commit-sha は GitHub の Actions lock（.github/workflows/actions.lock）が不変性を保証するため無効化する
+# （ワークフローはタグ参照 + lock でコミットを固定するモデルを採用）
+$sisakuIgnore = @('expression', 'cond', 'job-needs', 'env-var', 'workflow-call', 'deprecated-commands', 'commit-sha')
 $ignoreArgs = @()
 foreach ($r in $sisakuIgnore) { $ignoreArgs += @('-ignore', $r) }
 
