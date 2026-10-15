@@ -58,20 +58,19 @@ try {
         }
     }
 
-    # --- pinact（アクションの SHA 固定・コメント・最小経過日数の検証）---
-    if (Get-Command pinact -ErrorAction SilentlyContinue) {
-        Write-Host '=== pinact ===' -ForegroundColor Cyan
-        if ($Fix) {
-            & pinact run --fix
-            if ($LASTEXITCODE -ne 0) { $failed = $true }
-        } else {
-            # --fix=false --no-api: ネットワーク無しで 40 桁 SHA 固定だけを検証する
-            & pinact run --fix=false --no-api
-            if ($LASTEXITCODE -ne 0) { $failed = $true; Write-Warning 'pinact: SHA 未固定のアクションがあります（-Fix で固定）' }
-            else { Write-Host '[ok] pinact（全アクションが SHA 固定）' }
+    # --- pinact（任意。Actions lock 採用後はタグ参照が正となるため既定では実行しない）---
+    if ($env:JACTIONLINT_USE_PINACT -eq '1') {
+        if (Get-Command pinact -ErrorAction SilentlyContinue) {
+            Write-Host '=== pinact ===' -ForegroundColor Cyan
+            if ($Fix) { & pinact run --fix; if ($LASTEXITCODE -ne 0) { $failed = $true } }
+            else {
+                & pinact run --fix=false --no-api
+                if ($LASTEXITCODE -ne 0) { $failed = $true; Write-Warning 'pinact: SHA 未固定のアクションがあります' }
+                else { Write-Host '[ok] pinact' }
+            }
         }
     } else {
-        Write-Warning 'pinact が見つかりません（mise install）'
+        Write-Host '[i] pinact はスキップ（Actions lock が不変性を保証。実行するには JACTIONLINT_USE_PINACT=1）'
     }
 
     if ($failed) { throw 'actions lint で問題を検出しました（-Fix で自動修正できます）' }
