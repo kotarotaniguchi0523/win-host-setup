@@ -1,32 +1,49 @@
 amends "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Config.pkl"
 import "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Builtins.pkl"
 
-// このリポジトリの Lint（commit / push 時に実行）
+// このリポジトリの Lint
 //  - jactionlint : GitHub Actions（actionlint のチェックを包含。Dependabot と Actions lock も見る）
 //  - betterleaks : 秘密情報
-//  - yamllint    : YAML
-//  - sisakulint / secretlint / PII は tools/lint/ のスクリプトで実行する
-local linters = new Mapping {
-    ["jactionlint"] = Builtins.jactionlint
-    ["betterleaks"] = Builtins.betterleaks
-    // YAML の妥当性は tools/ci/lint-config.py（CI）で検証するため yamllint は使わない
+//  - sisakulint  : 追加 SAST（jactionlint が包含する actionlint 相当ルールは無効化）
+//  - pii / secrets / powershell : tools/ 以下のスクリプトで実行
+//
+// 実行タイミング:
+//  - pre-commit: 軽量（pii / secrets）だけ
+//  - pre-push  : 全部（jactionlint / betterleaks / sisakulint / powershell を含む）
 
-    // sisakulint（追加 SAST）— jactionlint が包含するルールは無効化する
-    ["sisakulint"] = new Step {
-        glob = List(".github/workflows/*.yml")
-        check = "sisakulint -ignore expression -ignore cond -ignore job-needs -ignore env-var -ignore workflow-call -ignore deprecated-commands -ignore commit-sha"
-        fix = "sisakulint -ignore expression -ignore cond -ignore job-needs -ignore env-var -ignore workflow-call -ignore deprecated-commands -ignore commit-sha -fix on"
-    }
+local sisakuArgs = "-ignore expression -ignore cond -ignore job-needs -ignore env-var -ignore workflow-call -ignore deprecated-commands -ignore commit-sha"
 
-    // secretlint（preset 付き）+ PII 検査は tools/lint/secrets.ps1 / tools/depii.ps1 が担当
-    ["repo-lint"] = new Step {
-        glob = List("**/*")
-        check = "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lint/secrets.ps1"
-    }
+local all = new Mapping<String, Step> {
     ["pii"] = new Step {
         glob = List("**/*")
         check = "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/depii.ps1 -Check"
     }
+    ["secrets"] = new Step {
+        glob = List("**/*")
+        check = "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lint/secrets.ps1"
+    }
+    ["jactionlint"] = Builtins.jactionlint
+    ["betterleaks"] = Builtins.betterleaks
+    ["sisakulint"] = new Step {
+        glob = List(".github/workflows/*.yml")
+        check = "sisakulint \(sisakuArgs)"
+        fix = "sisakulint \(sisakuArgs) -fix on"
+    }
+    ["powershell"] = new Step {
+        glob = List("**/*.ps1")
+        check = "pwsh -NoProfile -Command \"if (Get-Module -ListAvailable PSScriptAnalyzer) { $i = Invoke-ScriptAnalyzer -Path ./tools -Recurse -Severity Error; if ($i) { $i | Format-Table -AutoSize; exit 1 } } else { Write-Host '[i] PSScriptAnalyzer 未導入のためスキップ' }\""
+    }
 }
 
-steps = linters
+// pre-commit（軽量）
+steps = new Mapping<String, Step | Group> {
+    ["pii"] = all["pii"]
+    ["secrets"] = all["secrets"]
+}
+
+// pre-push（全部）
+hooks {
+    ["pre-push"] {
+        steps = all
+    }
+}
