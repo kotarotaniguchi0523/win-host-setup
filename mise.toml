@@ -4,14 +4,14 @@
 #
 # Note: sisakulint does not ship a Windows binary (darwin/linux only), so
 #       build it from source with the go: backend (works with the same definition on Linux/macOS).
+#
+# No npm: tools here on purpose. A locked install replays the dependency graph that the embedded
+# aube installer records in .mise/locks, and that graph cannot be resolved while npm traffic goes
+# through the Takumi Guard proxy registry. Secrets are scanned with betterleaks (a self-contained
+# binary) instead, so CI installs no Node.js runtime and no npm packages.
 [tools]
-# node/npm are required by the npm: backend so CI can install the npm-based tools
-node                                = "26.11.1"
-npm                                 = "12.2.0"
 "github:jdx/jactionlint"                = "2.1.0"
 "go:github.com/sisaku-security/sisakulint/cmd/sisakulint" = "0.3.8"
 hk                                  = { version = "2.6.0", lazy = true }  # local git hooks only (not installed in CI)
-"npm:secretlint"                    = "13.0.7"
-"npm:@secretlint/secretlint-rule-preset-recommend" = "13.0.7"
 betterleaks                         = "1.9.0"
 pinact                              = "5.0.0"

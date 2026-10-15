@@ -48,10 +48,17 @@
 |---|---|
 | **Renovate App**（Mend hosted / `github.com/apps/renovate`）| 依存更新 PR（すべての対象）。**PAT 不要**（自己ホストの workflow と `RENOVATE_TOKEN` は廃止） |
 | `.github/workflows/relock.yml` | `mise/config.toml` が変わった PR で **`mise lock` を実行し `mise.lock` を同じ PR に積む** |
-| `.github/workflows/validate.yml` | push / PR で **`mise install --locked`（ロックのドリフト検出）** ＋ PSScriptAnalyzer ＋ JSON/YAML/TOML 構文 |
+| `.github/workflows/validate.yml` | push / PR で **`mise install --locked`（ロックのドリフト検出）** ＋ JSON/YAML/TOML の構文検証（PSScriptAnalyzer は hk の pre-push が担当） |
 | `.github/workflows/winget-outdated.yml` | 週次（Windows ランナー）で **`winget` 自身を情報源に `host.dsc.yaml` のピンを更新**し PR を作成 |
 | `.github/workflows/skills.yml` | `skills/**` の変更で **APM のマニフェスト検証・`apm.lock.yaml` ドリフト検出・`apm audit`（セキュリティ監査）** |
 | `.github/workflows/healthcheck.yml` | 週次で **`mise` のドリフト／更新候補・winget の乖離・公開リポジトリの衛生（個人パス混入検査）** を点検 |
+
+### 役割分担（更新 PR とセキュリティ）
+
+- **Renovate**（Mend hosted）が mise / GitHub Actions / Skills (APM) の更新 PR を作ります。
+- **Dependabot** は**セキュリティアラートのみ**を有効にし、更新 PR は作りません。bot の版更新設定 `.github/dependabot.yml` は削除し、セキュリティ更新 PR も停止しています。
+- **脆弱性が見つかったとき**は、Renovate の `vulnerabilityAlerts`（＋`osvVulnerabilityAlerts`）が週次のスケジュールと `minimumReleaseAge` を迂回して**即時に** PR を作ります。
+- **minor 以下**（minor / patch / pin / digest）の更新は、**CI が通れば自動でマージ**します。major は Dependency Dashboard で承認してから PR を作ります。
 
 ### Renovate が担当する範囲
 - **`mise/config.toml`**（native な `mise` マネージャ）— 25 ツール前後を継続更新。
@@ -117,9 +124,9 @@ pwsh -File tools/sync.ps1 -Message "..."   # コミットメッセージ指定
 4. source リポジトリをコミット → public リポジトリをコミットして push
 
 ### 必要な Secrets
-| 名前 | 用途 |
-|---|---|
-| `RENOVATE_TOKEN` | Renovate が PR を作るための PAT（`repo` スコープ） |
+
+ありません。Renovate App（Mend hosted）は PAT を使わないため、以前使っていた `RENOVATE_TOKEN` は削除しました。
+Dependabot 側はセキュリティアラートだけを有効にしているので、そちらにも認証情報は要りません。
 
 ## 再現手順
 

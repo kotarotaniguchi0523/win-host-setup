@@ -47,6 +47,12 @@
       "matchUpdateTypes": ["major"],
       "groupName": null,
       "dependencyDashboardApproval": true
+    },
+    {
+      "description": "minor 以下（minor / patch / pin / digest）は CI が通れば自動マージする",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true,
+      "platformAutomerge": true
     }
   ],
 
@@ -59,7 +65,14 @@
   },
   "vulnerabilityAlerts": {
     "enabled": true,
-    "labels": ["security"]
+    "labels": ["security"],
+    "description": "Security fixes bypass the weekly schedule and the release-age gate so they land as soon as the advisory is known",
+    "schedule": ["at any time"],
+    "minimumReleaseAge": null,
+    "dependencyDashboardApproval": false,
+    "groupName": null,
+    "prPriority": 10
   },
+  "osvVulnerabilityAlerts": true,
   "ignorePaths": ["public/**"]
 }

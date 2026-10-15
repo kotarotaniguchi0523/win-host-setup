@@ -47,7 +47,7 @@ $cfgPath = "$env:USERPROFILE\.config\mise\config.toml"
 # ================= document =================
 T "# Inventory — Windows ホストのグローバル導入（完全版・全一覧）"
 T ""
-T "収集: 2026-10-13〜15 / 場所: ``C:\Users\%USERNAME%\win-host-setup``"
+T "収集: 2026-10-13〜15 / 場所: ``$env:USERPROFILE\win-host-setup``"
 T "対象: **Windows 本体のグローバル導入のみ**（プロジェクトローカル、エディタ/ブラウザ拡張は対象外）。"
 T "目標: **mise へ統一**（Python ``3.14`` / Node ``26`` / Go ``1.27`` / ``hk``）。手順は ``PLAN.md``、移行分析は ``migration-npm.md``/``migration-pip.md``。"
 T ""

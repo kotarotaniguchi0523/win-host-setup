@@ -1,4 +1,4 @@
-# AGENTS.md — Windows Package Management Policy
+# AGENTS.md: Windows Package Management Policy
 
 Windows ホスト OS へのソフトウェア導入・更新では、**サプライチェーンセキュリティ・配布元の真正性・最小権限・再現性**を優先する。
 
@@ -39,7 +39,7 @@ Windows ホスト OS へのソフトウェア導入・更新では、**サプラ
 - **mise**: `~/.config/mise/config.toml` + `mise.lock`（`paranoid`/`locked`/`minimum_release_age="2d"`/`pin`）。検証は `mise tool <name>` の `Security:` 行で**実効性を確認**する。
 - **winget**: 宣言は WinGet Configuration（DSC）。Store 版があるものは `--source msstore` を明示。
 - **Chocolatey / Scoop は使わない**。
-- 監査結果は `PLAN.md` の「監査」節と `inventory.md` に記録する。
+- 監査結果は `AUDIT.md` と `inventory.md` に記録する。
 
 ---
 

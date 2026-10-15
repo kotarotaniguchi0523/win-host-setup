@@ -1,4 +1,4 @@
-# PLAN — Windows ホストのグローバル導入を mise に統一（セキュア）
+# PLAN: Windows ホストのグローバル導入を mise に統一（セキュア）
 
 > 対象: **Windows 本体のグローバル導入のみ**（リポジトリ/プロジェクトローカル、エディタ/ブラウザ拡張、**WSL 内部**は対象外）。
 > 方針: **`AGENTS.md`**（Package Management Policy: msstore 優先 → mise/aqua の実効検証 → winget）。
@@ -14,7 +14,7 @@
 
 **mise 管理 27 件**（内訳は下部 §3 アーカイブ参照）
 
-- **既定 = 最新**（2026-10-15 変更）: `node = ["26.11.1", "24.21.0"]`（既定 **26.11.1**）/ `python = ["3.15.0", "3.14.8"]`（既定 **3.15.0**）— **配列は先頭が既定**（`mise which` で実測）
+- **既定 = 最新**（2026-10-15 変更）: `node = ["26.11.1", "24.21.0"]`（既定 **26.11.1**）/ `python = ["3.15.0", "3.14.8"]`（既定 **3.15.0**）。**配列は先頭が既定**（`mise which` で実測）
 - **winget へ移行（2 件）**: `apm`（`pypi:apm-cli` は既定 3.15 で `pyyaml` の cp315 wheel が無く導入不可）/ `rust-analyzer`（aqua は `Security: [none]`）
 - **追加**: `pypi:git+…/skillspector@v2.12.0`（Python 3.13.16 固定で導入成功）
 - 全 27 ツールの「mise vs winget」判定は **`winget-vs-mise.md`**
@@ -72,7 +72,7 @@
 > **バイナリ系（mise 外の例外）**: `gopls`（`go install`／mise・winget・ubi いずれも不可）。
 > **npm backend の検証（実測）**: mise の `Security:` は `[none]` 表示だが、**`~/.npmrc` の `registry=https://npm.flatt.tech/` 経由で pnpm が `dist.integrity`（sha512）を実効検証**（＝Takumi Guard 込み。`pnpm view agent-browser dist.tarball` = `npm.flatt.tech/...` で確認済）。`npm.package_manager = "pnpm"`。
 > **逸脱**: `herdr` は aqua の `Security: [none]`（winget は preview のみ、npm は予約プレースホルダ `herdr@0.0.0`）→ **§14 に記録**。
-> 台帳は `tools/tool-inventory.ps1` で生成（**ツール×実体バイナリ×backend×検証**）。
+> 一覧は `tools/tool-inventory.ps1` で生成（**ツール×実体バイナリ×backend×検証**）。
 
 - [x] `[tools]` を正確ピン（`"24"`/`"3.13"` を排除）
 - [x] **`mise lock --global`** → `mise.lock`
@@ -177,25 +177,25 @@
 
 **内容**: ユーザー配下 37 件を精査（`repos.md` / `repos-analysis.md`）。判定 KEEP 3 / REVIEW 28 / CANDIDATE 4 / EMPTY 2。
 
-### Tier A — 安全に削除（完了）
+### Tier A: 安全に削除（完了）
 
 - [x] `~\worktrees\refacotr`（空の誤字ディレクトリ）→ 削除
 - [x] `~\worktrees\refactor\architecture`（683 MB / branch `refactor/architecture` は **remote に存在** / dirty は `.claude/settings.local.json` のみ）→ **`git worktree remove --force`**（設定は `backup-removals-2026-10-15/worktree-architecture/` に退避）→ **`~\worktrees` 自体を除去**
 - （`.codex\.tmp\plugins-clone-*` の壊れた空クローンは **Codex 本体のキャッシュ**のため対象外）
 
-### Tier B — remote なし＋未コミット（完了）
+### Tier B: remote なし＋未コミット（完了）
 
 - [x] `~\Desktop\個人的開発物\ask-use-question-mcp`（dirty 149）→ **フルバックアップ**（`backup-removals-2026-10-15/ask-use-question-mcp`, 251 MB）→ 🗑 削除
 - [x] `~\liff-flexmessage-test`（dirty 15）→ **バックアップ**（`backup-removals-2026-10-15/liff-flexmessage-test`, 0.8 MB：node_modules/.next 除外）→ 🗑 削除
 - [x] `~\Desktop\家計設計` → **保持**（現在の作業ディレクトリ）
 
-### Tier C — REVIEW（完了）
+### Tier C: REVIEW（完了）
 
 - [x] **25 件を削除（8.6 GB 解放）**: `search-novel` / `tutorial`(696 MB) / `%PROJECT_NAME%` / `dify` / `administorator-machine`(1.33 GB) / `mother-day` / `mem0` / `パターン認識と機械学習2025` / `音響音声処理` / `claudia` / `liff-gas-react` / `line-mcp` / `line-narrowcast-flexmessage-` / `laf-line-mini-app`(1.28 GB) / `my-processing-app` / `Awesome-GAS-project` / `liff-route-info` / `liff-hearing`(1.24 GB) / `taskmaster-kanban` / `laf-liff-app`(1.51 GB) / `blog` / `playwright-mcp` / `react` / `hono` / `claude-code-windows-setup`
 - [x] 未コミット分は **patch 退避**（`backup-removals-2026-10-15/repos-tierC/*/{tracked.diff,untracked.txt,status.txt,head.txt}`）
 - [x] **保持（除外）**: `~\.codex\vendor_imports\skills`（**Skills**）/ `~\.codex\.tmp\plugins*`（**plugins**）
 
-### Tier D — KEEP（保持・操作不要）
+### Tier D: KEEP（保持・操作不要）
 
 - [x] `~\projects\fit-redesign-new`（2026-10-15）
 - [x] `~\Desktop\家計設計\sbx-setup`（2026-10-13・remote あり）
@@ -215,13 +215,13 @@
 - [x] **`.bashrc` 整理**: 重複 `PATH`（3→1）と削除済 `task-master` エイリアスを除去（`.bashrc.bak-2026-10-15`）
 - [x] **pnpm グローバルツールを mise へ**: `dotenvx`(aqua) / `secretlint`・`textlint`(mise `npm:`) ※誤って残骸と判定→復旧
 - [x] **MAMP 撤去**（未使用）/ **Rust を mise 管理へ**（`rust 1.99.0` + `rust-analyzer`）
-- [ ] `%TEMP%\FF26DB13-…`(356 MB) — **`swap.vhdx`（稼働中VMのスワップ）のため削除禁止**
-- [x] `~\.local\share\containers`(4,982 MB) — **保持**（ユーザー判断により削除しない）
+- [ ] `%TEMP%\FF26DB13-…`(356 MB)。**`swap.vhdx`（稼働中VMのスワップ）のため削除禁止**
+- [x] `~\.local\share\containers`(4,982 MB)。**保持**（ユーザー判断により削除しない）
 - [x] **Codex 一時/キャッシュ**: `~\.codex\.tmp`(125.6 MB, 中断クローン含む) / `~\.cache\codex-runtimes`(1,329.3 MB) を削除 ＝ **計 1,455 MB**（C: 空き 177.85 → **179.05 GB**）。**`~\.codex\plugins`(506 MB, `codex.exe` 318.6 MB 等の本体) と自作プラグイン `gakuchika-review`(2 か所) は保全**
 - [x] **`~\.plugins` は存在しない**（実在は無ドットの `~\plugins` ＝自作 Codex プラグイン `gakuchika-review`。marketplace 本体は `~\.agents\plugins\marketplace.json` の "personal"）
 - **除外（保持）**: `~\.codex`（Skills/plugins）／ `~\.agents\plugins`・`~\plugins`（自作プラグイン 2 か所）／ `%LOCALAPPDATA%\OpenAI`（ChatGPT）／ `%LOCALAPPDATA%\Zed` ／ `%TEMP%\opencode` ／ `~\.local\share\opencode`
 
-## 13. バイナリ系（mise/winget 管理外）の台帳
+## 13. バイナリ系（mise/winget 管理外）の一覧
 
 **内容**: 「単体 .exe で配布されるもの」は mise/winget の外に落ちやすい（例: `ax`）。`tools/tool-inventory.ps1` で **ツール × 実体バイナリ × backend × 検証** を列挙する。
 

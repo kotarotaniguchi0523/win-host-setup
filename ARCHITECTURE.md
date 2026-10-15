@@ -81,7 +81,7 @@ win-host-setup/
 |   +-- update-winget-dsc.ps1 winget の最新版と突き合わせ
 |   +-- fix-machine-path.ps1  Machine PATH の整理 (管理者)
 |   +-- lint/actions.ps1      jactionlint + sisakulint (+ pinact 任意)
-|   +-- lint/secrets.ps1      betterleaks + secretlint
+|   +-- lint/secrets.ps1      betterleaks (secretlint は任意)
 |   +-- lint/all.ps1          上記 + PII + waza
 |   +-- ci/mise-verify.ps1    ロック整合性の検証 (relock でも使用)
 |   +-- ci/skills-verify.ps1  APM lock ドリフト + 監査 (SARIF)
@@ -100,7 +100,6 @@ win-host-setup/
 |   |   +-- winget-outdated.yml
 |   |   +-- healthcheck.yml
 |   |   +-- actions.lock      gh actions-lock が生成 (タグ -> コミット)
-|   +-- dependabot.yml        github-actions の更新
 |   +-- jactionlint.yaml      profile + baseline
 |   +-- jactionlint-baseline.json  既知の指摘 (新規のみ失敗させる)
 |
@@ -147,8 +146,9 @@ win-host-setup/
 
 ```
    +----------------+        +----------------+        +----------------+
-   |  Renovate      |        |  Dependabot    |        | winget-outdated|
-   |  (mise/Skills) |        | (github-actions|        | (winget 自身)  |
+   |  Renovate      |        |  Renovate      |        | winget-outdated|
+   |  (mise/Actions |        |  (security)    |        | (winget 自身)  |
+   |   /Skills)     |        |  即時 PR       |        |                |
    +-------+--------+        +-------+--------+        +-------+--------+
            |                         |                         |
            | PR                      | PR                      | PR
@@ -163,6 +163,9 @@ win-host-setup/
                             | GitHub main    |
                             +----------------+
 
+  自動マージ: minor 以下 (minor/patch/pin/digest) は CI の通過後に GitHub の auto-merge でマージ。
+              major は Dependency Dashboard で承認してから。
+
   注意: 現状は source -> public の一方通行。
         GitHub 側の更新を実環境へ反映するには public から pull して apply する。
 ```
@@ -175,9 +178,9 @@ win-host-setup/
   push / PR                      schedule (週次)               skills/** 変更
   +--------------------+         +--------------------+       +--------------------+
   | validate.yml       |         | (Renovate App)      |       | skills.yml         |
-  |  - mise lock 整合  |         |  - グループ別 PR   |       |  - APM lock ドリフト|
+  |  - mise lock 整合  |         |  - グループ別/即時 |       |  - APM lock ドリフト|
   |  - 設定の構文      |         +--------------------+       |  - apm audit(SARIF)|
-  |  - PSScriptAnalyzer|         | winget-outdated.yml|       |  - waza check      |
+  |                    |       | winget-outdated.yml|       |  - (waza はローカル)|
   +--------------------+         |  - DSC のピン更新  |       +--------------------+
   | lint.yml           |         +--------------------+
   |  - actions (並列)  |         | healthcheck.yml    |
@@ -214,7 +217,7 @@ win-host-setup/
                               ->  winget (Installer SHA256)
   2. 再現性    mise.lock / (pypi は uv 依存グラフ) / actions.lock / apm.lock.yaml
   3. PII       pii-rules (汎用 + .agent の実値) -> depii -> sanitize
-  4. 秘密      betterleaks + secretlint + GitHub secret scanning / push protection
+  4. 秘密      betterleaks + GitHub secret scanning / push protection（secretlint は任意）
   5. CI        validate / lint / skills (SARIF を Code Scanning へ)
   6. フック    hk pre-commit / pre-push
 ```
@@ -318,6 +321,9 @@ win-host-setup/
   （`capture` は `-Force` でホストが正として上書きする。衝突を避けたい場合は `tools/sync.ps1 -Check` で先に差分を見る）
 - **APM Skills の更新経路**: Renovate（`apm` マネージャ / グループ "Skills (APM)"）が PR を作り、
   `skills-relock.yml` が `apm.lock.yaml` を再生成して追随、`skills.yml` がドリフトと監査を検証する。
-- CI の `lint` は runner 側で赤（ローカルは緑）。原因は runner での `mise install`（Go ビルドの sisakulint / npm の secretlint）。
+- CI の `lint` が runner 側で赤だった件は、プロジェクトから npm 版 secretlint を外して解消しました
+  （locked install が要求する依存グラフを Takumi Guard 経由では生成できないため）。シークレット検査はバイナリの betterleaks が担当します。
+- CI から外した検査: `validate.yml` の PSScriptAnalyzer と `skills.yml` の waza。どちらも hk の pre-push が同等の検査をするためです。
+  一方、secrets と PII は GitHub 上の PR がローカルフックを通らないため、CI に残しています。
 - jactionlint の指摘 45 件は **baseline 記録** (CI 緑は「新規なし」の意味)。`missing-timeout` 等は返済対象。
 - 分析系ドキュメント (inventory/repos/migration) は公開しない (`.agent/docs/`)。

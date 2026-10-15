@@ -42,13 +42,15 @@ foreach ($f in 'apm.yml', 'apm.lock.yaml') {
     }
 }
 
-# 2) Skill names managed by APM (from the lock's deployed_files)
+# 2) Skill names managed by APM: the deployed_files in the lock, plus the dependency
+#    names (virtual skills such as microsoft/waza/skills/waza ship without deployed_files)
 $managed = @()
 $lock = Join-Path $repoSk 'apm.lock.yaml'
 if (Test-Path $lock) {
-    $managed = Get-Content $lock -Encoding UTF8 |
-        ForEach-Object { if ($_ -match '^\s*-\s+\.agents/skills/([^/\s]+)\s*$') { $Matches[1] } } |
-        Sort-Object -Unique
+    $managed = @(Get-Content $lock -Encoding UTF8 | ForEach-Object {
+        if     ($_ -match '^\s*-\s+\.agents/skills/([^/\s]+)\s*$') { $Matches[1] }
+        elseif ($_ -match '^\s{2,}name:\s*(\S+)\s*$')              { $Matches[1] }
+    } | Sort-Object -Unique)
 }
 
 # 3) Local skills (not APM-managed) -> skills/local/

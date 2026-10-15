@@ -47,19 +47,22 @@ Copy-Item (Join-Path $src 'apm.yml') (Join-Path $dst 'apm.yml') -Force
 Write-Host "[ok] ~/.apm/apm.yml"
 
 # --- lock (--global does not depend on the CWD) ---
+# Note: do not name this variable $lock - PowerShell is case-insensitive, so it would be the
+#       same variable as the -Lock switch parameter and assigning a string to it fails.
 if ($Lock) {
     & $apm lock --global | Out-Null
-    $lock = Join-Path $dst 'apm.lock.yaml'
-    if (Test-Path $lock) { Copy-Item $lock (Join-Path $src 'apm.lock.yaml') -Force; Write-Host '[ok] skills/apm.lock.yaml を更新' }
+    $lockPath = Join-Path $dst 'apm.lock.yaml'
+    if (Test-Path $lockPath) { Copy-Item $lockPath (Join-Path $src 'apm.lock.yaml') -Force; Write-Host '[ok] skills/apm.lock.yaml を更新' }
 }
 
 # --- deploy (compare the lock's deployed_files with the actual state and re-run if anything is missing) ---
+# The declared targets are codex (~/.agents/skills) and opencode (~/.config/opencode/skills); both are verified.
 function Test-SkillsDeployed {
-    $lock = Join-Path $dst 'apm.lock.yaml'
-    if (-not (Test-Path $lock)) { return $true }
+    $lockPath = Join-Path $dst 'apm.lock.yaml'
+    if (-not (Test-Path $lockPath)) { return $true }
     $missing = @()
-    foreach ($line in (Get-Content $lock -Encoding UTF8)) {
-        if ($line -match '^\s*-\s+(\.agents/skills/[^/\s]+)/?$') {
+    foreach ($line in (Get-Content $lockPath -Encoding UTF8)) {
+        if ($line -match '^\s*-\s+(\.(?:agents/skills|config/opencode/skills)/[^/\s]+)/?$') {
             $rel = $Matches[1]
             $p = Join-Path (Get-HomeDir) ($rel -replace '/', '\')
             if (-not (Test-Path $p)) { $missing += $rel }

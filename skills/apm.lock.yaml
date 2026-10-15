@@ -1,6 +1,308 @@
 lockfile_version: '1'
 apm_version: 0.33.0
 dependencies:
+- repo_url: microsoft/waza
+  name: waza
+  host: github.com
+  resolved_commit: 04e7b4c6d593555834e71221227326c63274a921
+  resolved_ref: v0.38.10
+  version: unknown
+  virtual_path: skills/waza
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:2f23489639fec953559f61dedd389a8399b06b997adc517f214daa53aab63ec9
+- repo_url: microsoft/waza
+  name: waza-interactive
+  host: github.com
+  resolved_commit: 04e7b4c6d593555834e71221227326c63274a921
+  resolved_ref: v0.38.10
+  version: unknown
+  virtual_path: skills/waza-interactive
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:a6b13d067eb1e4ace721316c4fbb31a8f20ed994104fc6864de90d1982a1b5b4
+- repo_url: mizchi/explainer
+  name: explainer
+  host: github.com
+  resolved_commit: ccdd7bacfb47451e38506d837af8a629504960b2
+  resolved_ref: main
+  version: 0.5.3
+  package_type: skill_bundle
+  deployed_files:
+  - .agents/skills/d2-diagram
+  - .agents/skills/d2-diagram/SKILL.md
+  - .agents/skills/d2-diagram/assets/d2-facts.mjs
+  - .agents/skills/d2-diagram/assets/vlmkit-workspace.d2
+  - .agents/skills/d2-diagram/assets/vlmkit-workspace.facts.json
+  - .agents/skills/d2-diagram/assets/vlmkit-workspace.svg
+  - .agents/skills/d2-diagram/assets/vlmkit-workspace.txt
+  - .agents/skills/d2-slides
+  - .agents/skills/d2-slides/SKILL.md
+  - .agents/skills/d2-slides/assets/build-deck.mjs
+  - .agents/skills/d2-slides/assets/deck-review.mjs
+  - .agents/skills/explainer
+  - .agents/skills/explainer-book
+  - .agents/skills/explainer-book/SKILL.md
+  - .agents/skills/explainer-book/references/book-json.md
+  - .agents/skills/explainer-book/scripts/verify-book.mjs
+  - .agents/skills/explainer/SKILL.md
+  - .agents/skills/explainer/references/figures.md
+  - .agents/skills/explainer/references/persona.md
+  - .agents/skills/explainer/references/writing.md
+  - .agents/skills/explainer/scripts/build-html.mjs
+  - .agents/skills/explainer/scripts/figure-arrows.mjs
+  - .agents/skills/explainer/scripts/figure-check.mjs
+  - .agents/skills/explainer/scripts/figure-variants.mjs
+  - .agents/skills/explainer/scripts/icons.mjs
+  - .agents/skills/explainer/scripts/tlc-to-mermaid.mjs
+  - .agents/skills/explainer/scripts/verify-doc.mjs
+  - .agents/skills/first-reader
+  - .agents/skills/first-reader/LICENSE
+  - .agents/skills/first-reader/NOTICE
+  - .agents/skills/first-reader/README.md
+  - .agents/skills/first-reader/SKILL.md
+  - .agents/skills/first-reader/references/interview.md
+  - .agents/skills/first-reader/references/personas.md
+  - .agents/skills/first-reader/references/report.md
+  - .agents/skills/first-reader/references/room.md
+  - .agents/skills/first-reader/scripts/ask.py
+  - .agents/skills/first-reader/scripts/feed.py
+  - .agents/skills/first-reader/scripts/recall.py
+  - .agents/skills/first-reader/scripts/room.py
+  - .agents/skills/first-reader/scripts/room_template.html
+  - .agents/skills/first-reader/scripts/signals.py
+  - .agents/skills/first-reader/scripts/skim.py
+  - .config/opencode/skills/d2-diagram
+  - .config/opencode/skills/d2-diagram/SKILL.md
+  - .config/opencode/skills/d2-diagram/assets/d2-facts.mjs
+  - .config/opencode/skills/d2-diagram/assets/vlmkit-workspace.d2
+  - .config/opencode/skills/d2-diagram/assets/vlmkit-workspace.facts.json
+  - .config/opencode/skills/d2-diagram/assets/vlmkit-workspace.svg
+  - .config/opencode/skills/d2-diagram/assets/vlmkit-workspace.txt
+  - .config/opencode/skills/d2-slides
+  - .config/opencode/skills/d2-slides/SKILL.md
+  - .config/opencode/skills/d2-slides/assets/build-deck.mjs
+  - .config/opencode/skills/d2-slides/assets/deck-review.mjs
+  - .config/opencode/skills/explainer
+  - .config/opencode/skills/explainer-book
+  - .config/opencode/skills/explainer-book/SKILL.md
+  - .config/opencode/skills/explainer-book/references/book-json.md
+  - .config/opencode/skills/explainer-book/scripts/verify-book.mjs
+  - .config/opencode/skills/explainer/SKILL.md
+  - .config/opencode/skills/explainer/references/figures.md
+  - .config/opencode/skills/explainer/references/persona.md
+  - .config/opencode/skills/explainer/references/writing.md
+  - .config/opencode/skills/explainer/scripts/build-html.mjs
+  - .config/opencode/skills/explainer/scripts/figure-arrows.mjs
+  - .config/opencode/skills/explainer/scripts/figure-check.mjs
+  - .config/opencode/skills/explainer/scripts/figure-variants.mjs
+  - .config/opencode/skills/explainer/scripts/icons.mjs
+  - .config/opencode/skills/explainer/scripts/tlc-to-mermaid.mjs
+  - .config/opencode/skills/explainer/scripts/verify-doc.mjs
+  - .config/opencode/skills/first-reader
+  - .config/opencode/skills/first-reader/LICENSE
+  - .config/opencode/skills/first-reader/NOTICE
+  - .config/opencode/skills/first-reader/README.md
+  - .config/opencode/skills/first-reader/SKILL.md
+  - .config/opencode/skills/first-reader/references/interview.md
+  - .config/opencode/skills/first-reader/references/personas.md
+  - .config/opencode/skills/first-reader/references/report.md
+  - .config/opencode/skills/first-reader/references/room.md
+  - .config/opencode/skills/first-reader/scripts/ask.py
+  - .config/opencode/skills/first-reader/scripts/feed.py
+  - .config/opencode/skills/first-reader/scripts/recall.py
+  - .config/opencode/skills/first-reader/scripts/room.py
+  - .config/opencode/skills/first-reader/scripts/room_template.html
+  - .config/opencode/skills/first-reader/scripts/signals.py
+  - .config/opencode/skills/first-reader/scripts/skim.py
+  deployed_file_hashes:
+    .agents/skills/d2-diagram/SKILL.md: sha256:05df931fb5898b19cb48010f5b81e351710f2b4bd34ca5ae37d79a878aa5ad51
+    .agents/skills/d2-diagram/assets/d2-facts.mjs: sha256:a25e7de35f825471e1d3ac489b43ad708e1d1c96798799be6ee11885ab2e1c46
+    .agents/skills/d2-diagram/assets/vlmkit-workspace.d2: sha256:804efdc26fb2901c5e6e4a304ea381a1c8e9c10fa115f0618c2b7f90532613a6
+    .agents/skills/d2-diagram/assets/vlmkit-workspace.facts.json: sha256:3f200a53d735a1b15cb72ee4245c1be8f8a45c0e0c969474e148ff1adc4eb70b
+    .agents/skills/d2-diagram/assets/vlmkit-workspace.svg: sha256:c19f20b0e57758212129b4880f3c81d8366d010977023fda1107eac79aae596d
+    .agents/skills/d2-diagram/assets/vlmkit-workspace.txt: sha256:c860b54459f265a1eb275b668cd354ed0cb7a6232a6e6777069bb46652434a7a
+    .agents/skills/d2-slides/SKILL.md: sha256:f18527eca8884179634e387beb566dd2e701f9e8d02fcd57bd981cacd8dad1f7
+    .agents/skills/d2-slides/assets/build-deck.mjs: sha256:13c126da6bb36d0d4a1b833c9b76a72862a99fb6eabff563b884acb0663371d0
+    .agents/skills/d2-slides/assets/deck-review.mjs: sha256:debb19d0fefd3531eadc9cddeb991b3be754c05cec696b3b74ac3acd7ad8852d
+    .agents/skills/explainer-book/SKILL.md: sha256:3e6311339fe3be70e1e86a17642d03f7bf02d594793d105ebc8a2cbe8deee769
+    .agents/skills/explainer-book/references/book-json.md: sha256:2e293744f0ce6ba987f718ad9291d05be4194cfb5099bc83c1e16e752870222d
+    .agents/skills/explainer-book/scripts/verify-book.mjs: sha256:31e3f98750f0266f840486f792a67aa18f6c7b82b617884705aa809708307374
+    .agents/skills/explainer/SKILL.md: sha256:99e089961affbf6f52dcc9ddb78ef4af886c35cb4b1616d350888b72e93778ea
+    .agents/skills/explainer/references/figures.md: sha256:84fd0e8cb8c82d98520241f6dec71147f8f0d0c160df335c0c5cb88e8e885912
+    .agents/skills/explainer/references/persona.md: sha256:701c296db39bf22c0afff3a97a256cf98f8ed5427d9408d241f0222f344d518e
+    .agents/skills/explainer/references/writing.md: sha256:9c38b31474296f0b045c5ee24ab35d81362e8b95ad62a1ccc488bbd7f3a040a6
+    .agents/skills/explainer/scripts/build-html.mjs: sha256:c05ee674936b2af1094ae22eea34b1d05a107122c7e94f691ba8693098265b16
+    .agents/skills/explainer/scripts/figure-arrows.mjs: sha256:7099992138a441cead13642eb2ed256219b68933dfdb0edbcab20158bc3909eb
+    .agents/skills/explainer/scripts/figure-check.mjs: sha256:83e55a25bbac2c16f69667b169825c09cc983e2cf596035d272a122e747a4a35
+    .agents/skills/explainer/scripts/figure-variants.mjs: sha256:330c1c9e2dd50aa1a533054270ddcbc4c53977919c48a0c78009549343c85d30
+    .agents/skills/explainer/scripts/icons.mjs: sha256:b33cd85be42e29c81a370ba3e497c1fc4f67ac2f079cace63899dedd2c57e944
+    .agents/skills/explainer/scripts/tlc-to-mermaid.mjs: sha256:91999c925194e8403cd6c6ff8df5fac28f31b4ef5f8dc5b3c23e30d0c4ebe0d2
+    .agents/skills/explainer/scripts/verify-doc.mjs: sha256:05fc79132c7c4a63714a1ddb42083fe358264f3f49566c2c9de09ddc88f45362
+    .agents/skills/first-reader/LICENSE: sha256:c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4
+    .agents/skills/first-reader/NOTICE: sha256:87ee09615b36efd2e9b1c60a93224441c2c9958f54b7fb6131249d472ba4b6d6
+    .agents/skills/first-reader/README.md: sha256:b21d577ae0c25a04fe1fbface5f19e18f79d8ddcf724198b700e3295b026e193
+    .agents/skills/first-reader/SKILL.md: sha256:51ead158e27a65eff7c1bacc5db8a89d1ed1101b44b3b57fa05440f60582d55d
+    .agents/skills/first-reader/references/interview.md: sha256:1cfe4df25d1f5db6e1ecb869172ed4cc59cdf7c1ce21036a521d6f7336513093
+    .agents/skills/first-reader/references/personas.md: sha256:80ed354630f231235f47b096b6d6feb0b2ae854ff0beb47c6e72ac99d892aa02
+    .agents/skills/first-reader/references/report.md: sha256:eb79fcd5800ee7500257bd01e9da09e38c9fb048a17242feaa81c7c053e66cb8
+    .agents/skills/first-reader/references/room.md: sha256:4ab04a5d7ed4fa0795de189d4e6cc0370d566aedf5aff5f2b6e9741133a907b9
+    .agents/skills/first-reader/scripts/ask.py: sha256:4f474f8e7e41808fba18152b0edc4d84333e6fdda877b622ad9ef6cc8c5c680e
+    .agents/skills/first-reader/scripts/feed.py: sha256:2f1267f7367f4bcf548fa28151ebdc713511a26a43f85dcc5ba7c3addcd669a7
+    .agents/skills/first-reader/scripts/recall.py: sha256:77d54c219d721f9cd56db710af17efed79750fde69a5647908861f212724ea9f
+    .agents/skills/first-reader/scripts/room.py: sha256:100b61bd9e1d8ac0af8e51c7c630e133bc1cd3b2f9acb3b5c5cf1c7c72030657
+    .agents/skills/first-reader/scripts/room_template.html: sha256:8631c113a79ff74c25df88267342a690badc634a3fe6d9e578d48d8d7da0f32e
+    .agents/skills/first-reader/scripts/signals.py: sha256:4e9096ac2e5dac1ff8707689e9b816f6cc52de9872b5ed42d2342cb012f981aa
+    .agents/skills/first-reader/scripts/skim.py: sha256:47ceffc0b6c2a737e206a97b34fba2dff493e328bb8f68c371fd810201335ecb
+    .config/opencode/skills/d2-diagram/SKILL.md: sha256:05df931fb5898b19cb48010f5b81e351710f2b4bd34ca5ae37d79a878aa5ad51
+    .config/opencode/skills/d2-diagram/assets/d2-facts.mjs: sha256:a25e7de35f825471e1d3ac489b43ad708e1d1c96798799be6ee11885ab2e1c46
+    .config/opencode/skills/d2-diagram/assets/vlmkit-workspace.d2: sha256:804efdc26fb2901c5e6e4a304ea381a1c8e9c10fa115f0618c2b7f90532613a6
+    .config/opencode/skills/d2-diagram/assets/vlmkit-workspace.facts.json: sha256:3f200a53d735a1b15cb72ee4245c1be8f8a45c0e0c969474e148ff1adc4eb70b
+    .config/opencode/skills/d2-diagram/assets/vlmkit-workspace.svg: sha256:c19f20b0e57758212129b4880f3c81d8366d010977023fda1107eac79aae596d
+    .config/opencode/skills/d2-diagram/assets/vlmkit-workspace.txt: sha256:c860b54459f265a1eb275b668cd354ed0cb7a6232a6e6777069bb46652434a7a
+    .config/opencode/skills/d2-slides/SKILL.md: sha256:f18527eca8884179634e387beb566dd2e701f9e8d02fcd57bd981cacd8dad1f7
+    .config/opencode/skills/d2-slides/assets/build-deck.mjs: sha256:13c126da6bb36d0d4a1b833c9b76a72862a99fb6eabff563b884acb0663371d0
+    .config/opencode/skills/d2-slides/assets/deck-review.mjs: sha256:debb19d0fefd3531eadc9cddeb991b3be754c05cec696b3b74ac3acd7ad8852d
+    .config/opencode/skills/explainer-book/SKILL.md: sha256:3e6311339fe3be70e1e86a17642d03f7bf02d594793d105ebc8a2cbe8deee769
+    .config/opencode/skills/explainer-book/references/book-json.md: sha256:2e293744f0ce6ba987f718ad9291d05be4194cfb5099bc83c1e16e752870222d
+    .config/opencode/skills/explainer-book/scripts/verify-book.mjs: sha256:31e3f98750f0266f840486f792a67aa18f6c7b82b617884705aa809708307374
+    .config/opencode/skills/explainer/SKILL.md: sha256:99e089961affbf6f52dcc9ddb78ef4af886c35cb4b1616d350888b72e93778ea
+    .config/opencode/skills/explainer/references/figures.md: sha256:84fd0e8cb8c82d98520241f6dec71147f8f0d0c160df335c0c5cb88e8e885912
+    .config/opencode/skills/explainer/references/persona.md: sha256:701c296db39bf22c0afff3a97a256cf98f8ed5427d9408d241f0222f344d518e
+    .config/opencode/skills/explainer/references/writing.md: sha256:9c38b31474296f0b045c5ee24ab35d81362e8b95ad62a1ccc488bbd7f3a040a6
+    .config/opencode/skills/explainer/scripts/build-html.mjs: sha256:c05ee674936b2af1094ae22eea34b1d05a107122c7e94f691ba8693098265b16
+    .config/opencode/skills/explainer/scripts/figure-arrows.mjs: sha256:7099992138a441cead13642eb2ed256219b68933dfdb0edbcab20158bc3909eb
+    .config/opencode/skills/explainer/scripts/figure-check.mjs: sha256:83e55a25bbac2c16f69667b169825c09cc983e2cf596035d272a122e747a4a35
+    .config/opencode/skills/explainer/scripts/figure-variants.mjs: sha256:330c1c9e2dd50aa1a533054270ddcbc4c53977919c48a0c78009549343c85d30
+    .config/opencode/skills/explainer/scripts/icons.mjs: sha256:b33cd85be42e29c81a370ba3e497c1fc4f67ac2f079cace63899dedd2c57e944
+    .config/opencode/skills/explainer/scripts/tlc-to-mermaid.mjs: sha256:91999c925194e8403cd6c6ff8df5fac28f31b4ef5f8dc5b3c23e30d0c4ebe0d2
+    .config/opencode/skills/explainer/scripts/verify-doc.mjs: sha256:05fc79132c7c4a63714a1ddb42083fe358264f3f49566c2c9de09ddc88f45362
+    .config/opencode/skills/first-reader/LICENSE: sha256:c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4
+    .config/opencode/skills/first-reader/NOTICE: sha256:87ee09615b36efd2e9b1c60a93224441c2c9958f54b7fb6131249d472ba4b6d6
+    .config/opencode/skills/first-reader/README.md: sha256:b21d577ae0c25a04fe1fbface5f19e18f79d8ddcf724198b700e3295b026e193
+    .config/opencode/skills/first-reader/SKILL.md: sha256:51ead158e27a65eff7c1bacc5db8a89d1ed1101b44b3b57fa05440f60582d55d
+    .config/opencode/skills/first-reader/references/interview.md: sha256:1cfe4df25d1f5db6e1ecb869172ed4cc59cdf7c1ce21036a521d6f7336513093
+    .config/opencode/skills/first-reader/references/personas.md: sha256:80ed354630f231235f47b096b6d6feb0b2ae854ff0beb47c6e72ac99d892aa02
+    .config/opencode/skills/first-reader/references/report.md: sha256:eb79fcd5800ee7500257bd01e9da09e38c9fb048a17242feaa81c7c053e66cb8
+    .config/opencode/skills/first-reader/references/room.md: sha256:4ab04a5d7ed4fa0795de189d4e6cc0370d566aedf5aff5f2b6e9741133a907b9
+    .config/opencode/skills/first-reader/scripts/ask.py: sha256:4f474f8e7e41808fba18152b0edc4d84333e6fdda877b622ad9ef6cc8c5c680e
+    .config/opencode/skills/first-reader/scripts/feed.py: sha256:2f1267f7367f4bcf548fa28151ebdc713511a26a43f85dcc5ba7c3addcd669a7
+    .config/opencode/skills/first-reader/scripts/recall.py: sha256:77d54c219d721f9cd56db710af17efed79750fde69a5647908861f212724ea9f
+    .config/opencode/skills/first-reader/scripts/room.py: sha256:100b61bd9e1d8ac0af8e51c7c630e133bc1cd3b2f9acb3b5c5cf1c7c72030657
+    .config/opencode/skills/first-reader/scripts/room_template.html: sha256:8631c113a79ff74c25df88267342a690badc634a3fe6d9e578d48d8d7da0f32e
+    .config/opencode/skills/first-reader/scripts/signals.py: sha256:4e9096ac2e5dac1ff8707689e9b816f6cc52de9872b5ed42d2342cb012f981aa
+    .config/opencode/skills/first-reader/scripts/skim.py: sha256:47ceffc0b6c2a737e206a97b34fba2dff493e328bb8f68c371fd810201335ecb
+  content_hash: sha256:c2b7ac906a6fd9b32440a5c547a3aa4a384b9d759cc1eb2ff54692de2b381154
+  declared_license: MIT
+- repo_url: nanaism/yomiyasu
+  name: yomiyasu
+  host: github.com
+  resolved_commit: 602a3690dadd5d620bb21524353b8d192914eabb
+  resolved_ref: v1.1.2
+  version: 1.1.2
+  package_type: skill_bundle
+  deployed_files:
+  - .agents/skills/yomiyasu
+  - .agents/skills/yomiyasu/.claude-plugin/marketplace.json
+  - .agents/skills/yomiyasu/.claude-plugin/plugin.json
+  - .agents/skills/yomiyasu/LICENSE
+  - .agents/skills/yomiyasu/SKILL.md
+  - .agents/skills/yomiyasu/UNICODE-LICENSE.txt
+  - .agents/skills/yomiyasu/assets/algo-artis.png
+  - .agents/skills/yomiyasu/references/domains/business.md
+  - .agents/skills/yomiyasu/references/domains/essay.md
+  - .agents/skills/yomiyasu/references/domains/tech.md
+  - .agents/skills/yomiyasu/references/gemini-syntax.md
+  - .agents/skills/yomiyasu/references/slop-catalog.md
+  - .agents/skills/yomiyasu/scripts/markdown_visibility.py
+  - .agents/skills/yomiyasu/scripts/yomiyasu_diff.py
+  - .agents/skills/yomiyasu/scripts/yomiyasu_lint.py
+  - .config/opencode/skills/yomiyasu
+  - .config/opencode/skills/yomiyasu/.claude-plugin/marketplace.json
+  - .config/opencode/skills/yomiyasu/.claude-plugin/plugin.json
+  - .config/opencode/skills/yomiyasu/LICENSE
+  - .config/opencode/skills/yomiyasu/SKILL.md
+  - .config/opencode/skills/yomiyasu/UNICODE-LICENSE.txt
+  - .config/opencode/skills/yomiyasu/assets/algo-artis.png
+  - .config/opencode/skills/yomiyasu/references/domains/business.md
+  - .config/opencode/skills/yomiyasu/references/domains/essay.md
+  - .config/opencode/skills/yomiyasu/references/domains/tech.md
+  - .config/opencode/skills/yomiyasu/references/gemini-syntax.md
+  - .config/opencode/skills/yomiyasu/references/slop-catalog.md
+  - .config/opencode/skills/yomiyasu/scripts/markdown_visibility.py
+  - .config/opencode/skills/yomiyasu/scripts/yomiyasu_diff.py
+  - .config/opencode/skills/yomiyasu/scripts/yomiyasu_lint.py
+  deployed_file_hashes:
+    .agents/skills/yomiyasu/.claude-plugin/marketplace.json: sha256:1d563e4a0e24d8a419d01f4cd729ec2577f189f9dd61a1d4a8ab22119aef1d35
+    .agents/skills/yomiyasu/.claude-plugin/plugin.json: sha256:8cde4dc0893bc46827776a45610356f8997100bff0cc6e3e8699372f90316129
+    .agents/skills/yomiyasu/LICENSE: sha256:79d802f15bc8caf67f1a83c1bdbe214ccb41a0a0275f9046b329b89c65ee1fca
+    .agents/skills/yomiyasu/SKILL.md: sha256:0a8915986b0228abdf137d00f8e35959336f1914d36dfb73f1e8c053357209cf
+    .agents/skills/yomiyasu/UNICODE-LICENSE.txt: sha256:e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96
+    .agents/skills/yomiyasu/assets/algo-artis.png: sha256:57c7c204d43d0e2873e3b61221db3ac4ba75a7ce29271a6deaeb3bd09f26fdec
+    .agents/skills/yomiyasu/references/domains/business.md: sha256:b9970281b5005bbbc998d5de9b9e6b2bc1bb83976b3862c0556425a142f4352c
+    .agents/skills/yomiyasu/references/domains/essay.md: sha256:8c0dc2afe132299ad111d4e3bc004d75da6291dc4857328717dc63ba5c9c6740
+    .agents/skills/yomiyasu/references/domains/tech.md: sha256:255b1bcbf42a0c7ea7f42c7293cd964e541d70f6f5079ebcbffc332ce6b7b0dd
+    .agents/skills/yomiyasu/references/gemini-syntax.md: sha256:7685424e9f63cd0d45c0fca673eabd10d7879f29e220b7d8517e73fcd2a9b6e7
+    .agents/skills/yomiyasu/references/slop-catalog.md: sha256:e7791d123db2573f50ee922c51f7d50694ab7e6b81f318713e9f405fe3c6daf2
+    .agents/skills/yomiyasu/scripts/markdown_visibility.py: sha256:7e6f739114bc28b132aa8e2bcfb51c7de7f441c12a54431c7248b5353a9966bb
+    .agents/skills/yomiyasu/scripts/yomiyasu_diff.py: sha256:b704e088fd6e1b01c21fb6b97373cc21d441cb14e976f3a47a95c3ba1c73a964
+    .agents/skills/yomiyasu/scripts/yomiyasu_lint.py: sha256:299a61970e8c30092f947e2ace95e80ff8a513fac87824363f89ba77e6cac468
+    .config/opencode/skills/yomiyasu/.claude-plugin/marketplace.json: sha256:1d563e4a0e24d8a419d01f4cd729ec2577f189f9dd61a1d4a8ab22119aef1d35
+    .config/opencode/skills/yomiyasu/.claude-plugin/plugin.json: sha256:8cde4dc0893bc46827776a45610356f8997100bff0cc6e3e8699372f90316129
+    .config/opencode/skills/yomiyasu/LICENSE: sha256:79d802f15bc8caf67f1a83c1bdbe214ccb41a0a0275f9046b329b89c65ee1fca
+    .config/opencode/skills/yomiyasu/SKILL.md: sha256:0a8915986b0228abdf137d00f8e35959336f1914d36dfb73f1e8c053357209cf
+    .config/opencode/skills/yomiyasu/UNICODE-LICENSE.txt: sha256:e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96
+    .config/opencode/skills/yomiyasu/assets/algo-artis.png: sha256:57c7c204d43d0e2873e3b61221db3ac4ba75a7ce29271a6deaeb3bd09f26fdec
+    .config/opencode/skills/yomiyasu/references/domains/business.md: sha256:b9970281b5005bbbc998d5de9b9e6b2bc1bb83976b3862c0556425a142f4352c
+    .config/opencode/skills/yomiyasu/references/domains/essay.md: sha256:8c0dc2afe132299ad111d4e3bc004d75da6291dc4857328717dc63ba5c9c6740
+    .config/opencode/skills/yomiyasu/references/domains/tech.md: sha256:255b1bcbf42a0c7ea7f42c7293cd964e541d70f6f5079ebcbffc332ce6b7b0dd
+    .config/opencode/skills/yomiyasu/references/gemini-syntax.md: sha256:7685424e9f63cd0d45c0fca673eabd10d7879f29e220b7d8517e73fcd2a9b6e7
+    .config/opencode/skills/yomiyasu/references/slop-catalog.md: sha256:e7791d123db2573f50ee922c51f7d50694ab7e6b81f318713e9f405fe3c6daf2
+    .config/opencode/skills/yomiyasu/scripts/markdown_visibility.py: sha256:7e6f739114bc28b132aa8e2bcfb51c7de7f441c12a54431c7248b5353a9966bb
+    .config/opencode/skills/yomiyasu/scripts/yomiyasu_diff.py: sha256:b704e088fd6e1b01c21fb6b97373cc21d441cb14e976f3a47a95c3ba1c73a964
+    .config/opencode/skills/yomiyasu/scripts/yomiyasu_lint.py: sha256:299a61970e8c30092f947e2ace95e80ff8a513fac87824363f89ba77e6cac468
+  content_hash: sha256:bb02d94567557510c0e8d2c8d36f8a5b18b6d1851636132e6d0008d5c259aef0
+  declared_license: MIT
+- repo_url: nushell/nu_scripts
+  name: nu_scripts
+  host: github.com
+  resolved_commit: 3157208885c6f4c39ec016265ddae00160ae860b
+  resolved_ref: main
+  version: unknown
+  package_type: skill_bundle
+  deployed_files:
+  - .agents/skills/nushell
+  - .agents/skills/nushell/SKILL.md
+  - .agents/skills/nushell/references/advanced.md
+  - .agents/skills/nushell/references/bash-equivalents.md
+  - .agents/skills/nushell/references/commands.md
+  - .agents/skills/nushell/references/data-analysis.md
+  - .agents/skills/nushell/references/http-transport.md
+  - .agents/skills/nushell/references/types-and-syntax.md
+  - .config/opencode/skills/nushell
+  - .config/opencode/skills/nushell/SKILL.md
+  - .config/opencode/skills/nushell/references/advanced.md
+  - .config/opencode/skills/nushell/references/bash-equivalents.md
+  - .config/opencode/skills/nushell/references/commands.md
+  - .config/opencode/skills/nushell/references/data-analysis.md
+  - .config/opencode/skills/nushell/references/http-transport.md
+  - .config/opencode/skills/nushell/references/types-and-syntax.md
+  deployed_file_hashes:
+    .agents/skills/nushell/SKILL.md: sha256:ac37c43a550059697159ff6b1d2c4c6ac04fc85a7a11b25827745ec42c4fa517
+    .agents/skills/nushell/references/advanced.md: sha256:9b7feb587cf4e124653a85a11b7829eaf975b8ccaa2de7399fcc489a913aa6ff
+    .agents/skills/nushell/references/bash-equivalents.md: sha256:90af0a6769182eea9c1b24a0c0605b1462749726a1432af5025ec2dbbc33ad95
+    .agents/skills/nushell/references/commands.md: sha256:9acb0fa04dc757d576fc1d8738397bc6e40082c32074a09d7a5c4675ca7de4f1
+    .agents/skills/nushell/references/data-analysis.md: sha256:50e1fd9fc366ceb7cad11d78ef448b095d304a6d8e99f751daa969eab4d1236b
+    .agents/skills/nushell/references/http-transport.md: sha256:080ad01ee92b9e28c76be0f2d358a9deef9d84a2dd4e73ca44eb1af0373a2b1e
+    .agents/skills/nushell/references/types-and-syntax.md: sha256:c24386f664b9c525457ab2265a1510af286b8abbaa05476fcb84cff8584f8f13
+    .config/opencode/skills/nushell/SKILL.md: sha256:ac37c43a550059697159ff6b1d2c4c6ac04fc85a7a11b25827745ec42c4fa517
+    .config/opencode/skills/nushell/references/advanced.md: sha256:9b7feb587cf4e124653a85a11b7829eaf975b8ccaa2de7399fcc489a913aa6ff
+    .config/opencode/skills/nushell/references/bash-equivalents.md: sha256:90af0a6769182eea9c1b24a0c0605b1462749726a1432af5025ec2dbbc33ad95
+    .config/opencode/skills/nushell/references/commands.md: sha256:9acb0fa04dc757d576fc1d8738397bc6e40082c32074a09d7a5c4675ca7de4f1
+    .config/opencode/skills/nushell/references/data-analysis.md: sha256:50e1fd9fc366ceb7cad11d78ef448b095d304a6d8e99f751daa969eab4d1236b
+    .config/opencode/skills/nushell/references/http-transport.md: sha256:080ad01ee92b9e28c76be0f2d358a9deef9d84a2dd4e73ca44eb1af0373a2b1e
+    .config/opencode/skills/nushell/references/types-and-syntax.md: sha256:c24386f664b9c525457ab2265a1510af286b8abbaa05476fcb84cff8584f8f13
+  content_hash: sha256:fe1825bf3dc5dd5111c0dfb78eea681cf008591040a151fa3ae54fa22a5b5571
 - repo_url: vercel-labs/agent-browser
   name: 7806f76343b67d4b
   host: github.com
@@ -71,6 +373,600 @@ deployments:
   active_owner: yusukebe/ax
   content_hash: sha256:4acbbc5574e36a21c27fbc3099cc40638e074e7cada674e00d23698cef34d37c
 - kind: project-relative
+  target: codex
+  value: .agents/skills/d2-diagram
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/d2-diagram/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:05df931fb5898b19cb48010f5b81e351710f2b4bd34ca5ae37d79a878aa5ad51
+- kind: project-relative
+  target: codex
+  value: .agents/skills/d2-diagram/assets/d2-facts.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:a25e7de35f825471e1d3ac489b43ad708e1d1c96798799be6ee11885ab2e1c46
+- kind: project-relative
+  target: codex
+  value: .agents/skills/d2-diagram/assets/vlmkit-workspace.d2
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:804efdc26fb2901c5e6e4a304ea381a1c8e9c10fa115f0618c2b7f90532613a6
+- kind: project-relative
+  target: codex
+  value: .agents/skills/d2-diagram/assets/vlmkit-workspace.facts.json
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:3f200a53d735a1b15cb72ee4245c1be8f8a45c0e0c969474e148ff1adc4eb70b
+- kind: project-relative
+  target: codex
+  value: .agents/skills/d2-diagram/assets/vlmkit-workspace.svg
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:c19f20b0e57758212129b4880f3c81d8366d010977023fda1107eac79aae596d
+- kind: project-relative
+  target: codex
+  value: .agents/skills/d2-diagram/assets/vlmkit-workspace.txt
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:c860b54459f265a1eb275b668cd354ed0cb7a6232a6e6777069bb46652434a7a
+- kind: project-relative
+  target: codex
+  value: .agents/skills/d2-slides
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/d2-slides/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:f18527eca8884179634e387beb566dd2e701f9e8d02fcd57bd981cacd8dad1f7
+- kind: project-relative
+  target: codex
+  value: .agents/skills/d2-slides/assets/build-deck.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:13c126da6bb36d0d4a1b833c9b76a72862a99fb6eabff563b884acb0663371d0
+- kind: project-relative
+  target: codex
+  value: .agents/skills/d2-slides/assets/deck-review.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:debb19d0fefd3531eadc9cddeb991b3be754c05cec696b3b74ac3acd7ad8852d
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer-book
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer-book/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:3e6311339fe3be70e1e86a17642d03f7bf02d594793d105ebc8a2cbe8deee769
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer-book/references/book-json.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:2e293744f0ce6ba987f718ad9291d05be4194cfb5099bc83c1e16e752870222d
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer-book/scripts/verify-book.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:31e3f98750f0266f840486f792a67aa18f6c7b82b617884705aa809708307374
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:99e089961affbf6f52dcc9ddb78ef4af886c35cb4b1616d350888b72e93778ea
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer/references/figures.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:84fd0e8cb8c82d98520241f6dec71147f8f0d0c160df335c0c5cb88e8e885912
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer/references/persona.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:701c296db39bf22c0afff3a97a256cf98f8ed5427d9408d241f0222f344d518e
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer/references/writing.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:9c38b31474296f0b045c5ee24ab35d81362e8b95ad62a1ccc488bbd7f3a040a6
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer/scripts/build-html.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:c05ee674936b2af1094ae22eea34b1d05a107122c7e94f691ba8693098265b16
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer/scripts/figure-arrows.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:7099992138a441cead13642eb2ed256219b68933dfdb0edbcab20158bc3909eb
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer/scripts/figure-check.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:83e55a25bbac2c16f69667b169825c09cc983e2cf596035d272a122e747a4a35
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer/scripts/figure-variants.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:330c1c9e2dd50aa1a533054270ddcbc4c53977919c48a0c78009549343c85d30
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer/scripts/icons.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:b33cd85be42e29c81a370ba3e497c1fc4f67ac2f079cace63899dedd2c57e944
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer/scripts/tlc-to-mermaid.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:91999c925194e8403cd6c6ff8df5fac28f31b4ef5f8dc5b3c23e30d0c4ebe0d2
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explainer/scripts/verify-doc.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:05fc79132c7c4a63714a1ddb42083fe358264f3f49566c2c9de09ddc88f45362
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/LICENSE
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/NOTICE
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:87ee09615b36efd2e9b1c60a93224441c2c9958f54b7fb6131249d472ba4b6d6
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/README.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:b21d577ae0c25a04fe1fbface5f19e18f79d8ddcf724198b700e3295b026e193
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:51ead158e27a65eff7c1bacc5db8a89d1ed1101b44b3b57fa05440f60582d55d
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/references/interview.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:1cfe4df25d1f5db6e1ecb869172ed4cc59cdf7c1ce21036a521d6f7336513093
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/references/personas.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:80ed354630f231235f47b096b6d6feb0b2ae854ff0beb47c6e72ac99d892aa02
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/references/report.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:eb79fcd5800ee7500257bd01e9da09e38c9fb048a17242feaa81c7c053e66cb8
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/references/room.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:4ab04a5d7ed4fa0795de189d4e6cc0370d566aedf5aff5f2b6e9741133a907b9
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/scripts/ask.py
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:4f474f8e7e41808fba18152b0edc4d84333e6fdda877b622ad9ef6cc8c5c680e
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/scripts/feed.py
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:2f1267f7367f4bcf548fa28151ebdc713511a26a43f85dcc5ba7c3addcd669a7
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/scripts/recall.py
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:77d54c219d721f9cd56db710af17efed79750fde69a5647908861f212724ea9f
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/scripts/room.py
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:100b61bd9e1d8ac0af8e51c7c630e133bc1cd3b2f9acb3b5c5cf1c7c72030657
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/scripts/room_template.html
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:8631c113a79ff74c25df88267342a690badc634a3fe6d9e578d48d8d7da0f32e
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/scripts/signals.py
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:4e9096ac2e5dac1ff8707689e9b816f6cc52de9872b5ed42d2342cb012f981aa
+- kind: project-relative
+  target: codex
+  value: .agents/skills/first-reader/scripts/skim.py
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:47ceffc0b6c2a737e206a97b34fba2dff493e328bb8f68c371fd810201335ecb
+- kind: project-relative
+  target: codex
+  value: .agents/skills/nushell
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/nushell/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:ac37c43a550059697159ff6b1d2c4c6ac04fc85a7a11b25827745ec42c4fa517
+- kind: project-relative
+  target: codex
+  value: .agents/skills/nushell/references/advanced.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:9b7feb587cf4e124653a85a11b7829eaf975b8ccaa2de7399fcc489a913aa6ff
+- kind: project-relative
+  target: codex
+  value: .agents/skills/nushell/references/bash-equivalents.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:90af0a6769182eea9c1b24a0c0605b1462749726a1432af5025ec2dbbc33ad95
+- kind: project-relative
+  target: codex
+  value: .agents/skills/nushell/references/commands.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:9acb0fa04dc757d576fc1d8738397bc6e40082c32074a09d7a5c4675ca7de4f1
+- kind: project-relative
+  target: codex
+  value: .agents/skills/nushell/references/data-analysis.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:50e1fd9fc366ceb7cad11d78ef448b095d304a6d8e99f751daa969eab4d1236b
+- kind: project-relative
+  target: codex
+  value: .agents/skills/nushell/references/http-transport.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:080ad01ee92b9e28c76be0f2d358a9deef9d84a2dd4e73ca44eb1af0373a2b1e
+- kind: project-relative
+  target: codex
+  value: .agents/skills/nushell/references/types-and-syntax.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:c24386f664b9c525457ab2265a1510af286b8abbaa05476fcb84cff8584f8f13
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/.claude-plugin/marketplace.json
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:1d563e4a0e24d8a419d01f4cd729ec2577f189f9dd61a1d4a8ab22119aef1d35
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/.claude-plugin/plugin.json
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:8cde4dc0893bc46827776a45610356f8997100bff0cc6e3e8699372f90316129
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/LICENSE
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:79d802f15bc8caf67f1a83c1bdbe214ccb41a0a0275f9046b329b89c65ee1fca
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:0a8915986b0228abdf137d00f8e35959336f1914d36dfb73f1e8c053357209cf
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/UNICODE-LICENSE.txt
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/assets/algo-artis.png
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:57c7c204d43d0e2873e3b61221db3ac4ba75a7ce29271a6deaeb3bd09f26fdec
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/references/domains/business.md
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:b9970281b5005bbbc998d5de9b9e6b2bc1bb83976b3862c0556425a142f4352c
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/references/domains/essay.md
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:8c0dc2afe132299ad111d4e3bc004d75da6291dc4857328717dc63ba5c9c6740
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/references/domains/tech.md
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:255b1bcbf42a0c7ea7f42c7293cd964e541d70f6f5079ebcbffc332ce6b7b0dd
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/references/gemini-syntax.md
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:7685424e9f63cd0d45c0fca673eabd10d7879f29e220b7d8517e73fcd2a9b6e7
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/references/slop-catalog.md
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:e7791d123db2573f50ee922c51f7d50694ab7e6b81f318713e9f405fe3c6daf2
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/scripts/markdown_visibility.py
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:7e6f739114bc28b132aa8e2bcfb51c7de7f441c12a54431c7248b5353a9966bb
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/scripts/yomiyasu_diff.py
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:b704e088fd6e1b01c21fb6b97373cc21d441cb14e976f3a47a95c3ba1c73a964
+- kind: project-relative
+  target: codex
+  value: .agents/skills/yomiyasu/scripts/yomiyasu_lint.py
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:299a61970e8c30092f947e2ace95e80ff8a513fac87824363f89ba77e6cac468
+- kind: project-relative
   target: opencode
   value: .config/opencode/skills/agent-browser
   runtime: null
@@ -106,3 +1002,597 @@ deployments:
   - yusukebe/ax
   active_owner: yusukebe/ax
   content_hash: sha256:4acbbc5574e36a21c27fbc3099cc40638e074e7cada674e00d23698cef34d37c
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/d2-diagram
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: null
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/d2-diagram/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:05df931fb5898b19cb48010f5b81e351710f2b4bd34ca5ae37d79a878aa5ad51
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/d2-diagram/assets/d2-facts.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:a25e7de35f825471e1d3ac489b43ad708e1d1c96798799be6ee11885ab2e1c46
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/d2-diagram/assets/vlmkit-workspace.d2
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:804efdc26fb2901c5e6e4a304ea381a1c8e9c10fa115f0618c2b7f90532613a6
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/d2-diagram/assets/vlmkit-workspace.facts.json
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:3f200a53d735a1b15cb72ee4245c1be8f8a45c0e0c969474e148ff1adc4eb70b
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/d2-diagram/assets/vlmkit-workspace.svg
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:c19f20b0e57758212129b4880f3c81d8366d010977023fda1107eac79aae596d
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/d2-diagram/assets/vlmkit-workspace.txt
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:c860b54459f265a1eb275b668cd354ed0cb7a6232a6e6777069bb46652434a7a
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/d2-slides
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: null
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/d2-slides/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:f18527eca8884179634e387beb566dd2e701f9e8d02fcd57bd981cacd8dad1f7
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/d2-slides/assets/build-deck.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:13c126da6bb36d0d4a1b833c9b76a72862a99fb6eabff563b884acb0663371d0
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/d2-slides/assets/deck-review.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:debb19d0fefd3531eadc9cddeb991b3be754c05cec696b3b74ac3acd7ad8852d
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: null
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer-book
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: null
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer-book/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:3e6311339fe3be70e1e86a17642d03f7bf02d594793d105ebc8a2cbe8deee769
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer-book/references/book-json.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:2e293744f0ce6ba987f718ad9291d05be4194cfb5099bc83c1e16e752870222d
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer-book/scripts/verify-book.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:31e3f98750f0266f840486f792a67aa18f6c7b82b617884705aa809708307374
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:99e089961affbf6f52dcc9ddb78ef4af886c35cb4b1616d350888b72e93778ea
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer/references/figures.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:84fd0e8cb8c82d98520241f6dec71147f8f0d0c160df335c0c5cb88e8e885912
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer/references/persona.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:701c296db39bf22c0afff3a97a256cf98f8ed5427d9408d241f0222f344d518e
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer/references/writing.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:9c38b31474296f0b045c5ee24ab35d81362e8b95ad62a1ccc488bbd7f3a040a6
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer/scripts/build-html.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:c05ee674936b2af1094ae22eea34b1d05a107122c7e94f691ba8693098265b16
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer/scripts/figure-arrows.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:7099992138a441cead13642eb2ed256219b68933dfdb0edbcab20158bc3909eb
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer/scripts/figure-check.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:83e55a25bbac2c16f69667b169825c09cc983e2cf596035d272a122e747a4a35
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer/scripts/figure-variants.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:330c1c9e2dd50aa1a533054270ddcbc4c53977919c48a0c78009549343c85d30
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer/scripts/icons.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:b33cd85be42e29c81a370ba3e497c1fc4f67ac2f079cace63899dedd2c57e944
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer/scripts/tlc-to-mermaid.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:91999c925194e8403cd6c6ff8df5fac28f31b4ef5f8dc5b3c23e30d0c4ebe0d2
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/explainer/scripts/verify-doc.mjs
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:05fc79132c7c4a63714a1ddb42083fe358264f3f49566c2c9de09ddc88f45362
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: null
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/LICENSE
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/NOTICE
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:87ee09615b36efd2e9b1c60a93224441c2c9958f54b7fb6131249d472ba4b6d6
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/README.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:b21d577ae0c25a04fe1fbface5f19e18f79d8ddcf724198b700e3295b026e193
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:51ead158e27a65eff7c1bacc5db8a89d1ed1101b44b3b57fa05440f60582d55d
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/references/interview.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:1cfe4df25d1f5db6e1ecb869172ed4cc59cdf7c1ce21036a521d6f7336513093
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/references/personas.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:80ed354630f231235f47b096b6d6feb0b2ae854ff0beb47c6e72ac99d892aa02
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/references/report.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:eb79fcd5800ee7500257bd01e9da09e38c9fb048a17242feaa81c7c053e66cb8
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/references/room.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:4ab04a5d7ed4fa0795de189d4e6cc0370d566aedf5aff5f2b6e9741133a907b9
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/scripts/ask.py
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:4f474f8e7e41808fba18152b0edc4d84333e6fdda877b622ad9ef6cc8c5c680e
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/scripts/feed.py
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:2f1267f7367f4bcf548fa28151ebdc713511a26a43f85dcc5ba7c3addcd669a7
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/scripts/recall.py
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:77d54c219d721f9cd56db710af17efed79750fde69a5647908861f212724ea9f
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/scripts/room.py
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:100b61bd9e1d8ac0af8e51c7c630e133bc1cd3b2f9acb3b5c5cf1c7c72030657
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/scripts/room_template.html
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:8631c113a79ff74c25df88267342a690badc634a3fe6d9e578d48d8d7da0f32e
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/scripts/signals.py
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:4e9096ac2e5dac1ff8707689e9b816f6cc52de9872b5ed42d2342cb012f981aa
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/first-reader/scripts/skim.py
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/explainer
+  active_owner: mizchi/explainer
+  content_hash: sha256:47ceffc0b6c2a737e206a97b34fba2dff493e328bb8f68c371fd810201335ecb
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/nushell
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: null
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/nushell/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:ac37c43a550059697159ff6b1d2c4c6ac04fc85a7a11b25827745ec42c4fa517
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/nushell/references/advanced.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:9b7feb587cf4e124653a85a11b7829eaf975b8ccaa2de7399fcc489a913aa6ff
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/nushell/references/bash-equivalents.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:90af0a6769182eea9c1b24a0c0605b1462749726a1432af5025ec2dbbc33ad95
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/nushell/references/commands.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:9acb0fa04dc757d576fc1d8738397bc6e40082c32074a09d7a5c4675ca7de4f1
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/nushell/references/data-analysis.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:50e1fd9fc366ceb7cad11d78ef448b095d304a6d8e99f751daa969eab4d1236b
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/nushell/references/http-transport.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:080ad01ee92b9e28c76be0f2d358a9deef9d84a2dd4e73ca44eb1af0373a2b1e
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/nushell/references/types-and-syntax.md
+  runtime: null
+  scope: project
+  owners:
+  - nushell/nu_scripts
+  active_owner: nushell/nu_scripts
+  content_hash: sha256:c24386f664b9c525457ab2265a1510af286b8abbaa05476fcb84cff8584f8f13
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: null
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/.claude-plugin/marketplace.json
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:1d563e4a0e24d8a419d01f4cd729ec2577f189f9dd61a1d4a8ab22119aef1d35
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/.claude-plugin/plugin.json
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:8cde4dc0893bc46827776a45610356f8997100bff0cc6e3e8699372f90316129
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/LICENSE
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:79d802f15bc8caf67f1a83c1bdbe214ccb41a0a0275f9046b329b89c65ee1fca
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:0a8915986b0228abdf137d00f8e35959336f1914d36dfb73f1e8c053357209cf
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/UNICODE-LICENSE.txt
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/assets/algo-artis.png
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:57c7c204d43d0e2873e3b61221db3ac4ba75a7ce29271a6deaeb3bd09f26fdec
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/references/domains/business.md
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:b9970281b5005bbbc998d5de9b9e6b2bc1bb83976b3862c0556425a142f4352c
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/references/domains/essay.md
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:8c0dc2afe132299ad111d4e3bc004d75da6291dc4857328717dc63ba5c9c6740
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/references/domains/tech.md
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:255b1bcbf42a0c7ea7f42c7293cd964e541d70f6f5079ebcbffc332ce6b7b0dd
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/references/gemini-syntax.md
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:7685424e9f63cd0d45c0fca673eabd10d7879f29e220b7d8517e73fcd2a9b6e7
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/references/slop-catalog.md
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:e7791d123db2573f50ee922c51f7d50694ab7e6b81f318713e9f405fe3c6daf2
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/scripts/markdown_visibility.py
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:7e6f739114bc28b132aa8e2bcfb51c7de7f441c12a54431c7248b5353a9966bb
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/scripts/yomiyasu_diff.py
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:b704e088fd6e1b01c21fb6b97373cc21d441cb14e976f3a47a95c3ba1c73a964
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/yomiyasu/scripts/yomiyasu_lint.py
+  runtime: null
+  scope: project
+  owners:
+  - nanaism/yomiyasu
+  active_owner: nanaism/yomiyasu
+  content_hash: sha256:299a61970e8c30092f947e2ace95e80ff8a513fac87824363f89ba77e6cac468

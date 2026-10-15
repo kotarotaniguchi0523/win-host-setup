@@ -10,7 +10,7 @@
 #   pinact     ... verify SHA pinning of uses:, version comments, and the minimum release age
 
 [CmdletBinding()]
-param([switch]$Fix, [switch]$SkipSisakulint)
+param([switch]$Fix)
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot '..\lib\common.ps1')
 
@@ -44,7 +44,6 @@ try {
         else { Write-Host '[ok] jactionlint' }
     }
 
-    if ($SkipSisakulint) { Write-Host '[i] sisakulint skipped (running locally via hk)' } else {
     # --- sisakulint (extra SAST) ---
     if (-not (Get-Command sisakulint -ErrorAction SilentlyContinue)) { throw 'sisakulint が見つかりません（mise install）' }
     Write-Host '=== sisakulint ===' -ForegroundColor Cyan
@@ -61,7 +60,6 @@ try {
         } else {
             Write-Host '[ok] sisakulint'
         }
-    }
     }
 
     # --- pinact (optional. After adopting the Actions lock, tag references are canonical, so it does not run by default) ---

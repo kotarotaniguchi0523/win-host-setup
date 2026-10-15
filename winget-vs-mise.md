@@ -18,7 +18,7 @@
 | 版の固定 | `pin=true` ＋ `mise.lock`（checksum 付き・再現可能） | マニフェストの版（**古い版は削除される**） |
 | 差し替え耐性 | vendor の checksums を取得（vendor CDN と同一経路） | **vendor とは独立した固定ハッシュ** |
 | 追加統制 | なし（backend 次第で provenance） | なし |
-| 追加扫描（サプライチェーン） | **Takumi Guard 経由**（npm/pypi の全取得） | なし |
+| 追加スキャン（サプライチェーン） | **Takumi Guard 経由**（npm/pypi の全取得） | なし |
 
 **結論（原理）**:
 - **mise が `checksum` / `attestations` / `cosign` を持つ場合は mise が上位**（provenance はマニフェスト hash より強い）。
@@ -156,9 +156,9 @@ mise prune --yes                            # pypi:apm-cli を撤去
 | ② mise | **`pypi:git+https://github.com/nvidia/skillspector.git@v2.12.0`** — `Security: [none]` ⚠️ |
 | ③ winget | **なし** |
 
-**判定: mise が唯一の経路。`[none]` のため正確には ② を満たさない → 逸脱として記録**（PyPI 未公開のため git 固定のみ。タグ `v2.12.0` で不変性を担保し、依存は Takumi 経由）。
+**判定: mise が唯一の経路。`[none]` のため正確には ② を満たさない → 逸脱として記録**（PyPI 未公開のため git 固定のみ。タグ `v2.12.0` で不変性を保証し、依存は Takumi 経由）。
 
-### 7.3 Skills（`agent-browser` / `ax`）— APM 経由
+### 7.3 Skills（`agent-browser` / `ax`）: APM 経由
 
 | 対象 | 入手方法 | 検証 |
 |---|---|---|

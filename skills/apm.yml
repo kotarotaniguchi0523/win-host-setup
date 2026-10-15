@@ -2,6 +2,14 @@ name: win-host-setup
 version: 1.0.0
 description: Global Skills / APM packages used on this host (verification-focused, version-pinned)
 
+# Deploy targets, declared explicitly so the resolution does not depend on per-machine
+# auto-detection (see docs: targets matrix):
+#   codex    -> ~/.agents/skills/<name>/
+#   opencode -> ~/.config/opencode/skills/<name>/
+targets:
+  - codex
+  - opencode
+
 dependencies:
   apm:
     # Browser automation / web fetching

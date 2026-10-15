@@ -1,8 +1,8 @@
-# AUDIT — Windows Package Policy 準拠レビュー
+# AUDIT: Windows Package Policy 準拠レビュー
 
 実施: 2026-10-15 / 対象: Windows ホストのグローバル導入 / 根拠: `AGENTS.md`
 
-## 1. Rule 1 — 公式 Microsoft Store 版を優先
+## 1. Rule 1: 公式 Microsoft Store 版を優先
 
 | 対象 | 現状 | 判定 |
 |---|---|---|
@@ -15,7 +15,7 @@
 
 > 「MSIX/EXE/MSI の形式だけで安全性を判断しない」→ 発行元（Publisher）を `winget show` で確認した（下表 Rule 3）。
 
-## 2. Rule 2 — mise/aqua（検証が**実効**か `mise tool` で確認）
+## 2. Rule 2: mise/aqua（検証が**実効**か `mise tool` で確認）
 
 | tool | backend | `Security:` 行（実測） |
 |---|---|---|
@@ -49,7 +49,7 @@
 >
 > ただし署名が保証するのは **「誰が発行したか」と「バイトがその署名どおりか」**であり、**ソフトの安全性や SLSA build provenance の検証ではない**（provenance の有無は記録するが取得・検証はしない）。なお **すべての取得は mise 経由**（`locked=true` で URL は `mise.lock` に限定）。毎回再検証したい場合は `locked_verify_provenance` を有効化する。
 
-## 3. Rule 3 — 通常の WinGet（検証が不十分なもの）
+## 3. Rule 3: 通常の WinGet（検証が不十分なもの）
 
 | tool | id | Publisher（`winget show`） | 検証 |
 |---|---|---|---|
