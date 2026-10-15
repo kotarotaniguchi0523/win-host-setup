@@ -241,7 +241,76 @@ win-host-setup/
 
 ---
 
-## 9. 既知のギャップ
+## 9. ローカル設定の共有（どうやって repo と共有するか）
+
+**方式は「コピー」**（symlink ではない）。理由は Developer Mode が OFF で symlink 作成に管理者権限が要るため、
+また mise が設定を書き換える（`mise use`）ため、**実体を 1 箇所に固定すると書き込み競合が起きる**ため。
+
+### パス対応（どこが正か）
+
+```
+  実環境 (host)                              リポジトリ (source)              正 (source of truth)
+  ------------------------------------       ----------------------------     --------------------
+  ~/.config/mise/config.toml          <-->   mise/mise.toml                  ホスト (capture で写す)
+  ~/.config/mise/mise.lock            <-->   mise/mise.lock                  ホスト (lock は生成物)
+  ~/.config/mise/locks/               <-->   mise/locks/                     pypi の依存グラフ (生成物)
+  ~/.apm/apm.yml                      <-->   skills/apm.yml                 リポジトリ (宣言を書く)
+  ~/.apm/apm.lock.yaml                <-->   skills/apm.lock.yaml            生成物 (apm lock -g)
+  ~/.agents/skills/<name>/            <-->   skills/local/<name>/           ホスト (自作 Skill は実環境が正)
+  (存在しない)                               winget/host.dsc.yaml           リポジトリ (winget configure で適用)
+  (環境変数)                                 env/variables.md                生成物 (秘密は自動で伏せる)
+
+  補足: リポジトリ側は config.toml ではなく **mise/mise.toml** という名前で置く。
+        リポジトリ直下に config.toml を置くと mise が「プロジェクト設定」として読み、
+        paranoid が無視されて未信頼エラーになるため。
+```
+
+### コマンド（向きごと）
+
+```
+  ホスト -> リポジトリ                リポジトリ -> ホスト
+  +---------------------------+       +---------------------------+
+  | tools/capture.ps1         |       | tools/apply.ps1           |
+  |   mise/ を更新            |       |   ~/.config/mise/ へ配置   |
+  | tools/skills-capture.ps1  |       |   mise install を実行      |
+  |   skills/ を更新          |       | tools/skills-apply.ps1    |
+  +---------------------------+       |   ~/.apm へ配置 + 自作Skill|
+                                      |   apm lock/install (-Lock) |
+                                      +---------------------------+
+  一括 (推奨):
+      pwsh -File tools/sync.ps1                 # capture -> depii -> sanitize -> commit -> push
+      pwsh -File tools/sync.ps1 -Check          # 変更を書き換えず差分だけ確認
+      pwsh -File tools/sync.ps1 -NoPush         # push しない
+
+  新しいホストへ復元:
+      git clone <public>  ->  pwsh -File tools/apply.ps1
+                          ->  winget configure winget/host.dsc.yaml
+                          ->  pwsh -File tools/skills-apply.ps1 -Lock
+                          ->  hk install
+```
+
+### 共有しないもの（ローカル専用）
+
+```
+  .agent/                  .gitignore 済み
+    +-- docs/              分析系ドキュメント (inventory.md / repos.md / migration-*)
+    +-- pii-rules.local.ps1   PII の実値 (Git アカウント名 / 案件名 / メール)
+    +-- (環境変数の秘密は保存しない: CONTEXT7_API_KEY / GH_TOKEN 等は env/variables.md で伏せる)
+```
+
+### 共有時のルール
+
+1. **実パスを書かない**。`%USERPROFILE%` / `%USERNAME%` / `%GITHUB_USER%` などのプレースホルダを使う
+   （`tools/depii.ps1 -Check` が検出。コード内の検出は「要手直し」として失敗にする）。
+2. **秘密をコミットしない**。`env/variables.md` は秘密を自動で伏せ、CI の betterleaks / secretlint と
+   GitHub の secret scanning / push protection が二重に守る。
+3. **`mise/mise.lock` と `skills/apm.lock.yaml` は生成物**。手で編集せず `mise lock` / `apm lock -g` で更新する。
+4. **向きを間違えない**。自作 Skill はホストが正なので、リポジトリ側を直接編集した場合は
+   先に `tools/skills-apply.ps1` でホストへ反映してから `sync` する（逆順だと編集が失われる）。
+
+---
+
+## 10. 既知のギャップ
 
 - **同期は一方通行** (source -> public)。GitHub で merge された更新を実環境へ戻す経路がない (案: `tools/pull.ps1`)。
 - CI の `lint` は runner 側で赤 (ローカルは緑)。原因は runner での `mise install` (Go ビルドの sisakulint / npm の secretlint)。
