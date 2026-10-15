@@ -14,6 +14,10 @@ on:
 permissions:
   contents: read
   security-events: write # SARIF を Code Scanning へ上げるため
+concurrency:
+  group: skills-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     name: APM（lock ドリフト / 監査）

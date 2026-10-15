@@ -10,6 +10,10 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: healthcheck-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   mise:
     name: mise（ドリフト / 更新候補）
