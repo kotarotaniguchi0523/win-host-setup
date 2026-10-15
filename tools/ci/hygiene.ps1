@@ -17,7 +17,7 @@ if (-not (Test-Path $Root)) { throw "対象ディレクトリがありません:
 $pattern = '(?i)(C:\\+Users\\+(?!%|\.\.\.)[A-Za-z0-9._-]+|/home/(?!%|\.\.\.)[A-Za-z0-9._-]+|/Users/(?!%|\.\.\.)[A-Za-z0-9._-]+)'
 $emailPattern = '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'
 
-$skipDirs = @('.git', '.agent', 'node_modules', 'public')
+$skipDirs = @('.git', '.agent', 'node_modules', 'public', '.venv', '__pycache__', '.mypy_cache', '.ruff_cache', '.pytest_cache')
 
 $files = Get-ChildItem -Path $Root -Recurse -File -ErrorAction SilentlyContinue |
     Where-Object { $p = $_.FullName; -not ($skipDirs | Where-Object { $p -match "[\\/]$([regex]::Escape($_))[\\/]" }) }

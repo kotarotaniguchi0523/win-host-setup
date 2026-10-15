@@ -83,6 +83,7 @@ win-host-setup/
 |   +-- lint/actions.ps1      jactionlint + sisakulint (+ pinact 任意)
 |   +-- lint/secrets.ps1      betterleaks (secretlint は任意)
 |   +-- lint/all.ps1          上記 + PII + waza
+|   +-- pathctl/              [Python 3.15] グローバル PATH の点検・修復 CLI (uv + ty)
 |   +-- ci/mise-verify.ps1    ロック整合性の検証 (relock でも使用)
 |   +-- ci/skills-verify.ps1  APM lock ドリフト + 監査 (SARIF)
 |   +-- ci/hygiene.ps1        個人パス混入の検査
@@ -220,6 +221,7 @@ win-host-setup/
   4. 秘密      betterleaks + GitHub secret scanning / push protection（secretlint は任意）
   5. CI        validate / lint / skills (SARIF を Code Scanning へ)
   6. フック    hk pre-commit / pre-push
+  7. PATH      pathctl (path check / fix / tools: mise 無しで使えるツールも一覧)
 ```
 
 ---

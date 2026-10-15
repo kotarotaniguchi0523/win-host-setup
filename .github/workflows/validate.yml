@@ -46,3 +46,21 @@ jobs:
         run: |
           python3 -m pip install --quiet --disable-pip-version-check pyyaml
           python3 tools/ci/lint-config.py
+
+  python:
+    name: Python（pathctl の型チェック）
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v5.1.2
+        with:
+          cache: true
+      - name: 依存を同期（dev は ty のみ）
+        run: uv sync --project tools/pathctl --frozen
+      - name: 型チェック
+        run: uv run --project tools/pathctl ty check
+      - name: JSON 契約の確認
+        run: uv run --project tools/pathctl pathctl schema --json > /dev/null

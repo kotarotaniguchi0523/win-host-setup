@@ -1,0 +1,6 @@
+# uv / Python artifacts (never published)
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.python-version

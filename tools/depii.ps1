@@ -48,6 +48,8 @@ if ($Files.Count -gt 0) {
 foreach ($path in ($targets | Sort-Object)) {
     if ($path -like '*\.agent\*') { continue }
     if ($path -like '*\public\*')  { continue }
+    # Build artifacts (Python / Node) are neither published nor scanned
+    if ($path -match '\\(\.venv|__pycache__|node_modules|\.git|\.mypy_cache|\.ruff_cache|\.pytest_cache)\\') { continue }
     # Exclude the rule definitions themselves (their key strings would self-detect)
     $leaf = Split-Path $path -Leaf
     if ($leaf -in @('pii-rules.ps1', 'depii.ps1')) { continue }

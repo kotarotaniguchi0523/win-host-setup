@@ -266,6 +266,22 @@
       "message": "action \"actions/checkout@v7.0.1\" must be pinned to a full-length commit SHA like \"{owner}/{repo}@{sha}\" because the \"unpinned-uses\" rule is enabled"
     },
     {
+      "file": ".github/workflows/validate.yml",
+      "rule": "unpinned-uses",
+      "fingerprint": "173183ceb2e37e0e",
+      "context": "a7929842acce60ff",
+      "occurrence": 0,
+      "message": "action \"actions/checkout@v7.0.1\" must be pinned to a full-length commit SHA like \"{owner}/{repo}@{sha}\" because the \"unpinned-uses\" rule is enabled"
+    },
+    {
+      "file": ".github/workflows/validate.yml",
+      "rule": "unpinned-uses",
+      "fingerprint": "6ae71cb529fca962",
+      "context": "9727b3a7c418b1fb",
+      "occurrence": 0,
+      "message": "action \"jdx/mise-action@v5.1.2\" must be pinned to a full-length commit SHA like \"{owner}/{repo}@{sha}\" because the \"unpinned-uses\" rule is enabled"
+    },
+    {
       "file": ".github/workflows/winget-outdated.yml",
       "rule": "excessive-permissions",
       "fingerprint": "90b223db1cdd1688",

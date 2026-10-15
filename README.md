@@ -128,6 +128,27 @@ pwsh -File tools/sync.ps1 -Message "..."   # コミットメッセージ指定
 ありません。Renovate App（Mend hosted）は PAT を使わないため、以前使っていた `RENOVATE_TOKEN` は削除しました。
 Dependabot 側はセキュリティアラートだけを有効にしているので、そちらにも認証情報は要りません。
 
+## グローバル PATH の管理（`tools/pathctl`）
+
+Windows のグローバル PATH を点検・修復し、**どのツールがどの入手元で使えるか**（mise / winget / npm / 直置き）を一覧する CLI です。Python 3.15 の**標準ライブラリのみ**で動き、実行時の依存はありません。
+
+```powershell
+uv run --project tools/pathctl pathctl doctor --json            # 点検（JSON）
+uv run --project tools/pathctl pathctl tools --without-mise     # mise 無しでも使えるツール
+uv run --project tools/pathctl pathctl path check               # PATH の問題点
+```
+
+| コマンド | 内容 |
+|---|---|
+| `pathctl doctor [--strict]` | PATH とツールをまとめて点検（終了コード 1 は要対応の意味） |
+| `pathctl tools [--without-mise]` | ツールの入手元一覧（`without_mise` = mise が無くても起動できる） |
+| `pathctl path list / check / fix / add / remove` | PATH の一覧・検査・修復（`fix` は既定で下見のみ、`--apply` で適用） |
+| `pathctl schema --json` | エージェント向けの入出力契約 |
+
+- 詳細は **`tools/pathctl/README.md`**。JSON は `schema: "pathctl/1"` の固定形で、エージェントはまず `pathctl schema --json` を読む想定です。
+- 型チェックは **ty**（`uv run --project tools/pathctl ty check`）、環境は **uv** のみ（dev 依存も ty だけ）。
+- マシン PATH の書き換えには管理者権限が要ります。初回の大掃除は **`tools/fix-machine-path.ps1`（管理者）**、日常の点検と微修正は **`pathctl`** という使い分けです。
+
 ## 再現手順
 
 ```powershell

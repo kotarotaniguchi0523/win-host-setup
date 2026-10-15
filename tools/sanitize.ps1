@@ -45,6 +45,8 @@ $report = @()
 
 foreach ($srcPath in ($targets | Sort-Object)) {
     $rel = $srcPath.Substring($repo.Length + 1)
+    # Build artifacts (Python / Node) are not published
+    if ($rel -match '(^|\\)(\.venv|__pycache__|node_modules|\.git|\.mypy_cache|\.ruff_cache|\.pytest_cache)(\\|$)') { continue }
 
     $text = [string](Get-Content $srcPath -Raw -Encoding UTF8)
     if ($null -eq $text) { $text = '' }
