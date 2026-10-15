@@ -7,6 +7,8 @@ dependencies:
     # ブラウザ操作 / Web 取得
     - vercel-labs/agent-browser#v0.39.1
     - yusukebe/ax#v0.1.25
+    # 日本語推敲（AI 生成の日本語を自然な日本語へ）
+    - nanaism/yomiyasu#v1.1.2
     # 公式 Nushell スキル（nushell org / nu_scripts）
     - nushell/nu_scripts#main
     # 説明・図解スキル（mizchi 作。タグが無いため main 固定 + lock で commit 固定）
