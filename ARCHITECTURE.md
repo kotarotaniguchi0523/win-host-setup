@@ -312,7 +312,12 @@ win-host-setup/
 
 ## 10. 既知のギャップ
 
-- **同期は一方通行** (source -> public)。GitHub で merge された更新を実環境へ戻す経路がない (案: `tools/pull.ps1`)。
-- CI の `lint` は runner 側で赤 (ローカルは緑)。原因は runner での `mise install` (Go ビルドの sisakulint / npm の secretlint)。
+- **同期は双方向**（実装済み）: 実環境→repo は `tools/capture.ps1` / `tools/skills-capture.ps1`、repo→実環境 は
+  `tools/apply.ps1` / `tools/skills-apply.ps1`、**GitHub(public)→source→実環境** は `tools/pull.ps1`（`-Apply` で適用まで）。
+  `tools/sync.ps1` は **pull → capture → depii → sanitize → commit → push** の順に実行する。
+  （`capture` は `-Force` でホストが正として上書きする。衝突を避けたい場合は `tools/sync.ps1 -Check` で先に差分を見る）
+- **APM Skills の更新経路**: Renovate（`apm` マネージャ / グループ "Skills (APM)"）が PR を作り、
+  `skills-relock.yml` が `apm.lock.yaml` を再生成して追随、`skills.yml` がドリフトと監査を検証する。
+- CI の `lint` は runner 側で赤（ローカルは緑）。原因は runner での `mise install`（Go ビルドの sisakulint / npm の secretlint）。
 - jactionlint の指摘 45 件は **baseline 記録** (CI 緑は「新規なし」の意味)。`missing-timeout` 等は返済対象。
 - 分析系ドキュメント (inventory/repos/migration) は公開しない (`.agent/docs/`)。

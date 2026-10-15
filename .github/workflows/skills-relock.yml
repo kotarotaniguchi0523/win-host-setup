@@ -1,0 +1,51 @@
+# skills-relock.yml — Renovate が skills/apm.yml を更新したら apm.lock.yaml を再生成して同じ PR に積む
+# （mise 側の relock.yml と対になる。これが無いと宣言とロックがズレたまま PR が通ってしまう）
+name: skills-relock
+
+on:
+  pull_request:
+    paths:
+      - 'skills/apm.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: skills-relock-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  relock:
+    runs-on: windows-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: false # push は gh auth setup-git 経由
+
+      - name: APM を導入
+        shell: pwsh
+        run: ./tools/ci/install-apm.ps1
+
+      - name: apm.lock.yaml を再生成してリポジトリへ書き戻す
+        shell: pwsh
+        run: |
+          ./tools/ci/skills-verify.ps1 -SkipAudit -Relock
+
+      - name: ロックをコミット
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh auth setup-git
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add skills
+          if git diff --cached --quiet; then
+            echo "ロックに変更なし"
+          else
+            git commit -m "chore(skills): apm.lock.yaml を再生成"
+            git push
+          fi

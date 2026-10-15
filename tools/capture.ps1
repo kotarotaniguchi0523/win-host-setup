@@ -6,7 +6,7 @@
 #  - ユーザー環境変数 → env/variables.md（**秘密は伏せる**）
 
 [CmdletBinding()]
-param()
+param([switch]$Force)
 $ErrorActionPreference = 'Stop'
 $repo    = Split-Path $PSScriptRoot -Parent
 $miseSrc = Join-Path $env:USERPROFILE '.config\mise'

@@ -9,7 +9,7 @@
 #   先に tools/skills-apply.ps1 を実行してホストへ反映してから本スクリプトを実行すること。
 
 [CmdletBinding()]
-param([switch]$Check)
+param([switch]$Check, [switch]$Force)
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'lib\common.ps1')
 

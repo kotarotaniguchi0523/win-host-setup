@@ -6,7 +6,7 @@
 # ドリフト判定は「ピン（repo_url / resolved_ref / resolved_commit）」で行う（整形差に強い）。
 
 [CmdletBinding()]
-param([string]$SarifPath, [switch]$StrictAudit)
+param([string]$SarifPath, [switch]$StrictAudit, [switch]$SkipAudit, [switch]$Relock)
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot '..\lib\common.ps1')
 
@@ -57,7 +57,14 @@ if (Test-Path $repoLck) {
     Write-Host '[i] apm.lock.yaml が無いためドリフト検出をスキップ'
 }
 
-if ($SkipAudit) { return }
+if ($SkipAudit) {
+    if ($Relock) {
+        Copy-Item (Join-Path $apmHome 'apm.yml') $repoYml -Force
+        if (Test-Path (Join-Path $apmHome 'apm.lock.yaml')) { Copy-Item (Join-Path $apmHome 'apm.lock.yaml') $repoLck -Force }
+        Write-Host '[ok] apm.yml / apm.lock.yaml をリポジトリへ書き戻しました'
+    }
+    return
+}
 
 # --- セキュリティ監査（hidden Unicode / drift / policy）---
 # --ci は json / sarif のみ対応。SARIF を出力しつつ、要点をサマリに出す。
