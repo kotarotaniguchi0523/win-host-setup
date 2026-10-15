@@ -1,7 +1,7 @@
 # scan-repos.ps1 — ユーザー配下の Git リポジトリを列挙
 $ErrorActionPreference = 'SilentlyContinue'
 $root = $env:USERPROFILE
-$DST = "C:\Users\%USERNAME%\win-host-setup"
+$DST = Split-Path $PSScriptRoot -Parent
 $OUT = Join-Path $DST 'repos.md'
 
 $skip = @('AppData','node_modules','.git','.cargo','.rustup','.cache','.local','.npm','.pnpm-store',

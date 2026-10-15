@@ -1,6 +1,6 @@
 # build-inventory.ps1 — inventory.md を生データから生成（会話に内容を出さない）
 $ErrorActionPreference = 'Stop'
-$dst = "C:\Users\%USERNAME%\win-host-setup"
+$dst = Split-Path $PSScriptRoot -Parent
 
 # ---- fresh raw capture (UTF-8) ----
 try { [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false) } catch {}

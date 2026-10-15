@@ -133,8 +133,18 @@ mise doctor
 ## サニタイズ（公開用コピーの生成）
 
 ```powershell
-pwsh -File tools/sanitize.ps1     # → public/ に個人情報を伏せたコピーを生成
+pwsh -File tools/depii.ps1 -Check   # ソース側の PII 検出（0 が目標）
+pwsh -File tools/depii.ps1          # ソース側を in-place で浄化
+pwsh -File tools/sanitize.ps1       # → public/ に個人情報を伏せたコピーを生成（最後の防波堤）
 ```
 
-置換内容: `C:\Users\<user>` → `%USERPROFILE%`、ユーザー名・GitHub アカウント名・ホスト名 → プレースホルダ。
-社内レジストリ（`flatt.tech`）は公開可（ユーザー判断）。
+置換内容: `C:\Users\<user>` → `%USERPROFILE%`、ユーザー名・GitHub アカウント名・メール・ホスト名 → プレースホルダ。
+ルールは **`tools/pii-rules.ps1`** に一元化。社内レジストリ（`flatt.tech`）は公開可（ユーザー判断）。
+
+### データの置き場所
+
+| 置き場所 | 内容 | 公開 |
+|---|---|---|
+| リポジトリ直下 | ドキュメント・設定・CI（**PII はプレースホルダで書く**） | ✅ public へ |
+| **`.agent/`** | 生データ・退避データ・個人メモ（**.gitignore 済み**） | ❌ ローカルのみ |
+| `public/` | `sanitize.ps1` の生成物（独立リポジトリ） | ✅ push 対象 |

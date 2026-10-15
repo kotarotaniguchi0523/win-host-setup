@@ -11,7 +11,15 @@ $src  = Join-Path $repo 'skills'
 $dst  = Join-Path $env:USERPROFILE '.apm'
 
 if (-not (Test-Path (Join-Path $src 'apm.yml'))) { throw "skills/apm.yml がありません" }
-if (-not (Get-Command apm -ErrorAction SilentlyContinue)) { throw "apm CLI が見つかりません（winget: Microsoft.APM）" }
+
+# apm CLI を解決（PATH に無ければ winget のパッケージ先を探す）
+$apm = (Get-Command apm -ErrorAction SilentlyContinue).Source
+if (-not $apm) {
+    $apm = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Microsoft.APM_*" -Recurse -Filter apm.exe -ErrorAction SilentlyContinue |
+           Select-Object -First 1 -ExpandProperty FullName
+}
+if (-not $apm) { throw "apm CLI が見つかりません（winget: Microsoft.APM）" }
+Write-Host "[i] apm: $apm"
 
 New-Item -ItemType Directory -Force -Path $dst | Out-Null
 
@@ -27,7 +35,7 @@ Write-Host "[ok] ~/.apm/apm.yml"
 
 if ($Lock) {
     Push-Location $dst
-    try { & apm lock --global } finally { Pop-Location }
+    try { & $apm lock --global } finally { Pop-Location }
     $lock = Join-Path $dst 'apm.lock.yaml'
     if (Test-Path $lock) { Copy-Item $lock (Join-Path $src 'apm.lock.yaml') -Force; Write-Host "[ok] skills/apm.lock.yaml を更新" }
 }

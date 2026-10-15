@@ -40,3 +40,29 @@ Windows ホスト OS へのソフトウェア導入・更新では、**サプラ
 - **winget**: 宣言は WinGet Configuration（DSC）。Store 版があるものは `--source msstore` を明示。
 - **Chocolatey / Scoop は使わない**。
 - 監査結果は `PLAN.md` の「監査」節と `inventory.md` に記録する。
+
+---
+
+## このリポジトリのデータ方針（PII・ローカル専用）
+
+- **リポジトリには個人情報を書かない。** プレースホルダを使う。
+
+  | 対象 | 表記 |
+  |---|---|
+  | ホームディレクトリ | `%USERPROFILE%` |
+  | ユーザー名 | `%USERNAME%` |
+  | ホスト名 | `%COMPUTERNAME%` |
+  | Git アカウント | `%GITHUB_USER%` / `%GITHUB_USER_2%` |
+  | メール | `%EMAIL%` |
+  | 案件・個人プロジェクト名 | `%PROJECT_NAME%` |
+
+  - 置換ルールは **`tools/pii-rules.ps1`** に一元化する。
+  - **`tools/depii.ps1`** が公開対象ファイルを in-place で浄化し、**`tools/sanitize.ps1`** が `public/` 生成時に最終防波堤として適用する。
+  - コミット前に `pwsh -File tools/depii.ps1 -Check` を実行し、検出 **0** を確認する。
+
+- **公開しないデータは `.agent/` に置く（`.gitignore` 済み・コミットされない）。**
+  - ホスト固有の生データ（`inventory-*.txt` / `winget-search-raw.txt` / `path-backup-*.txt` / `mise-security.json`）
+  - 削除前の退避データ（`backup-removals-*` / `backup-pyenv-*`）
+  - 個人的なメモ・一時ファイル
+
+- **秘密はどこにも保存しない。** トークンは環境変数、CI では GitHub Secrets（`RENOVATE_TOKEN`）に置く。`env/variables.md` は秘密を自動で伏せる。

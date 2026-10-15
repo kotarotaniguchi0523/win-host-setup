@@ -21,6 +21,7 @@ function Invoke-Step([string]$name, [scriptblock]$body) {
 
 Invoke-Step 'capture（mise）'        { & (Join-Path $PSScriptRoot 'capture.ps1') }
 Invoke-Step 'skills-capture（Skills）' { & (Join-Path $PSScriptRoot 'skills-capture.ps1') }
+Invoke-Step 'depii（ソースの PII 除去）' { & (Join-Path $PSScriptRoot 'depii.ps1') }
 Invoke-Step 'sanitize（公開版）'      { & (Join-Path $PSScriptRoot 'sanitize.ps1') }
 
 Invoke-Step 'source リポジトリをコミット' {
