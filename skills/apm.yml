@@ -1,22 +1,19 @@
-# APM（Agent Package Manager）のグローバル・マニフェスト
-# 実体の配置先: ~/.apm/apm.yml   （tools/skills-apply.ps1 が配置）
-# 使い方: ここに owner/repo#ref を足すと Renovate（apm マネージャ）が自動で更新します。
 name: win-host-setup
 version: 1.0.0
 description: このホストで使うグローバル Skills / APM パッケージ（検証重視・バージョン固定）
 
 dependencies:
   apm:
-    # リモート Skill（リポジトリ内の skills/*/SKILL.md を取得）
+    # ブラウザ操作 / Web 取得
     - vercel-labs/agent-browser#v0.39.1
     - yusukebe/ax#v0.1.25
+    # 公式 Nushell スキル（nushell org / nu_scripts）
+    - nushell/nu_scripts#main
+    # 説明・図解スキル（mizchi 作。タグが無いため main 固定 + lock で commit 固定）
+    - mizchi/explainer#main
+    # 公式 Waza スキル（Skill 評価 CLI の操作 / 対話）
+    - microsoft/waza/skills/waza#v0.38.10
+    - microsoft/waza/skills/waza-interactive#v0.38.10
 
 devDependencies:
   apm: []
-
-# --- 追加方法 ---
-#   1. ここに `owner/repo#<tag>` を追記
-#   2. pwsh -File tools/skills-apply.ps1 -Lock   （~/.apm へ配置 + apm.lock.yaml 再生成）
-#   3. pwsh -File tools/skills-apply.ps1         （グローバルへ適用）
-#   ※ `#<ref>` を必ず付けると Renovate が更新対象にします。
-#     SHA 固定 + 末尾コメント（# v1.0.0）にすると pinDigests が両方を追随させます。
