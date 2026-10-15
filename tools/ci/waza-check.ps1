@@ -11,6 +11,17 @@ $ErrorActionPreference = 'Stop'
 $repo = Get-RepoRoot
 $target = Join-Path $repo $Path
 
+# waza が無ければ、リポジトリの mise 設定をグローバルへ置いてから導入する
+if (-not (Get-Command waza -ErrorAction SilentlyContinue)) {
+    if (-not (Get-Command mise -ErrorAction SilentlyContinue)) { throw "waza も mise も見つかりません" }
+    Write-Host '[i] waza を mise で導入します'
+    $miseDst = Join-Path (Get-HomeDir) '.config/mise'
+    New-Item -ItemType Directory -Force -Path $miseDst | Out-Null
+    Copy-Item (Join-Path $repo 'mise/mise.toml') (Join-Path $miseDst 'config.toml') -Force
+    if (Test-Path (Join-Path $repo 'mise/mise.lock')) { Copy-Item (Join-Path $repo 'mise/mise.lock') (Join-Path $miseDst 'mise.lock') -Force }
+    Invoke-Native 'mise' @('install', 'waza') -What 'mise install waza'
+}
+
 if (-not (Get-Command waza -ErrorAction SilentlyContinue)) { throw "waza が見つかりません（mise で導入してください）" }
 if (-not (Test-Path $target)) { Write-Host "[i] $Path が無いためスキップ"; return }
 
