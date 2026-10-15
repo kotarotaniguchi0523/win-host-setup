@@ -47,13 +47,27 @@ jobs:
         shell: pwsh
         run: |
           if (-not (Test-Path skills\apm.lock.yaml)) { Write-Host "[i] apm.lock.yaml 未作成のためスキップ"; exit 0 }
-          $new = (Get-Content "$env:USERPROFILE\.apm\apm.lock.yaml" -Raw).Trim()
-          $old = (Get-Content skills\apm.lock.yaml -Raw).Trim()
-          if ($new -ne $old) {
-            Write-Host "::error::apm.lock.yaml が最新ではありません。tools/skills-apply.ps1 -Lock（または tools/sync.ps1）を実行してください。"
+
+          function Get-Pins([string]$path) {
+            $repo=$null; $ref=$null; $sha=$null; $out=@()
+            foreach ($l in (Get-Content $path -Encoding UTF8)) {
+              if     ($l -match '^\s*-\s*repo_url:\s*(\S+)')        { if ($repo) { $out += "$repo|$ref|$sha" }; $repo=$Matches[1]; $ref=$null; $sha=$null }
+              elseif ($l -match '^\s*resolved_ref:\s*(\S+)')        { $ref=$Matches[1] }
+              elseif ($l -match '^\s*resolved_commit:\s*(\S+)')     { $sha=$Matches[1] }
+            }
+            if ($repo) { $out += "$repo|$ref|$sha" }
+            $out | Sort-Object
+          }
+
+          $repoPins = Get-Pins skills\apm.lock.yaml
+          $ciPins   = Get-Pins "$env:USERPROFILE\.apm\apm.lock.yaml"
+          Write-Host "--- リポジトリ ---"; $repoPins
+          Write-Host "--- CI 生成 ---";   $ciPins
+          if (Compare-Object $repoPins $ciPins) {
+            Write-Host "::error::apm.lock.yaml のピン（repo_url / ref / commit）が一致しません。tools/skills-apply.ps1 -Lock または tools/sync.ps1 を実行してください。"
             exit 1
           }
-          Write-Host "OK: apm.lock.yaml は最新"
+          Write-Host "OK: apm.lock.yaml のピンは一致"
 
       - name: セキュリティ監査（hidden Unicode / drift / policy）
         shell: pwsh
