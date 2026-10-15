@@ -93,6 +93,10 @@ pwsh -File tools/skills-apply.ps1 -Lock
 
 - スキルの追加は `skills/apm.yml` の `dependencies.apm` に **`owner/repo#ref`** を書くだけ。**Renovate が自動で更新**します。
 - **自作 Skill** は `skills/local/<name>/SKILL.md` に置きます（APM 管理外として扱われ、Renovate の対象になりません）。
+  - **更新の向き**: 自作 Skill は **ホスト（`~/.agents/skills/`）が正**。ホストで編集 → `tools/sync.ps1`（capture）でリポジトリへ。
+    リポジトリ側を直接編集した場合は、**先に `tools/skills-apply.ps1` を実行してホストへ反映**してから `sync.ps1` を実行してください
+    （順序を誤ると capture がホスト側の古い内容でリポジトリを上書きします）。
+  - リモート Skill（`skills/apm.yml` の `owner/repo#ref`）は **Renovate が正**。
 - `apm audit`（`skills.yml`）が **hidden Unicode / drift / policy 違反**を検査し、**SARIF を Code Scanning へ**上げます。
 - **Waza**（`waza check` / `coverage` / `gate`）でも Skill を評価します（CI に組み込み済み）。
 - `apm audit --external skillspector` を使う場合は `apm experimental enable external-scanners` が必要です（skillspector は重量なため 1 回 240 秒超）。

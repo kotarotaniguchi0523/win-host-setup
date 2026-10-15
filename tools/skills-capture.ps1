@@ -2,6 +2,10 @@
 # 使い方: pwsh -File tools/skills-capture.ps1
 #  - ~/.apm/apm.yml / apm.lock.yaml           → skills/
 #  - ~/.agents/skills/* のうち APM 管理外   → skills/local/*（自作 Skill）
+#
+# ★ 向きに注意: 自作 Skill は **ホスト側が正**。このスクリプトは skills/local/<name> を
+#   ホストの内容で上書きする。リポジトリで直接編集した場合は、先に tools/skills-apply.ps1 で
+#   ホストへ反映してから実行すること（順序を誤るとリポジトリ側の編集が失われる）。
 
 [CmdletBinding()]
 param()
