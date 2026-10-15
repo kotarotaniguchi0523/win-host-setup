@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+# Windows ホストの winget 宣言（冪等・バージョン固定）。適用: winget configure winget/host.dsc.yaml
+# 方針: AGENTS.md / AUDIT.md。mise 管理分は mise/config.toml 側。msstore は source: msstore を明示。
+properties:
+  configurationVersion: 0.2.0
+  resources:
+    # --- 開発基盤 ---
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: mise
+      directives:
+        description: mise-en-place (jdx 公式)
+      settings: { id: jdx.mise, source: winget, version: '2026.9.18' }
+
+    # --- 開発 CLI（mise で検証できない / Windows 専用） ---
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: git
+      directives:
+        description: Git (The Git Development Community)
+      settings: { id: Git.Git, source: winget, version: '2.54.0' }
+
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: openssl
+      directives:
+        description: OpenSSL Light (Shining Light Productions)
+      settings: { id: ShiningLight.OpenSSL.Light, source: winget, version: '4.0.3' }
+
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: cloudflared
+      directives:
+        description: cloudflared (Cloudflare) — mise は検証 [none] のため winget
+      settings: { id: Cloudflare.cloudflared, source: winget, version: '2026.10.0' }
+
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: fd
+      directives:
+        description: fd (sharkdp) — mise は検証 [none] のため winget
+      settings: { id: sharkdp.fd, source: winget, version: '10.5.0' }
+
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: rustup
+      directives:
+        description: Rustup (Rust Project)
+      settings: { id: Rustlang.Rustup, source: winget, version: '1.28.2' }
+
+    # --- Store 公式版（msstore を明示） ---
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: ngrok-store
+      directives:
+        description: "ngrok — 公式 Microsoft Store 版 (publisher ngrok)"
+      settings: { id: 9MVS1J51GMK6, source: msstore }
+
+    # --- 基盤（必ず残す） ---
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: docker-desktop
+      directives:
+        description: Docker Desktop (Docker Inc.)
+      settings: { id: Docker.DockerDesktop, source: winget, version: '4.94.0' }
+
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: docker-sbx
+      directives:
+        description: Docker Sandboxes / sbx (Docker Inc.) — sandboxes\ のデータは保持
+      settings: { id: Docker.sbx, source: winget, version: '0.47.0' }
+
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: wsl
+      directives:
+        description: WSL (modern, Microsoft)
+      settings: { id: Microsoft.WSL, source: winget, version: '2.7.14.0' }
+
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: ubuntu
+      directives:
+        description: Ubuntu (Canonical, Store MSIX)
+      settings: { id: Canonical.Ubuntu, source: winget, version: '2604.1.75.0' }
+
+    # --- PowerShell: MSI(winget, Microsoft 公式) を利用中 ---
+    # 代替: msstore 9MZ1SNWT0N5D (publisher: Microsoft Corporation)。実行中シェルのため切替は別途慎重に。
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: powershell
+      directives:
+        description: PowerShell 7 (MSI, Microsoft Corporation)
+      settings: { id: Microsoft.PowerShell, source: winget, version: '7.6.6.0' }
