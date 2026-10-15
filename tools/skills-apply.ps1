@@ -41,7 +41,30 @@ if ($Lock) {
 }
 
 # グローバルへ適用（~/.apm に展開）
-& apm install --global
+# グローバルへ適用（~/.apm に展開）
+# 注: apm install は「新規依存の初回」で lock だけ更新し、統合（.agents/skills への展開）を
+#     次回実行に回すことがある。lock の deployed_files と実体を突き合わせ、不足なら再実行する。
+function Test-SkillsDeployed {
+    $lock = Join-Path $dst 'apm.lock.yaml'
+    if (-not (Test-Path $lock)) { return $true }
+    $missing = @()
+    foreach ($line in (Get-Content $lock -Encoding UTF8)) {
+        if ($line -match '^\s*-\s+(\.agents/skills/[^/\s]+)/?$') {
+            $rel = $Matches[1]
+            $p = Join-Path (Get-HomeDir) ($rel -replace '/', '\')
+            if (-not (Test-Path $p)) { $missing += $rel }
+        }
+    }
+    if ($missing.Count -gt 0) { Write-Host "[i] 未展開: $($missing -join ', ')" }
+    return ($missing.Count -eq 0)
+}
+
+& $apm install --global
+if (-not (Test-SkillsDeployed)) {
+    Write-Host '[i] 未展開の Skill があるため install を再実行します（APM の初回統合の癖）'
+    & $apm install --global
+    if (-not (Test-SkillsDeployed)) { throw 'apm install を 2 回実行しても Skill が展開されません（apm.yml と lock を確認してください）' }
+}
 
 # 自作スキル（skills/local/*）を ~/.agents/skills へ配置
 $localSrc = Join-Path $src 'local'
