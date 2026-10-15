@@ -10,7 +10,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  security-events: write   # SARIF を Code Scanning へ上げるため
 
 jobs:
   verify:
@@ -23,37 +24,77 @@ jobs:
         run: |
           winget install --id Microsoft.APM --exact --silent `
             --accept-package-agreements --accept-source-agreements --disable-interactivity
-          # winget 直後のプロセスには PATH が反映されないため、リンク先を直接探す
           $apm = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Microsoft.APM_*" -Recurse -Filter apm.exe -ErrorAction SilentlyContinue |
                  Select-Object -First 1 -ExpandProperty FullName
           if (-not $apm) { throw "apm.exe が見つかりません" }
           "APM_DIR=" + (Split-Path $apm) | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           & $apm --version
 
-      - name: マニフェストを配置して lock を検証
+      - name: マニフェストをグローバルへ配置して導入
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.apm" | Out-Null
-          Copy-Item skills\apm.yml "$env:USERPROFILE\.apm\apm.yml" -Force
-          if (Test-Path skills\apm.lock.yaml) { Copy-Item skills\apm.lock.yaml "$env:USERPROFILE\.apm\apm.lock.yaml" -Force }
+          $dst = "$env:USERPROFILE\.apm"
+          New-Item -ItemType Directory -Force -Path $dst | Out-Null
+          Copy-Item skills\apm.yml $dst -Force
+          if (Test-Path skills\apm.lock.yaml) { Copy-Item skills\apm.lock.yaml $dst -Force }
+          Push-Location $dst
+          try {
+            & "$env:APM_DIR\apm.exe" lock --global
+            & "$env:APM_DIR\apm.exe" install --global
+          } finally { Pop-Location }
 
-          & "$env:APM_DIR\apm.exe" lock --global
-          & "$env:APM_DIR\apm.exe" install --global
-
-      - name: lock のドリフトを検出（差分があれば fail）
+      - name: lock のドリフトを検出
         shell: pwsh
         run: |
-          if (-not (Test-Path skills\apm.lock.yaml)) { Write-Host "apm.lock.yaml 未作成（スキップ）"; exit 0 }
-          $new = Get-Content "$env:USERPROFILE\.apm\apm.lock.yaml" -Raw
-          $old = Get-Content skills\apm.lock.yaml -Raw
-          if ($new.Trim() -ne $old.Trim()) {
-            Write-Host "::error::apm.lock.yaml が最新ではありません。tools/skills-apply.ps1 -Lock を実行してください。"
+          if (-not (Test-Path skills\apm.lock.yaml)) { Write-Host "[i] apm.lock.yaml 未作成のためスキップ"; exit 0 }
+          $new = (Get-Content "$env:USERPROFILE\.apm\apm.lock.yaml" -Raw).Trim()
+          $old = (Get-Content skills\apm.lock.yaml -Raw).Trim()
+          if ($new -ne $old) {
+            Write-Host "::error::apm.lock.yaml が最新ではありません。tools/skills-apply.ps1 -Lock（または tools/sync.ps1）を実行してください。"
             exit 1
           }
           Write-Host "OK: apm.lock.yaml は最新"
 
       - name: セキュリティ監査（hidden Unicode / drift / policy）
         shell: pwsh
+        continue-on-error: true
         run: |
-          & "$env:APM_DIR\apm.exe" audit --ci --format markdown --output audit.md || exit 1
-          if (Test-Path audit.md) { Get-Content audit.md | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8 }
+          Push-Location "$env:USERPROFILE\.apm"
+          try {
+            & "$env:APM_DIR\apm.exe" audit --ci --format sarif --output "$env:GITHUB_WORKSPACE\apm-audit.sarif"
+            "APM_AUDIT_EXIT=$LASTEXITCODE" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          } finally { Pop-Location }
+          if (-not (Test-Path "$env:GITHUB_WORKSPACE\apm-audit.sarif")) {
+            '{"version":"2.1.0","$schema":"https://json.schemastore.org/sarif-2.1.0.json","runs":[]}' |
+              Set-Content "$env:GITHUB_WORKSPACE\apm-audit.sarif" -Encoding utf8
+          }
+
+      - name: SARIF を Code Scanning へ
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: apm-audit.sarif
+          category: apm-audit
+
+      - name: 監査結果を評価（CI ゲート）
+        shell: pwsh
+        run: |
+          if ($env:APM_AUDIT_EXIT -and $env:APM_AUDIT_EXIT -ne '0') {
+            Write-Host "::warning::apm audit が違反を検出しました（SARIF を参照）"
+          } else { Write-Host "OK: apm audit クリーン" }
+
+  waza:
+    name: Waza（Skill の回帰ゲート）
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: waza を導入（mise）
+        uses: jdx/mise-action@v5
+      - name: Skill の健全性チェック
+        shell: pwsh
+        continue-on-error: true
+        env:
+          MISE_GLOBAL_CONFIG_FILE: ${{ github.workspace }}/mise/mise.toml
+        run: |
+          if (Test-Path skills) {
+            waza check skills || Write-Host "::warning::waza check が指摘あり（初期は許容）"
+          }

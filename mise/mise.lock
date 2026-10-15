@@ -297,44 +297,44 @@ url_api = "https://api.github.com/repos/cli/cli/releases/assets/599854760"
 provenance = "github-attestations"
 
 [[tools."github:microsoft/waza"]]
-version = "0.33.0"
+version = "0.38.10"
 backend = "github:microsoft/waza"
-specifiers = ["0.33.0"]
+specifiers = ["0.38.10"]
 
 [tools."github:microsoft/waza"."platforms.linux-arm64"]
-checksum = "sha256:552ba4f45e5f73e3e9c0c93429e2c59e21f1a4de8b9895f98f54deea7f03dfa8"
-url = "https://github.com/microsoft/waza/releases/download/v0.33.0/waza-linux-arm64"
-url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/426430176"
+checksum = "sha256:0371e7d31da4aa9d5ddf4558ea3cd41490c7a4ca7d14ca4f13f842e99770e829"
+url = "https://github.com/microsoft/waza/releases/download/v0.38.10/waza-linux-arm64"
+url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/625747679"
 
 [tools."github:microsoft/waza"."platforms.linux-arm64-musl"]
-checksum = "sha256:552ba4f45e5f73e3e9c0c93429e2c59e21f1a4de8b9895f98f54deea7f03dfa8"
-url = "https://github.com/microsoft/waza/releases/download/v0.33.0/waza-linux-arm64"
-url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/426430176"
+checksum = "sha256:0371e7d31da4aa9d5ddf4558ea3cd41490c7a4ca7d14ca4f13f842e99770e829"
+url = "https://github.com/microsoft/waza/releases/download/v0.38.10/waza-linux-arm64"
+url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/625747679"
 
 [tools."github:microsoft/waza"."platforms.linux-x64"]
-checksum = "sha256:c1a31a15d959d2cd536feb41cf7b20f94b0434a8e86949d3de3d21c1e3fb6ff3"
-url = "https://github.com/microsoft/waza/releases/download/v0.33.0/waza-linux-amd64"
-url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/426430171"
+checksum = "sha256:fae469af3b20ca63b789ad64e8f2c007a069d0843cc88d9e83d224de4f7077b3"
+url = "https://github.com/microsoft/waza/releases/download/v0.38.10/waza-linux-amd64"
+url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/625747685"
 
 [tools."github:microsoft/waza"."platforms.linux-x64-musl"]
-checksum = "sha256:c1a31a15d959d2cd536feb41cf7b20f94b0434a8e86949d3de3d21c1e3fb6ff3"
-url = "https://github.com/microsoft/waza/releases/download/v0.33.0/waza-linux-amd64"
-url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/426430171"
+checksum = "sha256:fae469af3b20ca63b789ad64e8f2c007a069d0843cc88d9e83d224de4f7077b3"
+url = "https://github.com/microsoft/waza/releases/download/v0.38.10/waza-linux-amd64"
+url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/625747685"
 
 [tools."github:microsoft/waza"."platforms.macos-arm64"]
-checksum = "sha256:0467f019fd7f53fb6dec09d810a957db707bd69d72f3966861b23ef6155a11e5"
-url = "https://github.com/microsoft/waza/releases/download/v0.33.0/waza-darwin-arm64"
-url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/426430175"
+checksum = "sha256:ca70863080e732eb9157c0aa1d692f441e115a6a0740b805ca28458f433ab706"
+url = "https://github.com/microsoft/waza/releases/download/v0.38.10/waza-darwin-arm64"
+url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/625747681"
 
 [tools."github:microsoft/waza"."platforms.macos-x64"]
-checksum = "sha256:af40ce5667c5c67584243324d7d8011752575f1e5747b1bef1aac269bad2579c"
-url = "https://github.com/microsoft/waza/releases/download/v0.33.0/waza-darwin-amd64"
-url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/426430177"
+checksum = "sha256:ab9af220fa90714ae13ebf5250531fd2ada828181cdd5d7b205455c2445b7070"
+url = "https://github.com/microsoft/waza/releases/download/v0.38.10/waza-darwin-amd64"
+url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/625747684"
 
 [tools."github:microsoft/waza"."platforms.windows-x64"]
-checksum = "sha256:f4b65386476a7bcfc224c4e9ae372b963320c495447e6d5d4e382023173b05b9"
-url = "https://github.com/microsoft/waza/releases/download/v0.33.0/waza-windows-amd64.exe"
-url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/426430180"
+checksum = "sha256:f5f73521f201b7aa42a30e62885adc5a6212badbeb1d38df5da1248f32b27fd0"
+url = "https://github.com/microsoft/waza/releases/download/v0.38.10/waza-windows-amd64.exe"
+url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/625747705"
 
 [[tools.go]]
 version = "1.27.2"
@@ -679,12 +679,6 @@ url = "https://github.com/pnpm/pnpm/releases/download/v12.12.1/pnpm-win32-x64.zi
 url_api = "https://api.github.com/repos/pnpm/pnpm/releases/assets/630553368"
 provenance = "github-attestations"
 
-[[tools."pypi:apm-cli"]]
-version = "0.33.0"
-backend = "pypi:apm-cli"
-specifiers = ["0.33.0"]
-uv = { path = "locks/pypi-apm-cli/0.33.0", digest = "sha256:49187a0b7e866df540e6aebf7786e46dccc43920d23213597dfdf26f2b4620f6" }
-
 [[tools."pypi:git+https://github.com/nvidia/skillspector.git"]]
 version = "v2.12.0"
 backend = "pypi:git+https://github.com/nvidia/skillspector.git"
@@ -812,41 +806,6 @@ url_api = "https://api.github.com/repos/rtk-ai/rtk/releases/assets/419581646"
 version = "1.99.0"
 backend = "core:rust"
 specifiers = ["1.99.0"]
-
-[[tools.rust-analyzer]]
-version = "2026-10-12"
-backend = "aqua:rust-lang/rust-analyzer"
-specifiers = ["2026-10-12"]
-
-[tools.rust-analyzer."platforms.linux-arm64"]
-checksum = "sha256:d7219d5d8f5537bb227b521157aebddfe7e4a90f4a85a74f31e53722f5691025"
-url = "https://github.com/rust-lang/rust-analyzer/releases/download/2026-10-12/rust-analyzer-aarch64-unknown-linux-gnu.gz"
-url_api = "https://api.github.com/repos/rust-lang/rust-analyzer/releases/assets/632692727"
-
-[tools.rust-analyzer."platforms.linux-x64"]
-checksum = "sha256:040cab4e2abc490fadd95c3f6cbc60b941a78761dbc3acf0ec66fd7a97f31db3"
-url = "https://github.com/rust-lang/rust-analyzer/releases/download/2026-10-12/rust-analyzer-x86_64-unknown-linux-gnu.gz"
-url_api = "https://api.github.com/repos/rust-lang/rust-analyzer/releases/assets/632693207"
-
-[tools.rust-analyzer."platforms.linux-x64-musl"]
-checksum = "sha256:64263d802a5e8d6ea9f7186e6163271e02c2605135f3a7fbdc0995778174d191"
-url = "https://github.com/rust-lang/rust-analyzer/releases/download/2026-10-12/rust-analyzer-x86_64-unknown-linux-musl.gz"
-url_api = "https://api.github.com/repos/rust-lang/rust-analyzer/releases/assets/632693237"
-
-[tools.rust-analyzer."platforms.macos-arm64"]
-checksum = "sha256:a2e45e828b37bfc4b507c2ca456e8b61096e0bdfbae225f3d33295546d1eeacf"
-url = "https://github.com/rust-lang/rust-analyzer/releases/download/2026-10-12/rust-analyzer-aarch64-apple-darwin.gz"
-url_api = "https://api.github.com/repos/rust-lang/rust-analyzer/releases/assets/632692652"
-
-[tools.rust-analyzer."platforms.macos-x64"]
-checksum = "sha256:56a5698a2e0d495c3ec28155416db310c879f21a70f6f38db549166cf157cfab"
-url = "https://github.com/rust-lang/rust-analyzer/releases/download/2026-10-12/rust-analyzer-x86_64-apple-darwin.gz"
-url_api = "https://api.github.com/repos/rust-lang/rust-analyzer/releases/assets/632693136"
-
-[tools.rust-analyzer."platforms.windows-x64"]
-checksum = "sha256:77f7a907f0e6f179281bac38e2d08435c974db9a5b99de52c5c963aff52883ec"
-url = "https://github.com/rust-lang/rust-analyzer/releases/download/2026-10-12/rust-analyzer-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/rust-lang/rust-analyzer/releases/assets/632693172"
 
 [[tools."ubi:yusukebe/ax"]]
 version = "0.1.25"

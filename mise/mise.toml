@@ -7,7 +7,7 @@ doppler                = "3.76.0"
 # APM: winget `Microsoft.APM` 0.33.0 で管理（Publisher: Microsoft）。
 # 旧 `pypi:apm-cli` は既定 Python 3.15 で依存 `pyyaml` の cp315 wheel が無く導入不可のため winget へ移行（winget-vs-mise.md §6）
 "aqua:k1LoW/mo"        = "1.5.5"
-"github:microsoft/waza" = "0.33.0"
+"github:microsoft/waza" = "0.38.10"
 rtk                    = "0.40.0"
 pnpm                   = "12.12.1"
 uv                     = "0.13.0"

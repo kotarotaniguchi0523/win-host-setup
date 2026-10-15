@@ -34,4 +34,18 @@ if ($Lock) {
 
 # グローバルへ適用（~/.apm に展開）
 & apm install --global
-Write-Host "`n検証: apm audit --ci / apm outdated --global"
+
+# 自作スキル（skills/local/*）を ~/.agents/skills へ配置
+$localSrc = Join-Path $src 'local'
+if (Test-Path $localSrc) {
+    $dest = Join-Path $env:USERPROFILE '.agents\skills'
+    New-Item -ItemType Directory -Force -Path $dest | Out-Null
+    foreach ($d in (Get-ChildItem $localSrc -Directory)) {
+        $t = Join-Path $dest $d.Name
+        if (Test-Path $t) { Remove-Item $t -Recurse -Force }
+        Copy-Item $d.FullName $t -Recurse -Force
+        Write-Host "[ok] ~/.agents/skills/$($d.Name)（自作）"
+    }
+}
+
+Write-Host "`n検証: apm audit --ci / apm outdated --global / waza check"

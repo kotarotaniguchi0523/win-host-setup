@@ -82,8 +82,9 @@ Renovate / CI は **グループごとに 1 PR** を作ります。
 
 | リポジトリ | 実環境 |
 |---|---|
-| `skills/apm.yml` | `~/.apm/apm.yml` |
-| `skills/apm.lock.yaml` | `~/.apm/apm.lock.yaml` |
+| `skills/apm.yml` | `~/.apm/apm.yml`（リモート Skill の宣言） |
+| `skills/apm.lock.yaml` | `~/.apm/apm.lock.yaml`（**commit SHA + ファイルごとの sha256**） |
+| `skills/local/<name>/SKILL.md` | `~/.agents/skills/<name>/`（**自作 Skill**） |
 
 ```powershell
 # 実環境へ適用（+ lock 再生成）
@@ -91,8 +92,25 @@ pwsh -File tools/skills-apply.ps1 -Lock
 ```
 
 - スキルの追加は `skills/apm.yml` の `dependencies.apm` に **`owner/repo#ref`** を書くだけ。**Renovate が自動で更新**します。
-- `apm audit`（`skills.yml`）が **hidden Unicode / drift / policy 違反**を CI で検査します。
+- **自作 Skill** は `skills/local/<name>/SKILL.md` に置きます（APM 管理外として扱われ、Renovate の対象になりません）。
+- `apm audit`（`skills.yml`）が **hidden Unicode / drift / policy 違反**を検査し、**SARIF を Code Scanning へ**上げます。
+- **Waza**（`waza check` / `coverage` / `gate`）でも Skill を評価します（CI に組み込み済み）。
 - `apm audit --external skillspector` を使う場合は `apm experimental enable external-scanners` が必要です（skillspector は重量なため 1 回 240 秒超）。
+
+### ローカルで更新 → Push
+
+ホスト側で Skills や設定を変えたら、**1 コマンド**でリポジトリと公開版へ反映できます。
+
+```powershell
+pwsh -File tools/sync.ps1                  # capture → skills-capture → sanitize → commit → push
+pwsh -File tools/sync.ps1 -NoPush          # push しない（確認用）
+pwsh -File tools/sync.ps1 -Message "..."   # コミットメッセージ指定
+```
+
+1. `tools/capture.ps1` — `~/.config/mise` → `mise/`
+2. `tools/skills-capture.ps1` — `~/.apm` と自作 Skill → `skills/`
+3. `tools/sanitize.ps1` — `public/` を再生成（個人情報を伏せる）
+4. source リポジトリをコミット → public リポジトリをコミットして push
 
 ### 必要な Secrets
 | 名前 | 用途 |

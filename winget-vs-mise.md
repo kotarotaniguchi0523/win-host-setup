@@ -130,3 +130,40 @@ mise prune --yes                            # pypi:apm-cli を撤去
 - **winget は「mise が検証を持たない／mise で導入できない場合の受け皿」**として機能する。
 - `herdr` のみ「どこにも stable が無い」ため、**唯一の継続的な逸脱**として記録する。
 - **重要な実測知見**: 既定 Python を **3.15.0** にすると、**cp315 wheel が無い依存（`pyyaml` 等）を持つ Python ツールは `pypi:` で導入できない**。しかも mise は「不足ツールの自動導入」を全コマンドで試みるため、**1 ツールの導入失敗が全 mise コマンドの停止（ハング）に波及**する。→ Python ツールは **winget へ逃がす**か、**wheel のある 3.14 を明示**するのが安全。
+
+---
+
+## 7. 追加分の判定（2026-10-15 追記）
+
+### 7.1 `waza`（Agent Skills の評価 CLI / Microsoft）
+
+| 経路 | 実測 |
+|---|---|
+| ① msstore | **なし**（`winget search waza --source msstore`） |
+| ② mise | ✅ **`github:microsoft/waza`** — `Security: checksum (sha256)` |
+| ③ winget | **なし**（`winget search waza --source winget`） |
+
+**判定: ② mise が唯一の経路かつ検証あり → 準拠** ✅
+**実施**: `0.33.0` → **`0.38.10`** へ更新（`github:microsoft/waza`、`waza version 0.38.10`）。winget/msstore に無いため代替は存在しない。
+
+> Waza は `adversarial` / `check` / `coverage` / `gate` / `quality` / `replay` など **Skill の評価・回帰ゲート**を持つため、Skills の CI 監査に併用できる。
+
+### 7.2 `skillspector`（Skill のセキュリティスキャナ / NVIDIA）
+
+| 経路 | 実測 |
+|---|---|
+| ① msstore | **なし** |
+| ② mise | **`pypi:git+https://github.com/nvidia/skillspector.git@v2.12.0`** — `Security: [none]` ⚠️ |
+| ③ winget | **なし** |
+
+**判定: mise が唯一の経路。`[none]` のため正確には ② を満たさない → 逸脱として記録**（PyPI 未公開のため git 固定のみ。タグ `v2.12.0` で不変性を担保し、依存は Takumi 経由）。
+
+### 7.3 Skills（`agent-browser` / `ax`）— APM 経由
+
+| 対象 | 入手方法 | 検証 |
+|---|---|---|
+| `vercel-labs/agent-browser` | **APM**（`skills/apm.yml` に `#v0.39.1`） | ✅ `apm.lock.yaml` に **resolved_commit（SHA）+ 展開ファイルごとの sha256** |
+| `yusukebe/ax` | **APM**（`#v0.1.25`） | ✅ 同上（`resolved_commit` + `deployed_file_hashes`） |
+
+**判定: パッケージマネージャ経路（msstore/winget）は存在しないため APM が唯一。タグ + commit SHA + ファイルハッシュで検証できる点で準拠** ✅
+（Renovate の `apm` マネージャが `owner/repo#ref` を自動更新する）

@@ -1,0 +1,108 @@
+lockfile_version: '1'
+apm_version: 0.33.0
+dependencies:
+- repo_url: vercel-labs/agent-browser
+  name: 7806f76343b67d4b
+  host: github.com
+  resolved_commit: 1165952d74ceed98fdc2dd97190ad41f44dd0e24
+  resolved_ref: v0.39.1
+  version: '1165952'
+  package_type: skill_bundle
+  deployed_files:
+  - .agents/skills/agent-browser
+  - .agents/skills/agent-browser/SKILL.md
+  - .config/opencode/skills/agent-browser
+  - .config/opencode/skills/agent-browser/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/agent-browser/SKILL.md: sha256:3a7520e64de2dfaa516b6721c001e84e06e3c06a187b82af029ae721540ebfac
+    .config/opencode/skills/agent-browser/SKILL.md: sha256:3a7520e64de2dfaa516b6721c001e84e06e3c06a187b82af029ae721540ebfac
+  content_hash: sha256:eedd4c66d5a5a8546fdcca141c7f1215e02998b0fa9283f5911f31a67cc9c5c8
+- repo_url: yusukebe/ax
+  name: ax
+  host: github.com
+  resolved_commit: 0ddd8a748ae2401ae344f536f6e8dded890fcdbf
+  resolved_ref: v0.1.25
+  version: unknown
+  package_type: skill_bundle
+  deployed_files:
+  - .agents/skills/ax
+  - .agents/skills/ax/SKILL.md
+  - .config/opencode/skills/ax
+  - .config/opencode/skills/ax/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/ax/SKILL.md: sha256:4acbbc5574e36a21c27fbc3099cc40638e074e7cada674e00d23698cef34d37c
+    .config/opencode/skills/ax/SKILL.md: sha256:4acbbc5574e36a21c27fbc3099cc40638e074e7cada674e00d23698cef34d37c
+  content_hash: sha256:e36e00f99c4b146cb96191a3f8d247f3f5c1fec69bab63af25a7ce2a88281a0f
+deployments:
+- kind: project-relative
+  target: codex
+  value: .agents/skills/agent-browser
+  runtime: null
+  scope: project
+  owners:
+  - vercel-labs/agent-browser
+  active_owner: vercel-labs/agent-browser
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/agent-browser/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - vercel-labs/agent-browser
+  active_owner: vercel-labs/agent-browser
+  content_hash: sha256:3a7520e64de2dfaa516b6721c001e84e06e3c06a187b82af029ae721540ebfac
+- kind: project-relative
+  target: codex
+  value: .agents/skills/ax
+  runtime: null
+  scope: project
+  owners:
+  - yusukebe/ax
+  active_owner: yusukebe/ax
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/ax/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - yusukebe/ax
+  active_owner: yusukebe/ax
+  content_hash: sha256:4acbbc5574e36a21c27fbc3099cc40638e074e7cada674e00d23698cef34d37c
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/agent-browser
+  runtime: null
+  scope: project
+  owners:
+  - vercel-labs/agent-browser
+  active_owner: vercel-labs/agent-browser
+  content_hash: null
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/agent-browser/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - vercel-labs/agent-browser
+  active_owner: vercel-labs/agent-browser
+  content_hash: sha256:3a7520e64de2dfaa516b6721c001e84e06e3c06a187b82af029ae721540ebfac
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/ax
+  runtime: null
+  scope: project
+  owners:
+  - yusukebe/ax
+  active_owner: yusukebe/ax
+  content_hash: null
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/ax/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - yusukebe/ax
+  active_owner: yusukebe/ax
+  content_hash: sha256:4acbbc5574e36a21c27fbc3099cc40638e074e7cada674e00d23698cef34d37c
