@@ -6,7 +6,7 @@
 #   Machine PATH = Windows 標準 ＋ 全ユーザー共有のみ
 #   ・存在しないパスを除去
 #   ・重複を除去
-#   ・C:\Users\... （個人アプリ）を除去 → それらは User PATH に置く
+#   ・%USERPROFILE% 配下（個人アプリ）を除去 → それらは User PATH に置く
 
 [CmdletBinding()]
 param([switch]$Apply)

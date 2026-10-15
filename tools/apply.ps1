@@ -39,7 +39,12 @@ if (Test-Path $locksSrc) {
 }
 
 Write-Host "`n--- mise install ---"
+& mise install node    # npm が node に依存するため先に入れる
 & mise install
+if ($LASTEXITCODE -ne 0) {
+    Write-Warning "mise install が失敗しました。依存順序の競合の可能性があるため再試行します。"
+    & mise install
+}
 
 Write-Host "`n次の手順:"
 Write-Host "  winget configure winget/host.dsc.yaml"

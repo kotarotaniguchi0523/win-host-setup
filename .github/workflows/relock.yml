@@ -35,6 +35,8 @@ jobs:
           [ -d mise/locks ] && cp -r mise/locks ~/.config/mise/locks || true
 
           mise lock --global
+          # npm は node に依存するため、node を先に入れてから全体を導入する（順序競合の回避）
+          mise install node --locked || mise install node
           mise install --locked
           mise ls --global
 

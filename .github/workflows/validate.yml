@@ -35,7 +35,10 @@ jobs:
           mise doctor || true
 
       - name: lock どおりに導入できるか（ドリフト検出）
-        run: mise install --locked
+        run: |
+          # npm は node に依存するため、node を先に入れてから全体を導入する（順序競合の回避）
+          mise install node --locked || mise install node
+          mise install --locked
 
       - name: 導入結果
         run: mise ls --global
