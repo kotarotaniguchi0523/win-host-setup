@@ -38,6 +38,31 @@ if (Test-Path $locksSrc) {
     Write-Host "[ok] locks/ を適用"
 }
 
+# --- シェル設定（Nushell）: shell/nushell -> ~/.config/nushell ---
+$shellSrc = Join-Path $repo 'shell/nushell'
+$shellDst = Join-Path (Get-HomeDir) '.config/nushell'
+if (Test-Path $shellSrc) {
+    New-Item -ItemType Directory -Force -Path $shellDst | Out-Null
+    foreach ($f in 'config.nu', 'env.nu') {
+        $p = Join-Path $shellSrc $f
+        if (Test-Path $p) { Copy-Item $p (Join-Path $shellDst $f) -Force; Write-Host "[ok] shell/nushell/$f" }
+    }
+    $autoSrc = Join-Path $shellSrc 'autoload'
+    if (Test-Path $autoSrc) {
+        $autoDst = Join-Path $shellDst 'autoload'
+        New-Item -ItemType Directory -Force -Path $autoDst | Out-Null
+        Get-ChildItem $autoSrc -File | Where-Object { $_.Name -ne 'mise.nu' } | ForEach-Object {
+            Copy-Item $_.FullName (Join-Path $autoDst $_.Name) -Force
+            Write-Host "[ok] shell/nushell/autoload/$($_.Name)"
+        }
+    }
+}
+
+if (Get-Command nu -ErrorAction SilentlyContinue) {
+    & nu -c 'mise activate nu' | Set-Content (Join-Path $shellDst 'autoload\mise.nu') -Encoding UTF8
+    Write-Host '[ok] shell/nushell/autoload/mise.nu（再生成）'
+}
+
 Write-Host "`n--- mise install ---"
 & mise install node    # npm が node に依存するため先に入れる
 & mise install

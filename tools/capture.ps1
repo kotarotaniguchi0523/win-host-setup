@@ -46,3 +46,25 @@ foreach ($name in ([Environment]::GetEnvironmentVariables('User').Keys | Sort-Ob
 $lines += @('', '> 生成: `tools/capture.ps1`。秘密値は保存していない。')
 $lines | Set-Content (Join-Path $envDir 'variables.md') -Encoding UTF8
 Write-Host "[ok] env/variables.md"
+
+# --- シェル設定（Nushell）: ~/.config/nushell -> shell/nushell ---
+$shellSrc = Join-Path (Get-HomeDir) '.config/nushell'
+$shellDst = Join-Path $repo 'shell/nushell'
+if (Test-Path $shellSrc) {
+    New-Item -ItemType Directory -Force -Path $shellDst | Out-Null
+    foreach ($f in 'config.nu', 'env.nu') {
+        $p = Join-Path $shellSrc $f
+        if (Test-Path $p) { Copy-Item $p (Join-Path $shellDst $f) -Force; Write-Host "[ok] shell/nushell/$f" }
+    }
+    $autoSrc = Join-Path $shellSrc 'autoload'
+    if (Test-Path $autoSrc) {
+        $autoDst = Join-Path $shellDst 'autoload'
+        New-Item -ItemType Directory -Force -Path $autoDst | Out-Null
+        Get-ChildItem $autoSrc -File | Where-Object { $_.Name -ne 'mise.nu' } | ForEach-Object {  # mise.nu は apply で再生成する
+            Copy-Item $_.FullName (Join-Path $autoDst $_.Name) -Force
+            Write-Host "[ok] shell/nushell/autoload/$($_.Name)"
+        }
+    }
+} else {
+    Write-Host "[i] $shellSrc がありません（Nushell 未設定）"
+}
