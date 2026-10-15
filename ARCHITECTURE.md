@@ -325,5 +325,7 @@ win-host-setup/
   （locked install が要求する依存グラフを Takumi Guard 経由では生成できないため）。シークレット検査はバイナリの betterleaks が担当します。
 - CI から外した検査: `validate.yml` の PSScriptAnalyzer と `skills.yml` の waza。どちらも hk の pre-push が同等の検査をするためです。
   一方、secrets と PII は GitHub 上の PR がローカルフックを通らないため、CI に残しています。
+- CI の PII 検査は `-SkipEnvRules` を付けて実行します。runner のアカウント名・ホスト名を PII パターンにすると
+  一般語と衝突して誤検知するためで、一般の個人パス検出は `tools/ci/hygiene.ps1` が担当します。
 - jactionlint の指摘 45 件は **baseline 記録** (CI 緑は「新規なし」の意味)。`missing-timeout` 等は返済対象。
 - 分析系ドキュメント (inventory/repos/migration) は公開しない (`.agent/docs/`)。

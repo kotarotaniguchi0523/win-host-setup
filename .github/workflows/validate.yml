@@ -11,6 +11,10 @@ on:
 permissions:
   contents: read
 
+# Raise the GitHub API rate limit for the mise installs (attestation verification uses the API)
+env:
+  GITHUB_TOKEN: ${{ github.token }}
+
 concurrency:
   group: validate-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

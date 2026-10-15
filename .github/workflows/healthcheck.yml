@@ -14,6 +14,10 @@ concurrency:
   group: healthcheck-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Raise the GitHub API rate limit for the mise installs (attestation verification uses the API)
+env:
+  GITHUB_TOKEN: ${{ github.token }}
+
 jobs:
   mise:
     name: mise（ドリフト / 更新候補）

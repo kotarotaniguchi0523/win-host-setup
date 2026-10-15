@@ -14,6 +14,10 @@ concurrency:
   group: skills-relock-${{ github.head_ref }}
   cancel-in-progress: true
 
+# Raise the GitHub API rate limit for the mise installs (attestation verification uses the API)
+env:
+  GITHUB_TOKEN: ${{ github.token }}
+
 jobs:
   relock:
     runs-on: windows-latest
