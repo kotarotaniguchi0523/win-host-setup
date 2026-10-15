@@ -1,30 +1,43 @@
-# pii-rules.ps1 — 個人情報 → プレースホルダの置換ルール（sanitize.ps1 / depii.ps1 で共有）
-# ここには **実値（PII）を書かない**。固有のアカウント名・案件名は .agent/pii-rules.local.ps1
-#（.gitignore 済み・ローカルのみ）に置き、Get-PiiRules が読み込んで合成する。
+# pii-rules.ps1 - Replacement rules for personal information -> placeholders (shared by sanitize.ps1 / depii.ps1)
+# Do **not write real values (PII)** here. Put specific account names / project names in .agent/pii-rules.local.ps1
+# (already in .gitignore, local only), which Get-PiiRules loads and merges in.
 
 function Get-PiiRules {
-    param([string]$Repo)
+    param(
+        [string]$Repo,
+        # CI has no .agent/pii-rules.local.ps1, and the account / host name of the machine that runs the
+        # check must not become a pattern: a CI runner reports a generic name (USERNAME=runner) that
+        # matches ordinary words in the documents and fails the check on false positives.
+        [switch]$SkipEnvRules
+    )
 
     $user  = $env:USERNAME
     $host_ = $env:COMPUTERNAME
     $rules = [ordered]@{}
 
-    # 1) ホームディレクトリ（表記ゆれを先に潰す）
-    $rules["C:\Users\$user"] = '%USERPROFILE%'
-    $rules["c:\Users\$user"] = '%USERPROFILE%'
-    $rules["C:/Users/$user"] = '%USERPROFILE%'
-    $rules["\\Users\\$user"] = '\\Users\\%USERNAME%'
-    # 2) ユーザー名（単独出現）
-    if ($user) { $rules[$user] = '%USERNAME%' }
-    # 3) ホスト名
-    if ($host_) { $rules[$host_] = '%COMPUTERNAME%' }
-    # 4) Git のメールアドレス（動的・実値を書かない）
-    $email = (git config --global user.email 2>$null)
-    if ($email) { $rules[$email.Trim()] = '%EMAIL%' }
-    # 5) リポジトリの置き場所
-    $rules['win-host-setup'] = 'win-host-setup'
+    # Generic account / host names (CI runners, containers) are not personal information.
+    $genericNames = @('runner', 'user', 'admin', 'root', 'vscode', 'build', 'ci', 'ubuntu', 'guest', 'test')
+    $useUser = (-not $SkipEnvRules) -and $user  -and ($genericNames -notcontains $user.ToLower())
+    $useHost = (-not $SkipEnvRules) -and $host_ -and ($genericNames -notcontains $host_.ToLower())
 
-    # 6) ローカル専用の明示リスト（実値。コミットされない）
+    # 1) Home directory (collapses spelling variants first)
+    if ($useUser) {
+        $rules["C:\Users\$user"] = '%USERPROFILE%'
+        $rules["c:\Users\$user"] = '%USERPROFILE%'
+        $rules["C:/Users/$user"] = '%USERPROFILE%'
+        $rules["\\Users\\$user"] = '\\Users\\%USERNAME%'
+    }
+    # 2) User name (standalone occurrences)
+    if ($useUser) { $rules[$user] = '%USERNAME%' }
+    # 3) Host name
+    if ($useHost) { $rules[$host_] = '%COMPUTERNAME%' }
+    # 4) Git email address (dynamic; do not write real values)
+    $email = if ($SkipEnvRules) { $null } else { (git config --global user.email 2>$null) }
+    if ($email) { $rules[$email.Trim()] = '%EMAIL%' }
+    # 5) Repository location
+    $rules['Desktop\win-host-setup'] = 'win-host-setup'
+
+    # 6) Explicit local-only list (real values; not committed)
     if ($Repo) {
         $local = Join-Path $Repo '.agent\pii-rules.local.ps1'
         if (Test-Path $local) {
@@ -36,19 +49,20 @@ function Get-PiiRules {
     return $rules
 }
 
-# 公開してよい（＝PII を除去して管理する）トラック済みファイル
+# Tracked files that are safe to publish (i.e. managed with PII removed)
 function Get-PiiTargets {
     param([string]$Repo)
     return @(
-        'README.md', 'AGENTS.md', 'PLAN.md', 'AUDIT.md', 'winget-vs-mise.md',
-        'repos.md', 'repos-analysis.md', 'binaries-scan.md',
-        'inventory.md', 'TODO-inventory.md', 'migration-npm.md', 'migration-pip.md',
-        'renovate.json', '.gitattributes',
+        'README.md', 'ARCHITECTURE.md', 'AGENTS.md', 'PLAN.md', 'AUDIT.md', 'winget-vs-mise.md',
+        # Analysis documents (inventory/repos/migration etc.) are not published (moved to .agent/)
+        'renovate.json', '.secretlintrc.json', '.gitattributes', 'hk.pkl',
+        'mise.toml', 'mise.lock',
         'winget/host.dsc.yaml',
         'mise/mise.toml', 'mise/mise.lock',
         'skills/apm.yml', 'skills/apm.lock.yaml', 'skills/local',
         'env/variables.md',
-        '.github/workflows/*.yml',
-        'tools/*.ps1'
+        'shell',
+        '.github',
+        'tools'
     )
 }

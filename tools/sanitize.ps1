@@ -32,11 +32,12 @@ foreach ($pat in (Get-PiiTargets -Repo $repo)) {
     foreach ($f in $found) { if (-not $targets.Contains($f.FullName)) { $targets.Add($f.FullName) } }
 }
 
-# Publish every tool, including the sanitizer and the PII rules.
-# CI runs tools/depii.ps1 with tools/pii-rules.ps1 (-Check), so the published copies must match the
-# source; an older copy there reported PII that no longer exists. These files hold no PII: the real
-# values live in .agent/pii-rules.local.ps1, which is gitignored and never published.
-$exclude = @()
+# Publish every tool, including the sanitizer and the PII rules, but copy the rule definitions
+# verbatim: they contain the pattern strings themselves, so the replacement pass would report a
+# false PII hit and keep an outdated copy out of the public repository. CI runs tools/depii.ps1
+# with tools/pii-rules.ps1 (-Check), and those copies must match the source.
+$verbatim = @('tools\sanitize.ps1', 'tools\pii-rules.ps1', 'tools\depii.ps1')
+$verbatimRel = @{}; foreach ($v in $verbatim) { $verbatimRel[$v] = $true }
 
 $total = 0
 $codeHits = 0
@@ -44,13 +45,14 @@ $report = @()
 
 foreach ($srcPath in ($targets | Sort-Object)) {
     $rel = $srcPath.Substring($repo.Length + 1)
-    if ($exclude -contains $rel) { Write-Host "[skip] $rel（ツール自身）"; continue }
 
     $text = [string](Get-Content $srcPath -Raw -Encoding UTF8)
     if ($null -eq $text) { $text = '' }
 
     $n = 0; $new = $text
-    foreach ($k in $rules.Keys) {
+    # Rule definitions are published without the replacement pass (they hold the pattern strings)
+    $ruleKeys = if ($verbatimRel.ContainsKey($rel)) { @() } else { @($rules.Keys) }
+    foreach ($k in $ruleKeys) {
         if ([string]::IsNullOrEmpty($k)) { continue }
         $c = ([regex]::Matches($new, [regex]::Escape($k))).Count
         if ($c -gt 0) { $n += $c; $new = $new.Replace($k, $rules[$k]) }
