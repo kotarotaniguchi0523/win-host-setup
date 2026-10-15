@@ -34,8 +34,12 @@ foreach ($f in 'apm.yml', 'apm.lock.yaml') {
         continue
     }
 
-    Copy-Item $src $dst -Force
-    Write-Host "[ok] skills/$f"
+    if (-not $Force -and (Test-Path $dst) -and ((Get-FileHash $src).Hash -ne (Get-FileHash $dst).Hash)) {
+        Write-Warning "skills/$f がホストと不一致: スキップ（-Force でホスト優先 / tools/pull.ps1 でリポジトリ優先）"
+    } else {
+        Copy-Item $src $dst -Force
+        Write-Host "[ok] skills/$f"
+    }
 }
 
 # 2) APM が管理しているスキル名（ロックの deployed_files から）

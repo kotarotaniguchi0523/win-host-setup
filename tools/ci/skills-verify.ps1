@@ -49,7 +49,8 @@ if (Test-Path $repoLck) {
     Write-Host "--- リポジトリ ---"; $expected
     Write-Host "--- CI 生成 ---";     $actual
     $diff = Compare-Object $expected $actual
-    if ($diff) {
+    # -SkipAudit（relock 用）ではロックが古い前提なのでドリフト判定で止めない
+    if ($diff -and -not $SkipAudit) {
         throw "apm.lock.yaml のピン（repo_url / resolved_commit）が一致しません。tools/skills-apply.ps1 -Lock または tools/sync.ps1 を実行してください。"
     }
     Write-Host '[ok] apm.lock.yaml のピンは一致'

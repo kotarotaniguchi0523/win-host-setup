@@ -23,8 +23,11 @@ function Invoke-Step {
 }
 
 # 1-4) 生成・変換（子スクリプトは例外が伝播するのでそのまま呼ぶ）
-Invoke-Step 'pull（public → source。Renovate/Dependabot の更新を取り込む）' {
-    if (Test-Path (Join-Path $PSScriptRoot 'pull.ps1')) { & (Join-Path $PSScriptRoot 'pull.ps1') }
+Invoke-Step 'pull（public → source → 実環境。Renovate/Dependabot の更新を取り込む）' {
+    if (Test-Path (Join-Path $PSScriptRoot 'pull.ps1')) {
+        # -Apply: 実環境へ反映してから capture（ホストが正）するので、取り込んだ内容が失われない
+        & (Join-Path $PSScriptRoot 'pull.ps1') -Apply
+    }
 }
 Invoke-Step 'capture（mise）'          { & (Join-Path $PSScriptRoot 'capture.ps1') -Force }
 Invoke-Step 'skills-capture（Skills）' { & (Join-Path $PSScriptRoot 'skills-capture.ps1') -Force }

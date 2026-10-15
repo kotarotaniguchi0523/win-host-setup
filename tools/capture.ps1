@@ -16,8 +16,12 @@ if (-not (Test-Path $miseSrc)) { throw "見つかりません: $miseSrc" }
 New-Item -ItemType Directory -Force -Path $miseDst | Out-Null
 
 # config.toml はリポジトリ内で mise に拾われないよう mise.toml の名前で保存する
-Copy-Item (Join-Path $miseSrc 'config.toml') (Join-Path $miseDst 'mise.toml') -Force
-Write-Host "[ok] mise/mise.toml"
+if (-not $Force -and (Test-Path "$miseDst\mise.toml") -and ((Get-FileHash "$miseSrc\config.toml").Hash -ne (Get-FileHash "$miseDst\mise.toml").Hash)) {
+    Write-Warning 'mise/mise.toml がホストと不一致: スキップ（-Force でホスト優先 / tools/pull.ps1 でリポジトリ優先）'
+} else {
+    Copy-Item (Join-Path $miseSrc 'config.toml') (Join-Path $miseDst 'mise.toml') -Force
+    Write-Host '[ok] mise/mise.toml'
+}
 Copy-Item (Join-Path $miseSrc 'mise.lock')   (Join-Path $miseDst 'mise.lock') -Force
 Write-Host "[ok] mise/mise.lock"
 
