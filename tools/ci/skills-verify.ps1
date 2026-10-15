@@ -30,15 +30,16 @@ try {
 } finally { Pop-Location }
 
 # --- lock ドリフト（ピンで比較）---
+# 注意: resolved_ref は環境によりタグにも SHA にもなる（例: v0.39.1 / 1165952d…）ため、
+#       実体を固定する **repo_url + resolved_commit** のみで比較する。
 function Get-Pins([string]$Path) {
     if (-not (Test-Path $Path)) { return @() }
-    $repoUrl = $null; $ref = $null; $sha = $null; $out = @()
+    $repoUrl = $null; $sha = $null; $out = @()
     foreach ($line in (Get-Content $Path -Encoding UTF8)) {
-        if     ($line -match '^\s*-\s*repo_url:\s*(\S+)')    { if ($repoUrl) { $out += "$repoUrl|$ref|$sha" }; $repoUrl = $Matches[1]; $ref = $null; $sha = $null }
-        elseif ($line -match '^\s*resolved_ref:\s*(\S+)')    { $ref = $Matches[1] }
+        if     ($line -match '^\s*-\s*repo_url:\s*(\S+)')    { if ($repoUrl) { $out += "$repoUrl|$sha" }; $repoUrl = $Matches[1]; $sha = $null }
         elseif ($line -match '^\s*resolved_commit:\s*(\S+)') { $sha = $Matches[1] }
     }
-    if ($repoUrl) { $out += "$repoUrl|$ref|$sha" }
+    if ($repoUrl) { $out += "$repoUrl|$sha" }
     return ($out | Sort-Object)
 }
 
@@ -49,7 +50,7 @@ if (Test-Path $repoLck) {
     Write-Host "--- CI 生成 ---";     $actual
     $diff = Compare-Object $expected $actual
     if ($diff) {
-        throw "apm.lock.yaml のピン（repo_url / ref / commit）が一致しません。tools/skills-apply.ps1 -Lock または tools/sync.ps1 を実行してください。"
+        throw "apm.lock.yaml のピン（repo_url / resolved_commit）が一致しません。tools/skills-apply.ps1 -Lock または tools/sync.ps1 を実行してください。"
     }
     Write-Host '[ok] apm.lock.yaml のピンは一致'
 } else {

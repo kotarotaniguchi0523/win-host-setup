@@ -19,7 +19,7 @@ if (-not (Get-Command waza -ErrorAction SilentlyContinue)) {
     New-Item -ItemType Directory -Force -Path $miseDst | Out-Null
     Copy-Item (Join-Path $repo 'mise/mise.toml') (Join-Path $miseDst 'config.toml') -Force
     if (Test-Path (Join-Path $repo 'mise/mise.lock')) { Copy-Item (Join-Path $repo 'mise/mise.lock') (Join-Path $miseDst 'mise.lock') -Force }
-    Invoke-Native 'mise' @('install', 'waza') -What 'mise install waza'
+    Invoke-Native 'mise' @('install', 'github:microsoft/waza') -What 'mise install github:microsoft/waza'
 }
 
 if (-not (Get-Command waza -ErrorAction SilentlyContinue)) { throw "waza が見つかりません（mise で導入してください）" }
