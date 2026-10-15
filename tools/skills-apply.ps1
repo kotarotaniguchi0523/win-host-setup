@@ -34,8 +34,8 @@ Copy-Item (Join-Path $src 'apm.yml') (Join-Path $dst 'apm.yml') -Force
 Write-Host "[ok] ~/.apm/apm.yml"
 
 if ($Lock) {
-    Push-Location $dst
-    try { & $apm lock --global } finally { Pop-Location }
+    # apm の --global は CWD に依存しない（~/.apm を直接使う）。Push-Location は不要。
+    & $apm lock --global
     $lock = Join-Path $dst 'apm.lock.yaml'
     if (Test-Path $lock) { Copy-Item $lock (Join-Path $src 'apm.lock.yaml') -Force; Write-Host "[ok] skills/apm.lock.yaml を更新" }
 }
