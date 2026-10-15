@@ -27,8 +27,20 @@ try {
     Write-Host '=== betterleaks (tracked files) ===' -ForegroundColor Cyan
     $tracked = @(git -C $repo ls-files)
     if ($tracked.Count -gt 0) {
-        & betterleaks dir @tracked --no-banner
-        if ($LASTEXITCODE -ne 0) { $failed = $true }
+        # コマンドライン長の上限（Windows は約 32KB）を避けるため分割してスキャンする
+        $batch = @(); $len = 0
+        foreach ($f in $tracked) {
+            $batch += $f; $len += $f.Length + 1
+            if ($len -gt 6000) {
+                & betterleaks dir @batch --no-banner
+                if ($LASTEXITCODE -ne 0) { $failed = $true }
+                $batch = @(); $len = 0
+            }
+        }
+        if ($batch.Count -gt 0) {
+            & betterleaks dir @batch --no-banner
+            if ($LASTEXITCODE -ne 0) { $failed = $true }
+        }
     }
 
     # --- secretlint（preset 付き）---

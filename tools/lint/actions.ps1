@@ -32,7 +32,11 @@ try {
     Write-Host '=== jactionlint ===' -ForegroundColor Cyan
     if ($Fix) {
         & jactionlint --fix
-        if ($LASTEXITCODE -gt 1) { $failed = $true }
+        # 自動修正できない指摘が残っていないか再チェックする（--fix の exit は 1 でも成功扱いになるため）
+        Write-Host '[i] 修正後に再チェックします' -ForegroundColor DarkGray
+        & jactionlint
+        if ($LASTEXITCODE -ne 0) { $failed = $true; Write-Warning 'jactionlint: 自動修正できない指摘が残っています' }
+        else { Write-Host '[ok] jactionlint（修正後クリーン）' }
     } else {
         & jactionlint
         if ($LASTEXITCODE -gt 1) { $failed = $true }
