@@ -1,31 +1,29 @@
 # winget: DSC のピンを最新化して PR を出す（winget を情報源にする）
 # 土曜 03:00 JST に実行。差分が無ければ何もしない。
 name: winget-outdated
-
 on:
   schedule:
     - cron: '0 18 * * 5'
   workflow_dispatch:
-
 permissions:
   contents: write
   pull-requests: write
-
 jobs:
   update:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v7
-
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false   # push は gh auth setup-git 経由で行う
       - name: winget の最新版と突き合わせ
         shell: pwsh
         run: ./tools/update-winget-dsc.ps1 -Apply
-
       - name: 差分があれば PR を作成
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          gh auth setup-git   # persist-credentials: false のため gh 経由で認証する
           git diff --quiet -- winget/host.dsc.yaml
           if ($LASTEXITCODE -eq 0) { Write-Host '更新なし'; exit 0 }
 

@@ -1,0 +1,69 @@
+# Lint（並列ジョブ）: Actions / 秘密情報 / PII を独立したジョブで同時に実行する
+#  - 各ジョブは tools/lint/ と tools/ci/ のスクリプトを呼ぶだけ（ローカルでも同じコマンドで再現できる）
+#  - ツールのキャッシュは jdx/mise-action（mise のツールストア）に任せる
+#    （actions/cache は PR からキャッシュを汚染できるため使わない）
+name: lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  actions:
+    name: Actions Lint（actionlint / sisakulint / pinact）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
+        with:
+          cache: true
+      - name: Lint
+        shell: pwsh
+        run: ./tools/lint/actions.ps1
+      - name: SARIF（sisakulint）
+        if: ${{ always() && hashFiles('sisakulint.sarif') != '' }}
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@24c54180a607e11b4d6e1b0e1a2b3c4d5e6f7a8b # v4
+        with:
+          sarif_file: sisakulint.sarif
+          category: sisakulint
+
+  secrets:
+    name: 秘密情報（betterleaks / secretlint）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # betterleaks が履歴を走査するため
+      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
+        with:
+          cache: true
+      - name: スキャン
+        shell: pwsh
+        run: ./tools/lint/secrets.ps1
+
+  pii:
+    name: PII・衛生（depii / hygiene）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: PII 検査
+        shell: pwsh
+        run: ./tools/depii.ps1 -Check
+      - name: 個人パス・衛生検査
+        shell: pwsh
+        run: ./tools/ci/hygiene.ps1

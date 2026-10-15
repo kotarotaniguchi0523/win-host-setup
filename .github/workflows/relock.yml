@@ -1,42 +1,38 @@
 # Renovate が mise 設定を更新したら mise.lock を再生成して同じ PR に積む
 # ロジックは tools/ci/mise-verify.ps1 -Lock（ローカルでも同じコマンドで再現できる）
 name: relock
-
 on:
   pull_request:
     paths:
       - 'mise/mise.toml'
       - 'mise/mise.lock'
-
 permissions:
   contents: write
-
 concurrency:
   group: relock-${{ github.head_ref }}
   cancel-in-progress: true
-
 jobs:
   relock:
     runs-on: ubuntu-latest
     if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.head_ref }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: jdx/mise-action@v5
+          persist-credentials: false   # push は gh auth setup-git 経由で行う
+      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
         with:
           install: false
-
       - name: lock を再生成してリポジトリへ書き戻す
         shell: pwsh
         run: ./tools/ci/mise-verify.ps1 -Lock
-
       - name: ロックをコミット
         shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          gh auth setup-git   # persist-credentials: false のため gh 経由で認証する
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add mise

@@ -60,6 +60,7 @@ if (Test-Path $repoLck) {
 if ($SkipAudit) { return }
 
 # --- セキュリティ監査（hidden Unicode / drift / policy）---
+# --ci は json / sarif のみ対応。SARIF を出力しつつ、要点をサマリに出す。
 if (-not $SarifPath) { $SarifPath = Join-Path ([IO.Path]::GetTempPath()) 'apm-audit.sarif' }
 Push-Location $apmHome
 try { & $apm audit --ci --format sarif --output $SarifPath; $auditCode = $LASTEXITCODE }
@@ -70,13 +71,30 @@ if (-not (Test-Path $SarifPath)) {
         Set-Content -Path $SarifPath -Encoding UTF8
 }
 
+# サマリ（SARIF から件数とルール内訳を出す）
+try {
+    $sarif = Get-Content $SarifPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $results = @($sarif.runs | ForEach-Object { $_.results } | Where-Object { $_ })
+    $byRule = $results | Group-Object ruleId | Sort-Object Count -Descending | Select-Object -First 10
+    $md = "### APM audit`n`n- 検出: $($results.Count) 件（exit $auditCode）`n`n"
+    if ($byRule) {
+        $md += "| ルール | 件数 |`n|---|---|`n"
+        foreach ($g in $byRule) { $md += "| $($g.Name) | $($g.Count) |`n" }
+    }
+    Add-Summary $md
+} catch {
+    Write-Warning "SARIF の解析に失敗しました: $($_.Exception.Message)"
+}
+
 if ($env:GITHUB_ENV) { "APM_AUDIT_EXIT=$auditCode" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8 }
 
 if ($auditCode -ne 0) {
     $msg = "apm audit が違反を検出しました（exit $auditCode、SARIF: $SarifPath）"
     if ($StrictAudit) { throw $msg }
     Write-Warning $msg
-    if ($env:GITHUB_STEP_SUMMARY) { Add-Summary "### apm audit: 違反あり（SARIF を参照）" }
-    return
+} else {
+    Write-Host '[ok] apm audit クリーン'
 }
-Write-Host '[ok] apm audit クリーン'
+
+# 監査の非ゼロ終了を「スクリプトの終了コード」に漏らさない（呼び出し側で制御する）
+exit 0

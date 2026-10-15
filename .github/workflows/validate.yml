@@ -1,5 +1,5 @@
-# PR / push のたびに「lock の整合性」「設定の構文」「スクリプト」「PII」を検証する
-# ロジックは tools/ci/ 以下のスクリプトに分離している（ローカルでも同じコマンドで実行できる）
+# PR / push のたびに「lock の整合性」「設定の構文」「スクリプト」を検証する（並列ジョブ）
+# Lint（Actions / 秘密情報 / PII）は lint.yml が担当する。
 name: validate
 
 on:
@@ -11,15 +11,22 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   mise:
     name: mise（lock 整合性）
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: jdx/mise-action@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
         with:
           install: false
+          cache: true
       - name: lock のドリフト検出と導入
         shell: pwsh
         run: ./tools/ci/mise-verify.ps1 -Summary
@@ -28,7 +35,9 @@ jobs:
     name: 設定ファイルの構文
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: JSON / YAML / TOML の検証
         run: |
           python3 -m pip install --quiet --disable-pip-version-check pyyaml
@@ -38,18 +47,12 @@ jobs:
     name: PowerShell 静的チェック
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - shell: pwsh
         run: |
           Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -SkipPublisherCheck
           $issues = Invoke-ScriptAnalyzer -Path ./tools -Recurse -Severity Error
           if ($issues) { $issues | Format-Table -AutoSize; exit 1 }
           Write-Host '[ok] PSScriptAnalyzer（Error なし）'
-
-  hygiene:
-    name: PII 混入検査
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - shell: pwsh
-        run: ./tools/ci/hygiene.ps1
