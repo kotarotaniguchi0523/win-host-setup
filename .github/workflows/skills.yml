@@ -1,0 +1,59 @@
+# Skills（APM）: マニフェスト検証・lock ドリフト検出・セキュリティ監査
+# Windows ランナー（apm は winget の Microsoft.APM）
+name: skills
+
+on:
+  push:
+    paths: ['skills/**', '.github/workflows/skills.yml']
+  pull_request:
+    paths: ['skills/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: APM を導入
+        shell: pwsh
+        run: |
+          winget install --id Microsoft.APM --exact --silent `
+            --accept-package-agreements --accept-source-agreements --disable-interactivity
+          # winget 直後のプロセスには PATH が反映されないため、リンク先を直接探す
+          $apm = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Microsoft.APM_*" -Recurse -Filter apm.exe -ErrorAction SilentlyContinue |
+                 Select-Object -First 1 -ExpandProperty FullName
+          if (-not $apm) { throw "apm.exe が見つかりません" }
+          "APM_DIR=" + (Split-Path $apm) | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          & $apm --version
+
+      - name: マニフェストを配置して lock を検証
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.apm" | Out-Null
+          Copy-Item skills\apm.yml "$env:USERPROFILE\.apm\apm.yml" -Force
+          if (Test-Path skills\apm.lock.yaml) { Copy-Item skills\apm.lock.yaml "$env:USERPROFILE\.apm\apm.lock.yaml" -Force }
+
+          & "$env:APM_DIR\apm.exe" lock --global
+          & "$env:APM_DIR\apm.exe" install --global
+
+      - name: lock のドリフトを検出（差分があれば fail）
+        shell: pwsh
+        run: |
+          if (-not (Test-Path skills\apm.lock.yaml)) { Write-Host "apm.lock.yaml 未作成（スキップ）"; exit 0 }
+          $new = Get-Content "$env:USERPROFILE\.apm\apm.lock.yaml" -Raw
+          $old = Get-Content skills\apm.lock.yaml -Raw
+          if ($new.Trim() -ne $old.Trim()) {
+            Write-Host "::error::apm.lock.yaml が最新ではありません。tools/skills-apply.ps1 -Lock を実行してください。"
+            exit 1
+          }
+          Write-Host "OK: apm.lock.yaml は最新"
+
+      - name: セキュリティ監査（hidden Unicode / drift / policy）
+        shell: pwsh
+        run: |
+          & "$env:APM_DIR\apm.exe" audit --ci --format markdown --output audit.md || exit 1
+          if (Test-Path audit.md) { Get-Content audit.md | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8 }

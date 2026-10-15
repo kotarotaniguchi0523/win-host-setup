@@ -1,0 +1,38 @@
+# winget: DSC のピンを最新化して PR を出す（winget を情報源にする）
+# 土曜 03:00 JST に実行。差分が無ければ何もしない。
+name: winget-outdated
+
+on:
+  schedule:
+    - cron: '0 18 * * 5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: winget の最新版と突き合わせ
+        shell: pwsh
+        run: ./tools/update-winget-dsc.ps1 -Apply
+
+      - name: 差分があれば PR を作成
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git diff --quiet -- winget/host.dsc.yaml
+          if ($LASTEXITCODE -eq 0) { Write-Host '更新なし'; exit 0 }
+
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          $branch = "chore/winget-dsc-" + (Get-Date -Format 'yyyyMMdd')
+          git checkout -b $branch
+          git commit -am 'chore(winget): DSC のピンを最新へ'
+          git push -u origin $branch
+          gh pr create --title 'chore(winget): DSC のピンを最新へ' --body 'winget 自身で確認した最新版に更新します。' --base '${{ github.ref_name }}'

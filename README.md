@@ -1,4 +1,4 @@
-> このリポジトリは 	ools/sanitize.ps1 の生成物です（ユーザー名・パス・ホスト名をプレースホルダ化）。
+> このリポジトリは `tools/sanitize.ps1` の生成物です（ユーザー名・パス・ホスト名をプレースホルダ化）。
 > 実環境の値は含みません。
 
 # win-host-setup
@@ -50,6 +50,8 @@
 | `.github/workflows/relock.yml` | `mise/config.toml` が変わった PR で **`mise lock` を実行し `mise.lock` を同じ PR に積む** |
 | `.github/workflows/validate.yml` | push / PR で **`mise install --locked`（ロックのドリフト検出）** ＋ PSScriptAnalyzer ＋ JSON/YAML/TOML 構文 |
 | `.github/workflows/winget-outdated.yml` | 週次（Windows ランナー）で **`winget` 自身を情報源に `host.dsc.yaml` のピンを更新**し PR を作成 |
+| `.github/workflows/skills.yml` | `skills/**` の変更で **APM のマニフェスト検証・`apm.lock.yaml` ドリフト検出・`apm audit`（セキュリティ監査）** |
+| `.github/workflows/healthcheck.yml` | 週次で **`mise` のドリフト／更新候補・winget の乖離・公開リポジトリの衛生（個人パス混入検査）** を点検 |
 
 ### Renovate が担当する範囲
 - **`mise/config.toml`**（native な `mise` マネージャ）— 25 ツール前後を継続更新。
@@ -61,6 +63,36 @@
 ### ポリシーとの整合
 - `minimumReleaseAge: "2 days"` を Renovate 側にも設定し、mise の `minimum_release_age = "2d"` と揃えています。
 - `mise.lock` の再生成は Renovate ではなく **CI（relock.yml）** に寄せ、`allowedUnsafeExecutions` を空にしています（実行権限を Renovate に渡さない）。
+
+### グループごとの PR
+Renovate / CI は **グループごとに 1 PR** を作ります。
+
+| グループ | 担当 | 対象 |
+|---|---|---|
+| **mise tools** | Renovate（`mise` マネージャ） | `mise/mise.toml` の全ツール（配列の先頭＝既定のみ） |
+| **GitHub Actions** | Renovate（`github-actions`） | 各ワークフローの `uses:`（コミット SHA 固定） |
+| **Skills (APM)** | Renovate（`apm` マネージャ） | `skills/apm.yml` の `owner/repo#ref` |
+| **winget (DSC)** | `winget-outdated.yml` | `winget/host.dsc.yaml`（`msstore` は除く） |
+
+`mise.lock` の再生成は `relock.yml`、`apm.lock.yaml` の再生成は `tools/skills-apply.ps1 -Lock`（＋`skills.yml` がドリフト検出）が担当します。
+
+## Skills の管理（APM）
+
+**APM（Agent Package Manager）** でグローバル Skills を管理します。実体は `~/.apm/` に置かれ、このリポジトリが**唯一のソース**です。
+
+| リポジトリ | 実環境 |
+|---|---|
+| `skills/apm.yml` | `~/.apm/apm.yml` |
+| `skills/apm.lock.yaml` | `~/.apm/apm.lock.yaml` |
+
+```powershell
+# 実環境へ適用（+ lock 再生成）
+pwsh -File tools/skills-apply.ps1 -Lock
+```
+
+- スキルの追加は `skills/apm.yml` の `dependencies.apm` に **`owner/repo#ref`** を書くだけ。**Renovate が自動で更新**します。
+- `apm audit`（`skills.yml`）が **hidden Unicode / drift / policy 違反**を CI で検査します。
+- `apm audit --external skillspector` を使う場合は `apm experimental enable external-scanners` が必要です（skillspector は重量なため 1 回 240 秒超）。
 
 ### 必要な Secrets
 | 名前 | 用途 |

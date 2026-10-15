@@ -1,0 +1,65 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":enableVulnerabilityAlertsWithLabel(security)"
+  ],
+  "timezone": "Asia/Tokyo",
+  "schedule": ["before 6am on monday"],
+  "minimumReleaseAge": "2 days",
+  "labels": ["dependencies"],
+
+  "rangeStrategy": "pin",
+  "pinDigests": true,
+
+  "separateMajorMinor": false,
+  "separateMinorPatch": false,
+  "separateMultipleMajor": false,
+  "rebaseWhen": "behind-base-branch",
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 0,
+  "branchConcurrentLimit": 0,
+
+  "packageRules": [
+    {
+      "description": "グループ1: mise のツール一式を 1 PR にまとめる",
+      "matchManagers": ["mise"],
+      "groupName": "mise tools",
+      "groupSlug": "mise-tools"
+    },
+    {
+      "description": "グループ2: GitHub Actions 一式を 1 PR にまとめる（コミット SHA 固定）",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "groupSlug": "github-actions",
+      "pinDigests": true
+    },
+    {
+      "description": "グループ3: Skills（APM）を 1 PR にまとめる（apm.yml の owner/repo#ref を更新）",
+      "matchManagers": ["apm"],
+      "groupName": "Skills (APM)",
+      "groupSlug": "skills-apm"
+    },
+    {
+      "description": "メジャー更新はまとめず、Dependency Dashboard で承認してから PR を作る",
+      "matchUpdateTypes": ["major"],
+      "groupName": null,
+      "dependencyDashboardApproval": true
+    }
+  ],
+
+  "mise": {
+    "updatePinnedDependencies": true
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on the first day of the month"]
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"]
+  },
+  "ignorePaths": ["public/**"]
+}

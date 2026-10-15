@@ -1,0 +1,20 @@
+# APM（Agent Package Manager）のグローバル・マニフェスト
+# 実体の配置先: ~/.apm/apm.yml   （tools/skills-apply.ps1 が配置）
+# 使い方: ここに owner/repo#ref を足すと、Renovate（apm マネージャ）が自動で更新します。
+name: win-host-setup
+version: 1.0.0
+description: このホストで使うグローバル Skills / APM パッケージ（検証重視・バージョン固定）
+
+dependencies:
+  apm: []
+
+devDependencies:
+  apm: []
+
+# --- 追加例 ---
+# dependencies:
+#   apm:
+#     - microsoft/apm-sample-package#v1.0.0
+#     - kotarotaniguchi0523/<skills-repo>#v1.0.0
+# ※ `#<ref>`（タグ/ブランチ/SHA）を必ず付けると Renovate が更新対象にします。
+#    SHA 固定 + 末尾コメント（# v1.0.0）にすると pinDigests が両方を追随させます。

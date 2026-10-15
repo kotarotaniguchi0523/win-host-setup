@@ -43,4 +43,5 @@ Write-Host "`n--- mise install ---"
 
 Write-Host "`n次の手順:"
 Write-Host "  winget configure winget/host.dsc.yaml"
+Write-Host "  tools/skills-apply.ps1 -Lock   # Skills（APM）を ~/.apm へ適用"
 Write-Host "  tools/fix-machine-path.ps1 （管理者で実行）"

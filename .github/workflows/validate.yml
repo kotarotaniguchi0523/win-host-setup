@@ -1,0 +1,73 @@
+# PR / push のたびに「lock の整合性」と「スクリプトの健全性」を検証する
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mise:
+    name: mise（lock 整合性）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: jdx/mise-action@v5
+        with:
+          install: false
+
+      - name: リポジトリの設定をグローバル設定として配置
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.config/mise
+          cp mise/mise.toml ~/.config/mise/config.toml
+          [ -f mise/mise.lock ] && cp mise/mise.lock ~/.config/mise/mise.lock || true
+          [ -d mise/locks ] && cp -r mise/locks ~/.config/mise/locks || true
+
+      - name: バージョン / 環境
+        run: |
+          mise --version
+          mise doctor || true
+
+      - name: lock どおりに導入できるか（ドリフト検出）
+        run: mise install --locked
+
+      - name: 導入結果
+        run: mise ls --global
+
+  scripts:
+    name: PowerShell 静的チェック
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -SkipPublisherCheck
+          $issues = Invoke-ScriptAnalyzer -Path ./tools -Recurse -Severity Error
+          $issues | Format-Table -AutoSize
+          if ($issues) { exit 1 }
+
+  config:
+    name: 設定ファイルの構文
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: JSON / YAML / TOML の妥当性
+        run: |
+          python3 -m pip install --quiet --disable-pip-version-check pyyaml
+          python3 - <<'PY'
+          import json, glob, yaml, tomllib
+          json.load(open('renovate.json', encoding='utf-8'))
+          for f in glob.glob('.github/**/*.json', recursive=True):
+              json.load(open(f, encoding='utf-8'))
+          yaml.safe_load(open('winget/host.dsc.yaml', encoding='utf-8'))
+          for f in glob.glob('.github/workflows/*.yml'):
+              yaml.safe_load(open(f, encoding='utf-8'))
+          tomllib.load(open('mise/mise.toml', 'rb'))
+          print('OK: JSON / YAML / TOML')
+          PY

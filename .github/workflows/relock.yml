@@ -1,0 +1,57 @@
+# Renovate が mise/mise.toml を更新したら mise.lock を再生成して同じ PR に積む
+name: relock
+
+on:
+  pull_request:
+    paths:
+      - 'mise/mise.toml'
+      - 'mise/mise.lock'
+
+permissions:
+  contents: write
+
+jobs:
+  relock:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: jdx/mise-action@v5
+        with:
+          install: false
+
+      # リポジトリの設定を「グローバル設定」として配置してから実行する
+      # （リポジトリ直下のファイルをプロジェクト設定として読ませない）
+      - name: mise lock / install --locked
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.config/mise
+          cp mise/mise.toml ~/.config/mise/config.toml
+          [ -f mise/mise.lock ] && cp mise/mise.lock ~/.config/mise/mise.lock || true
+          [ -d mise/locks ] && cp -r mise/locks ~/.config/mise/locks || true
+
+          mise lock --global
+          mise install --locked
+          mise ls --global
+
+          cp ~/.config/mise/config.toml mise/mise.toml
+          cp ~/.config/mise/mise.lock   mise/mise.lock
+          rm -rf mise/locks
+          [ -d ~/.config/mise/locks ] && cp -r ~/.config/mise/locks mise/locks || true
+
+      - name: ロックをコミット
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mise
+          if git diff --cached --quiet; then
+            echo "ロックに変更なし"
+          else
+            git commit -m "chore(mise): mise.lock を再生成"
+            git push
+          fi
