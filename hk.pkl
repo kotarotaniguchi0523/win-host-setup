@@ -1,15 +1,15 @@
 amends "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Config.pkl"
 import "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Builtins.pkl"
 
-// このリポジトリの Lint
-//  - jactionlint : GitHub Actions（actionlint のチェックを包含。Dependabot と Actions lock も見る）
-//  - betterleaks : 秘密情報
-//  - sisakulint  : 追加 SAST（jactionlint が包含する actionlint 相当ルールは無効化）
-//  - pii / secrets / powershell : tools/ 以下のスクリプトで実行
+// Lint for this repository
+//  - jactionlint : GitHub Actions (includes actionlint checks; also covers Dependabot and the Actions lock)
+//  - betterleaks : secrets
+//  - sisakulint  : extra SAST (disables the actionlint-equivalent rules jactionlint already covers)
+//  - pii / secrets / powershell : run via scripts under tools/
 //
-// 実行タイミング:
-//  - pre-commit: 軽量（pii / secrets）だけ
-//  - pre-push  : 全部（jactionlint / betterleaks / sisakulint / powershell を含む）
+// When it runs:
+//  - pre-commit: light only (pii / secrets)
+//  - pre-push  : everything (includes jactionlint / betterleaks / sisakulint / powershell)
 
 local sisakuArgs = "-ignore expression -ignore cond -ignore job-needs -ignore env-var -ignore workflow-call -ignore deprecated-commands -ignore commit-sha"
 
@@ -35,13 +35,13 @@ local all = new Mapping<String, Step> {
     }
 }
 
-// pre-commit（軽量）
+// pre-commit (light)
 steps = new Mapping<String, Step | Group> {
     ["pii"] = all["pii"]
     ["secrets"] = all["secrets"]
 }
 
-// pre-push（全部）
+// pre-push (everything)
 hooks {
     ["pre-push"] {
         steps = all

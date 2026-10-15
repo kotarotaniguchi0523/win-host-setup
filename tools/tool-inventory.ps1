@@ -1,4 +1,4 @@
-# tool-inventory.ps1 — 管理主体ごとに「ツール × 実体バイナリ × backend × 検証」を列挙
+# tool-inventory.ps1 - List "tool x actual binary x backend x verification" per managing authority
 $miseDir = "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\jdx.mise_Microsoft.Winget.Source_8wekyb3d8bbwe\mise\bin"
 $env:Path = "$env:LOCALAPPDATA\mise\shims;$miseDir;" + [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
 $mise = Join-Path $miseDir 'mise.exe'

@@ -46,7 +46,7 @@
 
 | ワークフロー | 役割 |
 |---|---|
-| `.github/workflows/renovate.yml` | Renovate（セルフホスト）を週次＋手動で実行 → 依存更新 PR を作成。**`RENOVATE_TOKEN`（PAT）** が必要 |
+| **Renovate App**（Mend hosted / `github.com/apps/renovate`）| 依存更新 PR（すべての対象）。**PAT 不要**（自己ホストの workflow と `RENOVATE_TOKEN` は廃止） |
 | `.github/workflows/relock.yml` | `mise/config.toml` が変わった PR で **`mise lock` を実行し `mise.lock` を同じ PR に積む** |
 | `.github/workflows/validate.yml` | push / PR で **`mise install --locked`（ロックのドリフト検出）** ＋ PSScriptAnalyzer ＋ JSON/YAML/TOML 構文 |
 | `.github/workflows/winget-outdated.yml` | 週次（Windows ランナー）で **`winget` 自身を情報源に `host.dsc.yaml` のピンを更新**し PR を作成 |

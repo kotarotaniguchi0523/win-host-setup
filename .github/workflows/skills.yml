@@ -1,5 +1,5 @@
-# Skills（APM）: マニフェスト検証・lock ドリフト検出・セキュリティ監査（SARIF）・Waza 評価
-# ロジックは tools/ci/ 以下のスクリプトに分離している
+# Skills (APM): manifest verification, lock drift detection, security audit (SARIF), Waza evaluation
+# Logic is split into scripts under tools/ci/
 name: skills
 on:
   push:
@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
-  security-events: write # SARIF を Code Scanning へ上げるため
+  security-events: write # to upload SARIF to Code Scanning
 concurrency:
   group: skills-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -34,7 +34,7 @@ jobs:
         run: ./tools/ci/skills-verify.ps1 -SarifPath apm-audit.sarif
       - name: SARIF を Code Scanning へ
         if: ${{ always() && hashFiles('apm-audit.sarif') != '' }}
-        continue-on-error: true   # アップロード API の一時的な失敗でジョブを落とさない
+        continue-on-error: true   # do not fail the job on a transient upload API error
         uses: github/codeql-action/upload-sarif@v4.38.3
         with:
           sarif_file: apm-audit.sarif

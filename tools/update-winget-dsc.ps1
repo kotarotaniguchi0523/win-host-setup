@@ -1,7 +1,7 @@
-# update-winget-dsc.ps1 — winget 自身を情報源にして host.dsc.yaml のピンを最新化する
-# 使い方: pwsh -File tools/update-winget-dsc.ps1          # 差分の表示のみ
-#         pwsh -File tools/update-winget-dsc.ps1 -Apply   # 実際に書き換え
-# 対象: `settings: { id: <winget-id>, source: winget, version: '<ver>' }` の行（msstore は対象外）
+# update-winget-dsc.ps1 - Use winget itself as the source of truth to update the pins in host.dsc.yaml
+# Usage: pwsh -File tools/update-winget-dsc.ps1          # show the diff only
+#         pwsh -File tools/update-winget-dsc.ps1 -Apply   # actually rewrite
+# Target: lines of `settings: { id: <winget-id>, source: winget, version: '<ver>' }` (msstore is out of scope)
 
 [CmdletBinding()]
 param([switch]$Apply)

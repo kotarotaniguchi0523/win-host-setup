@@ -1,8 +1,8 @@
-# hygiene.ps1 — 公開リポジトリの衛生検査（個人パス・アカウント名の混入防止）
-# 使い方: pwsh -File tools/ci/hygiene.ps1 [-Root <dir>] [-WarnOnly]
-# 終了コード: 0=クリーン / 1=検出あり（-WarnOnly 以外）
+# hygiene.ps1 - Hygiene check for a public repository (prevents leaking personal paths and account names)
+# Usage: pwsh -File tools/ci/hygiene.ps1 [-Root <dir>] [-WarnOnly]
+# Exit code: 0=clean / 1=findings (unless -WarnOnly)
 #
-# 誤検知を避けるため、プレースホルダ（%VAR% 形式）と省略記号（...）は対象外にする。
+# To avoid false positives, placeholders (%VAR% form) and ellipses (...) are excluded.
 
 [CmdletBinding()]
 param([string]$Root, [switch]$WarnOnly)
@@ -12,8 +12,8 @@ $ErrorActionPreference = 'Stop'
 if (-not $Root) { $Root = Get-RepoRoot }
 if (-not (Test-Path $Root)) { throw "対象ディレクトリがありません: $Root" }
 
-# 実在するホームディレクトリの絶対パスだけを検出する
-#   C:\Users\<name>   /home/<name>   /Users/<name>   （<name> は %...% や ... を除く）
+# Detect only absolute paths of real home directories
+#   C:\Users\<name>   /home/<name>   /Users/<name>   (<name> excludes %...% and ...)
 $pattern = '(?i)(C:\\+Users\\+(?!%|\.\.\.)[A-Za-z0-9._-]+|/home/(?!%|\.\.\.)[A-Za-z0-9._-]+|/Users/(?!%|\.\.\.)[A-Za-z0-9._-]+)'
 $emailPattern = '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'
 

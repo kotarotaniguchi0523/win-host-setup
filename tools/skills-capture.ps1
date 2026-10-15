@@ -1,12 +1,12 @@
-# skills-capture.ps1 — 実環境の Skills をリポジトリへ書き出す（ローカル更新 → Push 用）
-# 使い方: pwsh -File tools/skills-capture.ps1 [-Check]
-#   -Check : 書き換えず、差分・上書き予定だけを表示
+# skills-capture.ps1 - Write the real environment's Skills into the repository (for local updates -> push)
+# Usage: pwsh -File tools/skills-capture.ps1 [-Check]
+#   -Check : do not rewrite; only show diffs and planned overwrites
 #  - ~/.apm/apm.yml / apm.lock.yaml         → skills/
-#  - ~/.agents/skills/* のうち APM 管理外 → skills/local/*（自作 Skill）
+#  - ~/.agents/skills/* that are not APM-managed -> skills/local/* (local skills)
 #
-# ★ 向き: 自作 Skill は **ホスト（~/.agents/skills）が正**。既存の skills/local/<name> は
-#   ホストの内容で置き換わる（その場合は必ずログに出す）。リポジトリ側を直接編集した場合は、
-#   先に tools/skills-apply.ps1 を実行してホストへ反映してから本スクリプトを実行すること。
+# * Direction: local skills use **the host (~/.agents/skills) as the source of truth**. An existing skills/local/<name> is
+#   replaced with the host's content (and that is always logged). If you edited the repository side directly,
+#   first run tools/skills-apply.ps1 to reflect it into the host, then run this script.
 
 [CmdletBinding()]
 param([switch]$Check, [switch]$Force)
@@ -21,7 +21,7 @@ $localDst = Join-Path $repoSk 'local'
 
 New-Item -ItemType Directory -Force -Path $repoSk | Out-Null
 
-# 1) グローバル・マニフェストとロック
+# 1) Global manifest and lock
 foreach ($f in 'apm.yml', 'apm.lock.yaml') {
     $src = Join-Path $apmDir $f
     if (-not (Test-Path $src)) { Write-Warning "見つかりません（スキップ）: $src"; continue }
@@ -42,7 +42,7 @@ foreach ($f in 'apm.yml', 'apm.lock.yaml') {
     }
 }
 
-# 2) APM が管理しているスキル名（ロックの deployed_files から）
+# 2) Skill names managed by APM (from the lock's deployed_files)
 $managed = @()
 $lock = Join-Path $repoSk 'apm.lock.yaml'
 if (Test-Path $lock) {
@@ -51,7 +51,7 @@ if (Test-Path $lock) {
         Sort-Object -Unique
 }
 
-# 3) 自作スキル（APM 管理外）→ skills/local/
+# 3) Local skills (not APM-managed) -> skills/local/
 if (-not (Test-Path $skillDir)) {
     Write-Host "[i] $skillDir がありません（自作スキルなし）"
     return
@@ -59,7 +59,7 @@ if (-not (Test-Path $skillDir)) {
 
 $captured = 0
 foreach ($d in (Get-ChildItem $skillDir -Directory -ErrorAction SilentlyContinue)) {
-    if ($managed -contains $d.Name) { continue }   # APM 管理下は対象外
+    if ($managed -contains $d.Name) { continue }   # APM-managed ones are out of scope
 
     $target = Join-Path $localDst $d.Name
     $exists = Test-Path $target
@@ -81,7 +81,7 @@ foreach ($d in (Get-ChildItem $skillDir -Directory -ErrorAction SilentlyContinue
 
 if ($captured -eq 0) { Write-Host "[i] 自作スキルはありません（APM 管理: $($managed.Count) 件）" }
 
-# 空の skills/local は残さない
+# Do not leave an empty skills/local behind
 if ((Test-Path $localDst) -and -not (Get-ChildItem $localDst -Force -ErrorAction SilentlyContinue)) {
     Remove-Item $localDst -Recurse -Force
 }

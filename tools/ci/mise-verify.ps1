@@ -1,8 +1,8 @@
-# mise-verify.ps1 — リポジトリの mise 設定をグローバルへ配置し、lock どおりに導入できるか検証する
-# 使い方: pwsh -File tools/ci/mise-verify.ps1 [-Lock] [-Summary]
-#   -Lock    : mise lock を実行し、結果（config/lock/locks）をリポジトリへ書き戻す（relock 用）
-#   -Summary : 導入結果と更新候補を GITHUB_STEP_SUMMARY に出力する
-# 終了コード: 0=成功 / 1=失敗（lock 不一致・導入失敗）
+# mise-verify.ps1 - Deploy this repository's mise config globally and verify it installs as the lock specifies
+# Usage: pwsh -File tools/ci/mise-verify.ps1 [-Lock] [-Summary]
+#   -Lock    : run mise lock and write the results (config/lock/locks) back into the repository (for relock)
+#   -Summary : write the install results and update candidates to GITHUB_STEP_SUMMARY
+# Exit code: 0=success / 1=failure (lock mismatch or install failure)
 
 [CmdletBinding()]
 param([switch]$Lock, [switch]$Summary)
@@ -31,7 +31,7 @@ Invoke-Native mise @('--version') -What 'mise --version'
 
 if ($Lock) { Invoke-Native mise @('lock', '--global') -What 'mise lock --global' }
 
-# npm は mise 上で node に依存するため、node を先に入れてから全体を導入する
+# npm depends on node in mise, so install node first and then everything else
 try   { Invoke-Native mise @('install', 'node', '--locked') -What 'mise install node --locked' }
 catch { Write-Warning "node の lock 導入に失敗したため lock 無しで再試行します: $($_.Exception.Message)"
         Invoke-Native mise @('install', 'node') -What 'mise install node' }
@@ -46,7 +46,7 @@ if ($Summary) {
 
 if (-not $Lock) { return }
 
-# 結果をリポジトリへ書き戻す
+# Write the results back into the repository
 Copy-Item (Join-Path $miseDst 'config.toml') $srcToml -Force
 Copy-Item (Join-Path $miseDst 'mise.lock')   $srcLock -Force
 $dstLocks = Join-Path $miseDst 'locks'

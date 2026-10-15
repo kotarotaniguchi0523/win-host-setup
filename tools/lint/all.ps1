@@ -1,10 +1,10 @@
-# all.ps1 — このリポジトリの Lint をまとめて実行（hk / CI / 手動で共用）
-# 使い方: pwsh -File tools/lint/all.ps1 [-Fix]
-#   1. PII 検査      （tools/depii.ps1 -Check）
-#   2. Actions Lint  （tools/lint/actions.ps1: actionlint + sisakulint）
-#   3. 秘密情報      （tools/lint/secrets.ps1: betterleaks + secretlint）
-#   4. Skills 評価   （tools/ci/waza-check.ps1: waza）
-# 終了コード: 0=すべてクリーン / 1=検出あり
+# all.ps1 - Run all Lints for this repository together (shared by hk / CI / manual)
+# Usage: pwsh -File tools/lint/all.ps1 [-Fix]
+#   1. PII check      (tools/depii.ps1 -Check)
+#   2. Actions Lint   (tools/lint/actions.ps1: actionlint + sisakulint)
+#   3. Secrets        (tools/lint/secrets.ps1: betterleaks + secretlint)
+#   4. Skills eval    (tools/ci/waza-check.ps1: waza)
+# Exit code: 0=all clean / 1=findings
 
 [CmdletBinding()]
 param([switch]$Fix)

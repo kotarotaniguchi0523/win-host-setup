@@ -1,9 +1,9 @@
-# skills-verify.ps1 — Skills(APM) のマニフェスト配置・lock ドリフト検出・セキュリティ監査
-# 使い方: pwsh -File tools/ci/skills-verify.ps1 [-SarifPath <path>] [-StrictAudit]
-# 前提: apm CLI（Windows では winget Microsoft.APM）
-# 終了コード: 0=成功 / 1=lock のピン不一致、または -StrictAudit 時の監査違反
+# skills-verify.ps1 - Skills (APM) manifest deployment, lock drift detection, and security audit
+# Usage: pwsh -File tools/ci/skills-verify.ps1 [-SarifPath <path>] [-StrictAudit]
+# Requires: apm CLI (on Windows, winget Microsoft.APM)
+# Exit code: 0=success / 1=lock pin mismatch, or an audit violation under -StrictAudit
 #
-# ドリフト判定は「ピン（repo_url / resolved_ref / resolved_commit）」で行う（整形差に強い）。
+# Drift is judged by the "pins" (repo_url / resolved_ref / resolved_commit), which are robust to formatting differences.
 
 [CmdletBinding()]
 param([string]$SarifPath, [switch]$StrictAudit, [switch]$SkipAudit, [switch]$Relock)
@@ -29,9 +29,9 @@ try {
     Invoke-Native $apm @('install', '--global') -What 'apm install --global'
 } finally { Pop-Location }
 
-# --- lock ドリフト（ピンで比較）---
-# 注意: resolved_ref は環境によりタグにも SHA にもなる（例: v0.39.1 / 1165952d…）ため、
-#       実体を固定する **repo_url + resolved_commit** のみで比較する。
+# --- lock drift (compare by pin) ---
+# Note: resolved_ref can be a tag or a SHA depending on the environment (e.g. v0.39.1 / 1165952d...), so
+#       compare only **repo_url + resolved_commit**, which fix the actual commit.
 function Get-Pins([string]$Path) {
     if (-not (Test-Path $Path)) { return @() }
     $repoUrl = $null; $sha = $null; $out = @()
@@ -49,7 +49,7 @@ if (Test-Path $repoLck) {
     Write-Host "--- リポジトリ ---"; $expected
     Write-Host "--- CI 生成 ---";     $actual
     $diff = Compare-Object $expected $actual
-    # -SkipAudit（relock 用）ではロックが古い前提なのでドリフト判定で止めない
+# Under -SkipAudit (for relock) the lock is expected to be old, so do not stop on drift
     if ($diff -and -not $SkipAudit) {
         throw "apm.lock.yaml のピン（repo_url / resolved_commit）が一致しません。tools/skills-apply.ps1 -Lock または tools/sync.ps1 を実行してください。"
     }
@@ -67,8 +67,8 @@ if ($SkipAudit) {
     return
 }
 
-# --- セキュリティ監査（hidden Unicode / drift / policy）---
-# --ci は json / sarif のみ対応。SARIF を出力しつつ、要点をサマリに出す。
+# --- security audit (hidden Unicode / drift / policy) ---
+# --ci supports only json / sarif. Emit SARIF and put the highlights in the summary.
 if (-not $SarifPath) { $SarifPath = Join-Path ([IO.Path]::GetTempPath()) 'apm-audit.sarif' }
 Push-Location $apmHome
 try { & $apm audit --ci --format sarif --output $SarifPath; $auditCode = $LASTEXITCODE }
@@ -79,7 +79,7 @@ if (-not (Test-Path $SarifPath)) {
         Set-Content -Path $SarifPath -Encoding UTF8
 }
 
-# サマリ（SARIF から件数とルール内訳を出す）
+# Summary (extract the count and rule breakdown from SARIF)
 try {
     $sarif = Get-Content $SarifPath -Raw -Encoding UTF8 | ConvertFrom-Json
     $results = @($sarif.runs | ForEach-Object { $_.results } | Where-Object { $_ })
@@ -104,5 +104,5 @@ if ($auditCode -ne 0) {
     Write-Host '[ok] apm audit クリーン'
 }
 
-# 監査の非ゼロ終了を「スクリプトの終了コード」に漏らさない（呼び出し側で制御する）
+# Do not leak a non-zero audit exit into the "script exit code" (the caller decides)
 exit 0

@@ -1,10 +1,10 @@
-# Renovate（セルフホスト）— 依存の自動更新 PR を作る
-# 前提: リポジトリの Secrets に `RENOVATE_TOKEN`（repo スコープの PAT）を登録する
-#   ※ `GITHUB_TOKEN` で作った PR は他ワークフローを起動しないため PAT を推奨
+# Renovate (self-hosted) - create PRs that auto-update dependencies
+# Requires: register `RENOVATE_TOKEN` (a repo-scoped PAT) in the repository Secrets
+#   * A PAT is recommended because PRs created with `GITHUB_TOKEN` do not trigger other workflows
 name: renovate
 on:
   schedule:
-    - cron: '0 18 * * 0' # 月曜 03:00 JST
+    - cron: '0 18 * * 0' # Monday 03:00 JST
   workflow_dispatch:
     inputs:
       logLevel:
@@ -32,5 +32,5 @@ jobs:
         env:
           LOG_LEVEL: ${{ inputs.logLevel || 'info' }}
           RENOVATE_REPOSITORIES: ${{ github.repository }}
-          # mise.lock の再生成は relock.yml が担当するため、ここでは実行させない
+          # mise.lock regeneration is handled by relock.yml, so do not run it here
           RENOVATE_ALLOWED_UNSAFE_EXECUTIONS: '[]'

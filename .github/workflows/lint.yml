@@ -1,7 +1,7 @@
-# Lint（並列ジョブ）: Actions / 秘密情報 / PII を独立したジョブで同時に実行する
-#  - 各ジョブは tools/lint/ と tools/ci/ のスクリプトを呼ぶだけ（ローカルでも同じコマンドで再現できる）
-#  - ツールのキャッシュは jdx/mise-action（mise のツールストア）に任せる
-#    （actions/cache は PR からキャッシュを汚染できるため使わない）
+# Lint (parallel jobs): run Actions / secrets / PII in independent jobs at the same time
+#  - Each job just calls a script in tools/lint/ or tools/ci/ (reproducible locally with the same command)
+#  - Delegate tool caching to jdx/mise-action (the mise tool store)
+#    (do not use actions/cache because a PR could poison the cache)
 name: lint
 
 on:
@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-          fetch-depth: 0 # betterleaks が履歴を走査するため
+          fetch-depth: 0 # because betterleaks scans the history
       - uses: jdx/mise-action@v5.1.2
         with:
           cache: true

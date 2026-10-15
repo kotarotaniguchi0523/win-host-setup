@@ -1,10 +1,10 @@
-# todo.py — グローバル全項目を「参照元つき」で全て列挙した TODO を生成（判断はしない）
+# todo.py - Generate a TODO that enumerates every global item "with references" (no decisions)
 import importlib.metadata as md
 import json, os, re, glob, collections
 
 from pathlib import Path
 
-DST = str(Path(__file__).resolve().parents[1])  # リポジトリのルート
+DST = str(Path(__file__).resolve().parents[1])  # repository root
 OUT = os.path.join(DST, "TODO-inventory.md")
 APP = os.environ.get('APPDATA', '')
 LOCAL = os.environ.get('LOCALAPPDATA', '')

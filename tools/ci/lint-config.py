@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""lint-config.py — リポジトリの設定ファイルの構文を検証する（CI・ローカル共用）
+"""lint-config.py - validate the syntax of this repository's config files (shared by CI and local use)
 
-使い方: python3 tools/ci/lint-config.py [<repo-root>]
-終了コード: 0=OK / 1=構文エラー
+Usage: python3 tools/ci/lint-config.py [<repo-root>]
+Exit code: 0=OK / 1=syntax error
 """
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ import sys
 import tomllib
 
 try:
-    import yaml  # PyYAML（GitHub Actions の ubuntu ランナーには同梱。無ければ pip install pyyaml）
+    import yaml  # PyYAML (bundled with GitHub Actions ubuntu runners; pip install pyyaml if missing)
 except ModuleNotFoundError:  # pragma: no cover
     print("PyYAML が必要です: pip install pyyaml", file=sys.stderr)
     sys.exit(2)
@@ -38,7 +38,7 @@ def main() -> int:
                 with open(path, encoding="utf-8") as fh:
                     loader(fh)
             print(f"[ok] {rel}")
-        except Exception as exc:  # noqa: BLE001 - 構文エラーをまとめて報告する
+        except Exception as exc:  # noqa: BLE001 - report syntax errors together
             errors.append(f"{rel}: {exc}")
             print(f"[x] {rel}: {exc}")
 

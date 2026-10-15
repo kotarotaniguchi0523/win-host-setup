@@ -1,4 +1,4 @@
-# scan-repos.ps1 — ユーザー配下の Git リポジトリを列挙
+# scan-repos.ps1 - List the Git repositories under the user profile
 $ErrorActionPreference = 'SilentlyContinue'
 $root = $env:USERPROFILE
 $DST = Split-Path $PSScriptRoot -Parent

@@ -1,10 +1,10 @@
-# secrets.ps1 — 秘密情報のスキャン（betterleaks + secretlint）
-# 使い方: pwsh -File tools/lint/secrets.ps1 [<paths...>]
-#   paths 省略時: betterleaks は git 履歴、secretlint は主要ファイル
-# 終了コード: 0=クリーン / 1=検出あり
+# secrets.ps1 - Secret scanning (betterleaks + secretlint)
+# Usage: pwsh -File tools/lint/secrets.ps1 [<paths...>]
+#   When paths is omitted: betterleaks scans the git history, secretlint scans the main files
+# Exit code: 0=clean / 1=findings
 #
-# 注: secretlint の preset（@secretlint/secretlint-rule-preset-recommend）は別パッケージのため、
-#     mise のインストール先から NODE_PATH を解決して読み込む。
+# Note: secretlint's preset (@secretlint/secretlint-rule-preset-recommend) is a separate package, so
+#       resolve NODE_PATH from the mise install location and load it from there.
 
 [CmdletBinding()]
 param([string[]]$Paths = @())
@@ -16,9 +16,9 @@ Push-Location $repo
 try {
     $failed = $false
 
-    # --- betterleaks（履歴 + 追跡ファイル）---
-    # 注: .agent/（非公開の退避データ）等の未追跡ファイルは対象外にする。
-    #     追跡ファイルのみを対象にすることで「リポジトリに入るもの」を検査する。
+    # --- betterleaks (history + tracked files) ---
+    # Note: exclude untracked files such as .agent/ (private backup data).
+    #       Targeting only tracked files checks "what goes into the repository".
     if (-not (Get-Command betterleaks -ErrorAction SilentlyContinue)) { throw 'betterleaks が見つかりません（mise install）' }
     Write-Host '=== betterleaks (git history) ===' -ForegroundColor Cyan
     & betterleaks git $repo --no-banner
@@ -27,7 +27,7 @@ try {
     Write-Host '=== betterleaks (tracked files) ===' -ForegroundColor Cyan
     $tracked = @(git -C $repo ls-files)
     if ($tracked.Count -gt 0) {
-        # コマンドライン長の上限（Windows は約 32KB）を避けるため分割してスキャンする
+        # Split the scan to stay under the command-line length limit (about 32KB on Windows)
         $batch = @(); $len = 0
         foreach ($f in $tracked) {
             $batch += $f; $len += $f.Length + 1
@@ -43,7 +43,7 @@ try {
         }
     }
 
-    # --- secretlint（preset 付き）---
+    # --- secretlint (with preset) ---
     if (-not (Get-Command secretlint -ErrorAction SilentlyContinue)) {
         Write-Warning 'secretlint が見つかりません（mise install）。betterleaks のみで判定します。'
     } else {

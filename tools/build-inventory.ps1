@@ -1,4 +1,4 @@
-# build-inventory.ps1 — inventory.md を生データから生成（会話に内容を出さない）
+# build-inventory.ps1 - Generate inventory.md from raw data (do not dump the content into the conversation)
 $ErrorActionPreference = 'Stop'
 $dst = Split-Path $PSScriptRoot -Parent
 

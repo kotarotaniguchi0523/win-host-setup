@@ -1,11 +1,11 @@
-# pull.ps1 — 逆同期: public（または GitHub）→ source → 実環境
-# 使い方: pwsh -File tools/pull.ps1 [-Apply] [-From <dir>]
-#   -Apply : 取り込んだ後に実環境へ適用する（apply.ps1 / skills-apply.ps1 -Lock）
-#   -From  : 取り込み元（既定: ./public。GitHub から取る場合は clone 済みディレクトリを指定）
+# pull.ps1 - Reverse sync: public (or GitHub) -> source -> real environment
+# Usage: pwsh -File tools/pull.ps1 [-Apply] [-From <dir>]
+#   -Apply : after pulling, apply to the real environment (apply.ps1 / skills-apply.ps1 -Lock)
+#   -From  : pull source (default: ./public. To pull from GitHub, specify a cloned directory)
 #
-# 目的: Renovate / Dependabot が GitHub 側で更新した「宣言」（mise/mise.toml, skills/apm.yml,
-#       winget/host.dsc.yaml）と「ロック」を source に取り込み、実環境へ反映する。
-#       これが無いと capture（ホストが正）が GitHub の更新を上書きしてしまう。
+# Purpose: pull the "declarations" that Renovate / Dependabot updated on the GitHub side (mise/mise.toml, skills/apm.yml,
+#          winget/host.dsc.yaml) and the "locks" into source, then reflect them into the real environment.
+#          Without this, capture (host is the source of truth) would overwrite GitHub's updates.
 
 [CmdletBinding()]
 param([switch]$Apply, [string]$From)
@@ -16,7 +16,7 @@ $repo = Split-Path $PSScriptRoot -Parent
 if (-not $From) { $From = Join-Path $repo 'public' }
 if (-not (Test-Path $From)) { throw "取り込み元がありません: $From（先に public を clone / fetch してください）" }
 
-# 取り込む対象（宣言とロック）
+# Files to pull (declarations and locks)
 $files = @(
     'mise/mise.toml',
     'mise/mise.lock',

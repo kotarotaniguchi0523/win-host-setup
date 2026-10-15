@@ -1,10 +1,10 @@
-# deps.py — グローバル導入の「参照元つき」棚卸し TODO を生成
+# deps.py - Generate a TODO inventory of global installs "with references"
 import importlib.metadata as md
 import json, os, re, glob, collections
 
 from pathlib import Path
 
-DST = str(Path(__file__).resolve().parents[1])  # リポジトリのルート
+DST = str(Path(__file__).resolve().parents[1])  # repository root
 OUT = os.path.join(DST, "TODO-inventory.md")
 
 def name_of(req):
@@ -103,14 +103,14 @@ L += render("B. pip — ユーザー site（%APPDATA%\\Python）", {k: v for k, 
 npm = collect_npm()
 L += render("C. npm -g（%APPDATA%\\npm）", npm)
 
-# D. pnpm global（直接導入のみ）
+# D. pnpm global (direct installs only)
 L.append("## D. pnpm global（直接導入）")
 L.append("")
 L.append("- [ ] `osgrep` — 被参照: なし(root) ／ 依存: 巨大（`@huggingface/transformers`, `@lancedb`, `@swc`, `sharp` 等）")
 L.append("- [ ] `pnpm@10.17.1` — npm -g 経由。**mise 管理へ移行**（現行は古い）")
 L.append("")
 
-# E. mise 管理
+# E. mise-managed
 L.append("## E. mise 管理（`~/.config/mise/config.toml`）")
 L.append("")
 for t in ["betterleaks@1.2.0", "node@24.16.0", "python@3.13.13", "gh@2.92.0", "doppler@3.76.0",

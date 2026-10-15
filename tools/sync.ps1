@@ -1,11 +1,11 @@
-# sync.ps1 — 「ローカルで更新 → リポジトリ → 公開」を 1 コマンドで行う
-# 使い方: pwsh -File tools/sync.ps1 [-Message "..."] [-NoPush] [-Check]
-#  1. capture.ps1        : 実環境の mise 設定をリポジトリへ
-#  2. skills-capture.ps1 : 実環境の Skills（~/.apm・自作）をリポジトリへ
-#  3. depii.ps1          : ソース側の PII を除去
-#  4. sanitize.ps1       : public/ を再生成（個人情報を伏せる）
-#  5. source / public をコミットし、public を push
-# 失敗時はその時点で停止する（git の異常終了も例外にする）。
+# sync.ps1 - Do "update locally -> repository -> publish" with a single command
+# Usage: pwsh -File tools/sync.ps1 [-Message "..."] [-NoPush] [-Check]
+#  1. capture.ps1        : real environment's mise config -> repository
+#  2. skills-capture.ps1 : real environment's Skills (~/.apm and local) -> repository
+#  3. depii.ps1          : remove PII from the source side
+#  4. sanitize.ps1       : regenerate public/ (mask personal information)
+#  5. commit source / public and push public
+# Stop at the point of failure (also treat abnormal git exits as exceptions).
 
 [CmdletBinding()]
 param([string]$Message = "", [switch]$NoPush, [switch]$Check)
@@ -22,10 +22,10 @@ function Invoke-Step {
     & $Body
 }
 
-# 1-4) 生成・変換（子スクリプトは例外が伝播するのでそのまま呼ぶ）
+# 1-4) generate / convert (child scripts propagate exceptions, so call them directly)
 Invoke-Step 'pull（public → source → 実環境。Renovate/Dependabot の更新を取り込む）' {
     if (Test-Path (Join-Path $PSScriptRoot 'pull.ps1')) {
-        # -Apply: 実環境へ反映してから capture（ホストが正）するので、取り込んだ内容が失われない
+        # -Apply: reflects into the real environment before capture (host is the source of truth), so pulled content is not lost
         & (Join-Path $PSScriptRoot 'pull.ps1') -Apply
     }
 }
@@ -39,7 +39,7 @@ if ($Check) {
     return
 }
 
-# 5) コミット（変更が無ければ何もしない）
+# 5) commit (do nothing when there are no changes)
 function Commit-IfChanged {
     param([Parameter(Mandatory)][string]$GitDir, [Parameter(Mandatory)][string]$Label)
     Invoke-Native 'git' @('-C', $GitDir, 'add', '-A') -What "git add ($Label)"
@@ -58,7 +58,7 @@ Invoke-Step 'public リポジトリ' {
     $committed = Commit-IfChanged -GitDir $pub -Label 'public'
     if ($NoPush) { Write-Host '[i] -NoPush のため push しません'; return }
     if (-not $committed) {
-        # コミットは無くても未 push のコミットが残っている可能性がある
+        # Even with no commit, there may be unpushed commits left over
         $ahead = (git -C $pub rev-list --count '@{u}..HEAD' 2>$null)
         if (-not $ahead -or [int]$ahead -eq 0) { Write-Host '[i] push する変更なし'; return }
     }

@@ -1,19 +1,19 @@
 name: win-host-setup
 version: 1.0.0
-description: このホストで使うグローバル Skills / APM パッケージ（検証重視・バージョン固定）
+description: Global Skills / APM packages used on this host (verification-focused, version-pinned)
 
 dependencies:
   apm:
-    # ブラウザ操作 / Web 取得
+    # Browser automation / web fetching
     - vercel-labs/agent-browser#v0.39.1
     - yusukebe/ax#v0.1.25
-    # 日本語推敲（AI 生成の日本語を自然な日本語へ）
+    # Japanese proofreading (rewrite AI-generated Japanese into natural Japanese)
     - nanaism/yomiyasu#v1.1.2
-    # 公式 Nushell スキル（nushell org / nu_scripts）
+    # Official Nushell skills (nushell org / nu_scripts)
     - nushell/nu_scripts#main
-    # 説明・図解スキル（mizchi 作。タグが無いため main 固定 + lock で commit 固定）
+    # Explanation / diagram skills (by mizchi; no tags, so pinned to main + commit via lock)
     - mizchi/explainer#main
-    # 公式 Waza スキル（Skill 評価 CLI の操作 / 対話）
+    # Official Waza skills (Skill evaluation CLI operation / interaction)
     - microsoft/waza/skills/waza#v0.38.10
     - microsoft/waza/skills/waza-interactive#v0.38.10
 

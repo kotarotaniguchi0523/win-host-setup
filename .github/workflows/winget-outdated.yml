@@ -1,5 +1,5 @@
-# winget: DSC のピンを最新化して PR を出す（winget を情報源にする）
-# 土曜 03:00 JST に実行。差分が無ければ何もしない。
+# winget: bring the DSC pins up to date and open a PR (winget is the source of truth)
+# Runs Saturday 03:00 JST. Does nothing when there are no diffs.
 name: winget-outdated
 on:
   schedule:
@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
         with:
-          persist-credentials: false   # push は gh auth setup-git 経由で行う
+          persist-credentials: false   # push via gh auth setup-git
       - name: winget の最新版と突き合わせ
         shell: pwsh
         run: ./tools/update-winget-dsc.ps1 -Apply
@@ -27,7 +27,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh auth setup-git   # persist-credentials: false のため gh 経由で認証する
+          gh auth setup-git   # authenticate via gh because persist-credentials: false
           git diff --quiet -- winget/host.dsc.yaml
           if ($LASTEXITCODE -eq 0) { Write-Host '更新なし'; exit 0 }
 

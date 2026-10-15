@@ -1,12 +1,12 @@
-# 週次の健全性チェック（CI による保守運用）
-#  - mise: lock のドリフト検出 / 更新候補
-#  - winget: DSC のピンと最新版の乖離
-#  - 衛生: 個人パス等の混入検査
-# ロジックは tools/ci/ と tools/update-winget-dsc.ps1 に分離している
+# Weekly health check (maintenance operations via CI)
+#  - mise: lock drift detection / update candidates
+#  - winget: divergence between DSC pins and the latest versions
+#  - hygiene: check for leaked personal paths etc.
+# Logic is split into tools/ci/ and tools/update-winget-dsc.ps1
 name: healthcheck
 on:
   schedule:
-    - cron: '0 18 * * 6' # 日曜 03:00 JST
+    - cron: '0 18 * * 6' # Sunday 03:00 JST
   workflow_dispatch:
 permissions:
   contents: read

@@ -1,7 +1,7 @@
-# install-apm.ps1 — APM CLI（winget Microsoft.APM）を導入し、実行パスを GITHUB_ENV に出す
-# 使い方: pwsh -File tools/ci/install-apm.ps1
-# 前提: Windows（winget が使えること）
-# 出力: APM_DIR=<apm.exe のあるディレクトリ>
+# install-apm.ps1 - Install the APM CLI (winget Microsoft.APM) and export its path to GITHUB_ENV
+# Usage: pwsh -File tools/ci/install-apm.ps1
+# Requires: Windows (winget must be available)
+# Output: APM_DIR=<directory containing apm.exe>
 
 [CmdletBinding()]
 param()
@@ -10,7 +10,7 @@ $ErrorActionPreference = 'Stop'
 
 if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw "winget が見つかりません（Windows ランナーで実行してください）" }
 
-# 既に入っていれば入れ直さない
+# Skip reinstall if it is already present
 if (-not (Get-Command apm -ErrorAction SilentlyContinue)) {
     try {
         Invoke-Native 'winget' @(

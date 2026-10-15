@@ -1,10 +1,10 @@
-# apply.ps1 — リポジトリ（source）→ 実環境へ適用
-# 使い方: pwsh -File tools/apply.ps1
-#  - mise/mise.toml  → ~/.config/mise/config.toml へ複製
-#  - mise/mise.lock  → ~/.config/mise/mise.lock  へ複製
-#  - mise/locks/     → ~/.config/mise/locks/     へ複製（pypi の依存グラフ）
-#  - mise install で不足ツールを導入
-# 注意: 既存の config / lock はタイムスタンプ付きでバックアップする
+# apply.ps1 - repository (source) -> real environment
+# Usage: pwsh -File tools/apply.ps1
+#  - mise/mise.toml  -> copy to ~/.config/mise/config.toml
+#  - mise/mise.lock  -> copy to ~/.config/mise/mise.lock
+#  - mise/locks/     -> copy to ~/.config/mise/locks/ (pypi dependency graph)
+#  - install missing tools with mise install
+# Note: existing config / lock are backed up with a timestamp
 
 [CmdletBinding()]
 param()
@@ -19,7 +19,7 @@ if (-not (Test-Path $srcCfg)) { throw "mise/mise.toml がありません（先�
 
 New-Item -ItemType Directory -Force -Path $miseDst | Out-Null
 
-# 既存をバックアップ
+# Back up the existing files
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 foreach ($f in 'config.toml', 'mise.lock') {
     $cur = Join-Path $miseDst $f
@@ -38,7 +38,7 @@ if (Test-Path $locksSrc) {
     Write-Host "[ok] locks/ を適用"
 }
 
-# --- シェル設定（Nushell）: shell/nushell -> ~/.config/nushell ---
+# --- shell config (Nushell): shell/nushell -> ~/.config/nushell ---
 $shellSrc = Join-Path $repo 'shell/nushell'
 $shellDst = Join-Path (Get-HomeDir) '.config/nushell'
 if (Test-Path $shellSrc) {
@@ -64,7 +64,7 @@ if (Get-Command nu -ErrorAction SilentlyContinue) {
 }
 
 Write-Host "`n--- mise install ---"
-& mise install node    # npm が node に依存するため先に入れる
+& mise install node    # install node first because npm depends on it
 & mise install
 if ($LASTEXITCODE -ne 0) {
     Write-Warning "mise install が失敗しました。依存順序の競合の可能性があるため再試行します。"

@@ -1,12 +1,12 @@
-# fix-machine-path.ps1 — Machine PATH を整理（**管理者権限で実行**）
-# 使い方: 管理者の PowerShell で  pwsh -File tools/fix-machine-path.ps1 [-Apply]
-#   -Apply を付けない場合は「プレビュー」のみ
+# fix-machine-path.ps1 - Clean up the Machine PATH (**run with administrator rights**)
+# Usage: in an administrator PowerShell:  pwsh -File tools/fix-machine-path.ps1 [-Apply]
+#   Without -Apply, this is a "preview" only
 #
-# 方針:
-#   Machine PATH = Windows 標準 ＋ 全ユーザー共有のみ
-#   ・存在しないパスを除去
-#   ・重複を除去
-#   ・%USERPROFILE% 配下（個人アプリ）を除去 → それらは User PATH に置く
+# Policy:
+#   Machine PATH = Windows defaults + all-users shared entries only
+#   - remove non-existent paths
+#   - remove duplicates
+#   - remove entries under %USERPROFILE% (per-user apps) -> those go into the User PATH
 
 [CmdletBinding()]
 param([switch]$Apply)

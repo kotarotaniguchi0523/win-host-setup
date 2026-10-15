@@ -1,7 +1,7 @@
-# waza-check.ps1 — Waza（Agent Skills の評価 CLI）で Skill を検査する
-# 使い方: pwsh -File tools/ci/waza-check.ps1 [-Path skills] [-Strict]
-#   -Strict : 指摘があれば exit 1（既定は警告のみ）
-# 前提: waza（mise 管理。jdx/mise-action 等で導入）
+# waza-check.ps1 - Inspect skills with Waza (the Agent Skills evaluation CLI)
+# Usage: pwsh -File tools/ci/waza-check.ps1 [-Path skills] [-Strict]
+#   -Strict : exit 1 when there are findings (default is warnings only)
+# Requires: waza (managed by mise; install via jdx/mise-action etc.)
 
 [CmdletBinding()]
 param([string]$Path = 'skills', [switch]$Strict)
@@ -11,7 +11,7 @@ $ErrorActionPreference = 'Stop'
 $repo = Get-RepoRoot
 $target = Join-Path $repo $Path
 
-# waza が無ければ、リポジトリの mise 設定をグローバルへ置いてから導入する
+# If waza is missing, deploy this repository's mise config globally and then install it
 if (-not (Get-Command waza -ErrorAction SilentlyContinue)) {
     if (-not (Get-Command mise -ErrorAction SilentlyContinue)) { throw "waza も mise も見つかりません" }
     Write-Host '[i] waza を mise で導入します'

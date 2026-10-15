@@ -1,5 +1,5 @@
-# PR / push のたびに「lock の整合性」「設定の構文」「スクリプト」を検証する（並列ジョブ）
-# Lint（Actions / 秘密情報 / PII）は lint.yml が担当する。
+# On every PR / push, verify "lock consistency", "config syntax", and "scripts" (parallel jobs)
+# Lint (Actions / secrets / PII) is handled by lint.yml.
 name: validate
 
 on:

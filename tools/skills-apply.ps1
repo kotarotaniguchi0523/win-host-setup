@@ -1,15 +1,15 @@
-# skills-apply.ps1 — リポジトリの skills/apm.yml を ~/.apm へ配置して反映する
-# 使い方: pwsh -File tools/skills-apply.ps1 [-Lock]
-#   -Lock : 配置後に `apm lock --global` を実行して apm.lock.yaml を再生成し、リポジトリへ戻す
+# skills-apply.ps1 - Deploy this repository's skills/apm.yml to ~/.apm and apply it
+# Usage: pwsh -File tools/skills-apply.ps1 [-Lock]
+#   -Lock : after deploying, run `apm lock --global` to regenerate apm.lock.yaml and copy it back into the repository
 #
-# APM の前提（実測）:
-#   - `--global` は CWD に依存しない（~/.apm を直接使う）。audit だけは CWD のプロジェクトを見る
-#   - 新規依存の統合は「初回 install では走らず、次回実行で走る」ことがある → 実体で検証して再実行する
-#   - 助言メッセージ（apm compile -g）で exit=1 を返すことがある → 終了コードでは判定しない
+# APM prerequisites (measured):
+#   - `--global` does not depend on the CWD (it uses ~/.apm directly). Only audit looks at the CWD project
+#   - Integration of new dependencies "may not run on the first install but on the next run" -> verify against the actual state and re-run
+#   - It may return exit=1 for advisory messages (apm compile -g) -> do not rely on the exit code
 #
-# 既知の upstream バグ（回避策はこのスクリプト側で実施）:
-#   - microsoft/apm#2927 APM 0.30.0 audit reports freshly installed skills as unintegrated on Windows（初回統合漏れ）
-#   - microsoft/apm#3056 UnicodeDecodeError: 'gbk' codec can't decode byte on Windows during 'apm install'（cp932 系）
+# Known upstream bugs (workarounds are implemented in this script):
+#   - microsoft/apm#2927 APM 0.30.0 audit reports freshly installed skills as unintegrated on Windows (missed first integration)
+#   - microsoft/apm#3056 UnicodeDecodeError: 'gbk' codec can't decode byte on Windows during 'apm install' (cp932 family)
 #   - microsoft/apm#3206 apm install writes stale version to apm.lock.yaml when apm_modules/ holds the previous tag
 #   - microsoft/apm#2885 [FEATURE] Support atomic exact dependency reconciliation for global installs
 
@@ -25,14 +25,14 @@ $skillsDest = Join-Path (Get-HomeDir) '.agents/skills'
 
 if (-not (Test-Path (Join-Path $src 'apm.yml'))) { throw "skills/apm.yml がありません" }
 
-# apm CLI を解決（PATH に無ければ winget のパッケージ先を探す）
+# Resolve the apm CLI (look in PATH, then the winget package location)
 $apm = (Get-Command apm -ErrorAction SilentlyContinue).Source
 if (-not $apm) { $apm = Resolve-Apm }
 Write-Host "[i] apm: $apm"
 
 New-Item -ItemType Directory -Force -Path $dst | Out-Null
 
-# 既存をバックアップ（世代は 2 つまでに保つ）
+# Back up existing files (keep at most 2 generations)
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 foreach ($f in 'apm.yml', 'apm.lock.yaml') {
     $cur = Join-Path $dst $f
@@ -46,14 +46,14 @@ Get-ChildItem $dst -Filter '*.bak-*' -ErrorAction SilentlyContinue |
 Copy-Item (Join-Path $src 'apm.yml') (Join-Path $dst 'apm.yml') -Force
 Write-Host "[ok] ~/.apm/apm.yml"
 
-# --- lock（--global は CWD 非依存）---
+# --- lock (--global does not depend on the CWD) ---
 if ($Lock) {
     & $apm lock --global | Out-Null
     $lock = Join-Path $dst 'apm.lock.yaml'
     if (Test-Path $lock) { Copy-Item $lock (Join-Path $src 'apm.lock.yaml') -Force; Write-Host '[ok] skills/apm.lock.yaml を更新' }
 }
 
-# --- 展開（lock の deployed_files と実体を突き合わせて不足なら再実行）---
+# --- deploy (compare the lock's deployed_files with the actual state and re-run if anything is missing) ---
 function Test-SkillsDeployed {
     $lock = Join-Path $dst 'apm.lock.yaml'
     if (-not (Test-Path $lock)) { return $true }
@@ -69,7 +69,7 @@ function Test-SkillsDeployed {
     return ($missing.Count -eq 0)
 }
 
-$null = & $apm install --global 2>&1   # 助言で exit=1 を返すことがあるため終了コードは見ない
+$null = & $apm install --global 2>&1   # it may return exit=1 for advisories, so ignore the exit code
 if (-not (Test-SkillsDeployed)) {
     Write-Host '[i] 未展開の Skill があるため install を再実行します（APM の初回統合の癖）'
     $null = & $apm install --global 2>&1
@@ -77,7 +77,7 @@ if (-not (Test-SkillsDeployed)) {
 }
 Write-Host '[ok] すべての APM Skill が展開されています'
 
-# --- 自作スキル（skills/local/*）を ~/.agents/skills へ配置 ---
+# --- deploy local skills (skills/local/*) to ~/.agents/skills ---
 $localSrc = Join-Path $src 'local'
 if (Test-Path $localSrc) {
     New-Item -ItemType Directory -Force -Path $skillsDest | Out-Null
@@ -90,4 +90,4 @@ if (Test-Path $localSrc) {
 }
 
 Write-Host "`n検証: apm audit --ci / apm outdated --global / waza check"
-exit 0   # 最終状態（全 Skill 展開済み）で成功と判定する
+exit 0   # judge success by the final state (all skills deployed)

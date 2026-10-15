@@ -1,17 +1,17 @@
 # yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
-# Windows ホストの winget 宣言（冪等・バージョン固定）。適用: winget configure winget/host.dsc.yaml
-# 方針: AGENTS.md / AUDIT.md。mise 管理分は mise/config.toml 側。msstore は source: msstore を明示。
+# winget declaration for the Windows host (idempotent, version-pinned). Apply: winget configure winget/host.dsc.yaml
+# Policy: AGENTS.md / AUDIT.md. mise-managed items live on the mise/config.toml side. Use source: msstore explicitly for Store apps.
 properties:
   configurationVersion: 0.2.0
   resources:
-    # --- 開発基盤 ---
+    # --- Dev foundation ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: mise
       directives:
         description: mise-en-place (jdx 公式)
       settings: { id: jdx.mise, source: winget, version: '2026.9.18' }
 
-    # --- 開発 CLI（mise で検証できない / Windows 専用） ---
+    # --- Dev CLI (cannot be validated by mise / Windows-only) ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: git
       directives:
@@ -42,14 +42,14 @@ properties:
         description: Rustup (Rust Project)
       settings: { id: Rustlang.Rustup, source: winget, version: '1.28.2' }
 
-    # --- Store 公式版（msstore を明示） ---
+    # --- Official Store versions (explicit msstore) ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: ngrok-store
       directives:
         description: "ngrok — 公式 Microsoft Store 版 (publisher ngrok)"
       settings: { id: 9MVS1J51GMK6, source: msstore }
 
-    # --- 基盤（必ず残す） ---
+    # --- Foundation (must be kept) ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: docker-desktop
       directives:
@@ -74,8 +74,8 @@ properties:
         description: Ubuntu (Canonical, Store MSIX)
       settings: { id: Canonical.Ubuntu, source: winget, version: '2604.1.75.0' }
 
-    # --- PowerShell: MSI(winget, Microsoft 公式) を利用中 ---
-    # 代替: msstore 9MZ1SNWT0N5D (publisher: Microsoft Corporation)。実行中シェルのため切替は別途慎重に。
+    # --- PowerShell: using the MSI (winget, official Microsoft) ---
+    # Alternative: msstore 9MZ1SNWT0N5D (publisher: Microsoft Corporation). Switching is separate and careful since it is the running shell.
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: powershell
       directives:

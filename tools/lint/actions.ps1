@@ -1,13 +1,13 @@
-# actions.ps1 — GitHub Actions の Lint（jactionlint + sisakulint + pinact）
-# 使い方: pwsh -File tools/lint/actions.ps1 [-Fix]
-#   -Fix : jactionlint / sisakulint の自動修正と pinact のピン留めを適用する
-# 終了コード: 0=クリーン / 1=検出あり
+# actions.ps1 - Lint GitHub Actions (jactionlint + sisakulint + pinact)
+# Usage: pwsh -File tools/lint/actions.ps1 [-Fix]
+#   -Fix : apply jactionlint / sisakulint auto-fixes and pinact pinning
+# Exit code: 0=clean / 1=findings
 #
-# 役割分担:
-#   jactionlint … GitHub Actions の静的チェッカ（actionlint のチェックを包含し、zizmor 系の
-#                 セキュリティ規則・Dependabot 設定・Actions lock（.github/workflows/actions.lock）まで見る）
-#   sisakulint … 追加の SAST。**jactionlint が包含する actionlint 相当のルールは無効化**する
-#   pinact     … uses: の SHA 固定・バージョンコメント・最小経過日数の検証
+# Division of labor:
+#   jactionlint ... static checker for GitHub Actions (includes actionlint checks, zizmor-style
+#                 security rules, Dependabot config, and the Actions lock (.github/workflows/actions.lock))
+#   sisakulint ... extra SAST. **Disables the actionlint-equivalent rules that jactionlint already covers**
+#   pinact     ... verify SHA pinning of uses:, version comments, and the minimum release age
 
 [CmdletBinding()]
 param([switch]$Fix)
@@ -16,9 +16,9 @@ $ErrorActionPreference = 'Stop'
 
 $repo = Get-RepoRoot
 
-# jactionlint（= actionlint 相当）が担当するルールは sisakulint 側で無効化する（重複報告を避ける）
-# commit-sha は GitHub の Actions lock（.github/workflows/actions.lock）が不変性を保証するため無効化する
-# （ワークフローはタグ参照 + lock でコミットを固定するモデルを採用）
+# Disable in sisakulint the rules that jactionlint (= actionlint equivalent) covers (to avoid duplicate reports)
+# Disable commit-sha because the GitHub Actions lock (.github/workflows/actions.lock) guarantees immutability
+# (Workflows use a model of tag references + a lock that pins the commit)
 $sisakuIgnore = @('expression', 'cond', 'job-needs', 'env-var', 'workflow-call', 'deprecated-commands', 'commit-sha')
 $ignoreArgs = @()
 foreach ($r in $sisakuIgnore) { $ignoreArgs += @('-ignore', $r) }
@@ -27,12 +27,12 @@ Push-Location $repo
 try {
     $failed = $false
 
-    # --- jactionlint（構文・式・shellcheck・セキュリティ・Dependabot・Actions lock）---
+    # --- jactionlint (syntax, expressions, shellcheck, security, Dependabot, Actions lock) ---
     if (-not (Get-Command jactionlint -ErrorAction SilentlyContinue)) { throw 'jactionlint が見つかりません（mise install）' }
     Write-Host '=== jactionlint ===' -ForegroundColor Cyan
     if ($Fix) {
         & jactionlint --fix
-        # 自動修正できない指摘が残っていないか再チェックする（--fix の exit は 1 でも成功扱いになるため）
+        # Re-check whether any non-auto-fixable findings remain (--fix exits 1 even on success)
         Write-Host '[i] 修正後に再チェックします' -ForegroundColor DarkGray
         & jactionlint
         if ($LASTEXITCODE -ne 0) { $failed = $true; Write-Warning 'jactionlint: 自動修正できない指摘が残っています' }
@@ -44,7 +44,7 @@ try {
         else { Write-Host '[ok] jactionlint' }
     }
 
-    # --- sisakulint（追加の SAST）---
+    # --- sisakulint (extra SAST) ---
     if (-not (Get-Command sisakulint -ErrorAction SilentlyContinue)) { throw 'sisakulint が見つかりません（mise install）' }
     Write-Host '=== sisakulint ===' -ForegroundColor Cyan
     if ($Fix) {
@@ -62,7 +62,7 @@ try {
         }
     }
 
-    # --- pinact（任意。Actions lock 採用後はタグ参照が正となるため既定では実行しない）---
+    # --- pinact (optional. After adopting the Actions lock, tag references are canonical, so it does not run by default) ---
     if ($env:JACTIONLINT_USE_PINACT -eq '1') {
         if (Get-Command pinact -ErrorAction SilentlyContinue) {
             Write-Host '=== pinact ===' -ForegroundColor Cyan

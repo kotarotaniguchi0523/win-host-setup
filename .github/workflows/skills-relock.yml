@@ -1,5 +1,5 @@
-# skills-relock.yml — Renovate が skills/apm.yml を更新したら apm.lock.yaml を再生成して同じ PR に積む
-# （mise 側の relock.yml と対になる。これが無いと宣言とロックがズレたまま PR が通ってしまう）
+# skills-relock.yml - when Renovate updates skills/apm.yml, regenerate apm.lock.yaml and push it onto the same PR
+# (Counterpart to mise's relock.yml. Without it, a PR could pass with the declaration and lock out of sync.)
 name: skills-relock
 
 on:
@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.head_ref }}
-          persist-credentials: false # push は gh auth setup-git 経由
+          persist-credentials: false # push via gh auth setup-git
 
       - name: APM を導入
         shell: pwsh
