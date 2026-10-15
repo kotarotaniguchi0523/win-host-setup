@@ -22,10 +22,10 @@ jobs:
     name: Actions Lint（actionlint / sisakulint / pinact）
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
+      - uses: jdx/mise-action@v5.1.2
         with:
           cache: true
       - name: Lint
@@ -34,7 +34,7 @@ jobs:
       - name: SARIF（sisakulint）
         if: ${{ always() && hashFiles('sisakulint.sarif') != '' }}
         continue-on-error: true
-        uses: github/codeql-action/upload-sarif@24c54180a607e11b4d6e1b0e1a2b3c4d5e6f7a8b # v4
+        uses: github/codeql-action/upload-sarif@v4.38.3
         with:
           sarif_file: sisakulint.sarif
           category: sisakulint
@@ -43,11 +43,11 @@ jobs:
     name: 秘密情報（betterleaks / secretlint）
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 0 # betterleaks が履歴を走査するため
-      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
+      - uses: jdx/mise-action@v5.1.2
         with:
           cache: true
       - name: スキャン
@@ -58,7 +58,7 @@ jobs:
     name: PII・衛生（depii / hygiene）
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - name: PII 検査

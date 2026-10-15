@@ -5,9 +5,9 @@
 # 注: sisakulint は Windows バイナリを配布していない（darwin/linux のみ）ため、
 #     go: バックエンドでソースからビルドする（Linux/macOS でも同じ定義で動く）。
 [tools]
-actionlint                          = "1.7.12"
+"github:jdx/jactionlint"                = "2.1.0"
 "go:github.com/sisaku-security/sisakulint/cmd/sisakulint" = "0.3.8"
-hk                                  = "2.6.0"
+hk                                  = { version = "2.6.0", lazy = true }  # ローカルの git フック専用（CI では導入しない）
 "npm:secretlint"                    = "13.0.7"
 "npm:@secretlint/secretlint-rule-preset-recommend" = "13.0.7"
 betterleaks                         = "1.9.0"

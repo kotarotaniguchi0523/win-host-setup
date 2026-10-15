@@ -1,12 +1,13 @@
-# actions.ps1 — GitHub Actions の Lint（actionlint + sisakulint + pinact）
+# actions.ps1 — GitHub Actions の Lint（jactionlint + sisakulint + pinact）
 # 使い方: pwsh -File tools/lint/actions.ps1 [-Fix]
-#   -Fix : sisakulint の自動修正と pinact のピン留めを適用する
+#   -Fix : jactionlint / sisakulint の自動修正と pinact のピン留めを適用する
 # 終了コード: 0=クリーン / 1=検出あり
 #
 # 役割分担:
-#   actionlint … 構文・式・shellcheck・ジョブ依存などの「正しさ」
-#   sisakulint … GitHub Actions のセキュリティ (SAST)。**actionlint と重複するルールは無効化**する
-#   pinact     … uses: の SHA 固定・バージョンコメント・最小経過日数（= アクションの“lock”検証）
+#   jactionlint … GitHub Actions の静的チェッカ（actionlint のチェックを包含し、zizmor 系の
+#                 セキュリティ規則・Dependabot 設定・Actions lock（.github/workflows/actions.lock）まで見る）
+#   sisakulint … 追加の SAST。**jactionlint が包含する actionlint 相当のルールは無効化**する
+#   pinact     … uses: の SHA 固定・バージョンコメント・最小経過日数の検証
 
 [CmdletBinding()]
 param([switch]$Fix)
@@ -15,7 +16,7 @@ $ErrorActionPreference = 'Stop'
 
 $repo = Get-RepoRoot
 
-# actionlint が担当するルールは sisakulint 側で無効化する（重複報告を避ける）
+# jactionlint（= actionlint 相当）が担当するルールは sisakulint 側で無効化する（重複報告を避ける）
 $sisakuIgnore = @('expression', 'cond', 'job-needs', 'env-var', 'workflow-call', 'deprecated-commands')
 $ignoreArgs = @()
 foreach ($r in $sisakuIgnore) { $ignoreArgs += @('-ignore', $r) }
@@ -24,13 +25,20 @@ Push-Location $repo
 try {
     $failed = $false
 
-    # --- actionlint（構文・式・shellcheck）---
-    if (-not (Get-Command actionlint -ErrorAction SilentlyContinue)) { throw 'actionlint が見つかりません（mise install）' }
-    Write-Host '=== actionlint ===' -ForegroundColor Cyan
-    & actionlint
-    if ($LASTEXITCODE -ne 0) { $failed = $true }
+    # --- jactionlint（構文・式・shellcheck・セキュリティ・Dependabot・Actions lock）---
+    if (-not (Get-Command jactionlint -ErrorAction SilentlyContinue)) { throw 'jactionlint が見つかりません（mise install）' }
+    Write-Host '=== jactionlint ===' -ForegroundColor Cyan
+    if ($Fix) {
+        & jactionlint --fix
+        if ($LASTEXITCODE -gt 1) { $failed = $true }
+    } else {
+        & jactionlint
+        if ($LASTEXITCODE -gt 1) { $failed = $true }
+        elseif ($LASTEXITCODE -eq 1) { $failed = $true; Write-Warning 'jactionlint: 指摘あり（-Fix で自動修正できるものがあります）' }
+        else { Write-Host '[ok] jactionlint' }
+    }
 
-    # --- sisakulint（セキュリティ / SAST）---
+    # --- sisakulint（追加の SAST）---
     if (-not (Get-Command sisakulint -ErrorAction SilentlyContinue)) { throw 'sisakulint が見つかりません（mise install）' }
     Write-Host '=== sisakulint ===' -ForegroundColor Cyan
     if ($Fix) {

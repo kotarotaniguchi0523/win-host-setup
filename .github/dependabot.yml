@@ -1,0 +1,23 @@
+# Dependabot: GitHub Actions の参照を更新する（Actions lock と組み合わせて使う）
+# - ワークフローは SHA / タグで固定し、実体のコミットは .github/workflows/actions.lock が保証する
+# - mise / winget / Skills の更新は Renovate が担当する（重複を避けるため ecosystem は github-actions のみ）
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '18:00'
+      timezone: Asia/Tokyo
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 2 # 公開から 2 日未満のリリースは提案しない（mise の minimum_release_age と揃える）
+    groups:
+      github-actions:
+        patterns: ['*']
+    commit-message:
+      prefix: 'chore(actions)'
+    labels:
+      - dependencies

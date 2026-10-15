@@ -1,0 +1,4 @@
+# jactionlint の設定: 既存の指摘は baseline に記録し、新規の指摘だけで失敗させる
+# （プロファイル: default = correctness + security + policy）
+profile: default
+baseline: auto
