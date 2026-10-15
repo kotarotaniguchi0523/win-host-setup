@@ -1,0 +1,32 @@
+amends "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Builtins.pkl"
+
+// このリポジトリの Lint（commit / push 時に実行）
+//  - jactionlint : GitHub Actions（actionlint のチェックを包含。Dependabot と Actions lock も見る）
+//  - betterleaks : 秘密情報
+//  - yamllint    : YAML
+//  - sisakulint / secretlint / PII は tools/lint/ のスクリプトで実行する
+local linters = new Mapping {
+    ["jactionlint"] = Builtins.jactionlint
+    ["betterleaks"] = Builtins.betterleaks
+    // YAML の妥当性は tools/ci/lint-config.py（CI）で検証するため yamllint は使わない
+
+    // sisakulint（追加 SAST）— jactionlint が包含するルールは無効化する
+    ["sisakulint"] = new Step {
+        glob = List(".github/workflows/*.yml")
+        check = "sisakulint -ignore expression -ignore cond -ignore job-needs -ignore env-var -ignore workflow-call -ignore deprecated-commands -ignore commit-sha"
+        fix = "sisakulint -ignore expression -ignore cond -ignore job-needs -ignore env-var -ignore workflow-call -ignore deprecated-commands -ignore commit-sha -fix on"
+    }
+
+    // secretlint（preset 付き）+ PII 検査は tools/lint/secrets.ps1 / tools/depii.ps1 が担当
+    ["repo-lint"] = new Step {
+        glob = List("**/*")
+        check = "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lint/secrets.ps1"
+    }
+    ["pii"] = new Step {
+        glob = List("**/*")
+        check = "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/depii.ps1 -Check"
+    }
+}
+
+steps = linters
