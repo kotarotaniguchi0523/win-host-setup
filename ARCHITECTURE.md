@@ -92,7 +92,7 @@ win-host-setup/
 |
 +-- .github/
 |   +-- workflows/            CI (下記 4 章)
-|   |   +-- renovate.yml
+|   |   +-- (Renovate App: 自己ホストの renovate.yml は廃止)
 |   |   +-- relock.yml
 |   |   +-- validate.yml
 |   |   +-- lint.yml
