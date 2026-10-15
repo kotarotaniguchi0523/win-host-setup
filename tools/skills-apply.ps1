@@ -59,10 +59,10 @@ function Test-SkillsDeployed {
     return ($missing.Count -eq 0)
 }
 
-& $apm install --global
+& $apm install --global *> $null   # APM は助言メッセージで exit=1 を返すことがあるため、終了コードでは判定しない
 if (-not (Test-SkillsDeployed)) {
     Write-Host '[i] 未展開の Skill があるため install を再実行します（APM の初回統合の癖）'
-    & $apm install --global
+    & $apm install --global *> $null
     if (-not (Test-SkillsDeployed)) { throw 'apm install を 2 回実行しても Skill が展開されません（apm.yml と lock を確認してください）' }
 }
 
@@ -80,3 +80,4 @@ if (Test-Path $localSrc) {
 }
 
 Write-Host "`n検証: apm audit --ci / apm outdated --global / waza check"
+exit 0   # 最終状態（全 Skill 展開済み）で成功と判定する
