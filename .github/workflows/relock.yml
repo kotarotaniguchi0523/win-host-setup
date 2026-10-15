@@ -1,4 +1,5 @@
-# Renovate が mise/mise.toml を更新したら mise.lock を再生成して同じ PR に積む
+# Renovate が mise 設定を更新したら mise.lock を再生成して同じ PR に積む
+# ロジックは tools/ci/mise-verify.ps1 -Lock（ローカルでも同じコマンドで再現できる）
 name: relock
 
 on:
@@ -9,6 +10,10 @@ on:
 
 permissions:
   contents: write
+
+concurrency:
+  group: relock-${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
   relock:
@@ -24,28 +29,12 @@ jobs:
         with:
           install: false
 
-      # リポジトリの設定を「グローバル設定」として配置してから実行する
-      # （リポジトリ直下のファイルをプロジェクト設定として読ませない）
-      - name: mise lock / install --locked
-        run: |
-          set -euo pipefail
-          mkdir -p ~/.config/mise
-          cp mise/mise.toml ~/.config/mise/config.toml
-          [ -f mise/mise.lock ] && cp mise/mise.lock ~/.config/mise/mise.lock || true
-          [ -d mise/locks ] && cp -r mise/locks ~/.config/mise/locks || true
-
-          mise lock --global
-          # npm は node に依存するため、node を先に入れてから全体を導入する（順序競合の回避）
-          mise install node --locked || mise install node
-          mise install --locked
-          mise ls --global
-
-          cp ~/.config/mise/config.toml mise/mise.toml
-          cp ~/.config/mise/mise.lock   mise/mise.lock
-          rm -rf mise/locks
-          [ -d ~/.config/mise/locks ] && cp -r ~/.config/mise/locks mise/locks || true
+      - name: lock を再生成してリポジトリへ書き戻す
+        shell: pwsh
+        run: ./tools/ci/mise-verify.ps1 -Lock
 
       - name: ロックをコミット
+        shell: bash
         run: |
           set -euo pipefail
           git config user.name  "github-actions[bot]"

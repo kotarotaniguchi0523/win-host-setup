@@ -1,27 +1,41 @@
 # skills-capture.ps1 — 実環境の Skills をリポジトリへ書き出す（ローカル更新 → Push 用）
-# 使い方: pwsh -File tools/skills-capture.ps1
-#  - ~/.apm/apm.yml / apm.lock.yaml           → skills/
-#  - ~/.agents/skills/* のうち APM 管理外   → skills/local/*（自作 Skill）
+# 使い方: pwsh -File tools/skills-capture.ps1 [-Check]
+#   -Check : 書き換えず、差分・上書き予定だけを表示
+#  - ~/.apm/apm.yml / apm.lock.yaml         → skills/
+#  - ~/.agents/skills/* のうち APM 管理外 → skills/local/*（自作 Skill）
 #
-# ★ 向きに注意: 自作 Skill は **ホスト側が正**。このスクリプトは skills/local/<name> を
-#   ホストの内容で上書きする。リポジトリで直接編集した場合は、先に tools/skills-apply.ps1 で
-#   ホストへ反映してから実行すること（順序を誤るとリポジトリ側の編集が失われる）。
+# ★ 向き: 自作 Skill は **ホスト（~/.agents/skills）が正**。既存の skills/local/<name> は
+#   ホストの内容で置き換わる（その場合は必ずログに出す）。リポジトリ側を直接編集した場合は、
+#   先に tools/skills-apply.ps1 を実行してホストへ反映してから本スクリプトを実行すること。
 
 [CmdletBinding()]
-param()
+param([switch]$Check)
 $ErrorActionPreference = 'Stop'
-$repo    = Split-Path $PSScriptRoot -Parent
-$repoSk  = Join-Path $repo 'skills'
-$apmDir  = Join-Path $env:USERPROFILE '.apm'
-$skillDir= Join-Path $env:USERPROFILE '.agents\skills'
+. (Join-Path $PSScriptRoot 'lib\common.ps1')
+
+$repo     = Split-Path $PSScriptRoot -Parent
+$repoSk   = Join-Path $repo 'skills'
+$apmDir   = Join-Path $env:USERPROFILE '.apm'
+$skillDir = Join-Path $env:USERPROFILE '.agents\skills'
+$localDst = Join-Path $repoSk 'local'
 
 New-Item -ItemType Directory -Force -Path $repoSk | Out-Null
 
 # 1) グローバル・マニフェストとロック
 foreach ($f in 'apm.yml', 'apm.lock.yaml') {
     $src = Join-Path $apmDir $f
-    if (Test-Path $src) { Copy-Item $src (Join-Path $repoSk $f) -Force; Write-Host "[ok] skills/$f" }
-    else { Write-Warning "見つかりません: $src" }
+    if (-not (Test-Path $src)) { Write-Warning "見つかりません（スキップ）: $src"; continue }
+    $dst = Join-Path $repoSk $f
+
+    if ($Check) {
+        if (-not (Test-Path $dst)) { Write-Host "[+] skills/$f（新規）" }
+        elseif ((Get-FileHash $src).Hash -ne (Get-FileHash $dst).Hash) { Write-Host "[~] skills/$f（更新あり）" }
+        else { Write-Host "[=] skills/$f" }
+        continue
+    }
+
+    Copy-Item $src $dst -Force
+    Write-Host "[ok] skills/$f"
 }
 
 # 2) APM が管理しているスキル名（ロックの deployed_files から）
@@ -34,22 +48,36 @@ if (Test-Path $lock) {
 }
 
 # 3) 自作スキル（APM 管理外）→ skills/local/
-$localDst = Join-Path $repoSk 'local'
-if (Test-Path $skillDir) {
-    $found = 0
-    foreach ($d in (Get-ChildItem $skillDir -Directory -ErrorAction SilentlyContinue)) {
-        if ($managed -contains $d.Name) { continue }
-        $t = Join-Path $localDst $d.Name
-        if (Test-Path $t) { Remove-Item $t -Recurse -Force }
-        New-Item -ItemType Directory -Force -Path $localDst | Out-Null
-        Copy-Item $d.FullName $t -Recurse -Force
-        Write-Host "[ok] skills/local/$($d.Name)（自作）"
-        $found++
-    }
-    if ($found -eq 0) { Write-Host "[i] 自作スキルはありません（APM 管理: $($managed.Count) 件）" }
+if (-not (Test-Path $skillDir)) {
+    Write-Host "[i] $skillDir がありません（自作スキルなし）"
+    return
 }
 
-# 4) 空ディレクトリを掃除
+$captured = 0
+foreach ($d in (Get-ChildItem $skillDir -Directory -ErrorAction SilentlyContinue)) {
+    if ($managed -contains $d.Name) { continue }   # APM 管理下は対象外
+
+    $target = Join-Path $localDst $d.Name
+    $exists = Test-Path $target
+
+    if ($Check) {
+        Write-Host ("[{0}] skills/local/{1}" -f $(if ($exists) { '~' } else { '+' }), $d.Name)
+        $captured++
+        continue
+    }
+
+    if ($exists) { Write-Host "[!] 上書き: skills/local/$($d.Name)（ホスト側の内容で置換）" -ForegroundColor Yellow }
+    else         { Write-Host "[+] 新規: skills/local/$($d.Name)" }
+
+    New-Item -ItemType Directory -Force -Path $localDst | Out-Null
+    if ($exists) { Remove-Item $target -Recurse -Force }
+    Copy-Item $d.FullName $target -Recurse -Force
+    $captured++
+}
+
+if ($captured -eq 0) { Write-Host "[i] 自作スキルはありません（APM 管理: $($managed.Count) 件）" }
+
+# 空の skills/local は残さない
 if ((Test-Path $localDst) -and -not (Get-ChildItem $localDst -Force -ErrorAction SilentlyContinue)) {
     Remove-Item $localDst -Recurse -Force
 }

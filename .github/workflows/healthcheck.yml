@@ -1,7 +1,8 @@
 # 週次の健全性チェック（CI による保守運用）
-#  - mise: lock のドリフト検出 / 更新候補の一覧
-#  - winget: DSC のピンと最新版の乖離（Windows ランナー）
-#  - 公開リポジトリの衛生: 個人パス等の混入検査
+#  - mise: lock のドリフト検出 / 更新候補
+#  - winget: DSC のピンと最新版の乖離
+#  - 衛生: 個人パス等の混入検査
+# ロジックは tools/ci/ と tools/update-winget-dsc.ps1 に分離している
 name: healthcheck
 
 on:
@@ -21,56 +22,21 @@ jobs:
       - uses: jdx/mise-action@v5
         with:
           install: false
-      - name: 設定を配置
-        run: |
-          set -euo pipefail
-          mkdir -p ~/.config/mise
-          cp mise/mise.toml ~/.config/mise/config.toml
-          [ -f mise/mise.lock ] && cp mise/mise.lock ~/.config/mise/mise.lock || true
-
-      - name: lock のドリフトを検出
-        run: mise install --locked
-
-      - name: 更新候補と導入状況をサマリへ
-        run: |
-          {
-            echo "## mise: 更新候補"
-            echo '```'
-            mise outdated --global || true
-            echo '```'
-            echo "## mise: 導入済み"
-            echo '```'
-            mise ls --global || true
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+      - shell: pwsh
+        run: ./tools/ci/mise-verify.ps1 -Summary
 
   winget:
     name: winget（DSC の乖離）
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
-      - name: DSC のピンと winget 最新版を比較
-        shell: pwsh
-        run: |
-          ./tools/update-winget-dsc.ps1
-          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - shell: pwsh
+        run: ./tools/update-winget-dsc.ps1
 
   hygiene:
     name: 公開リポジトリの衛生
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: 個人パス・アカウント名の混入検査
-        run: |
-          set -euo pipefail
-          fail=0
-          # 個人ホームディレクトリの実パス（サニタイズ漏れ）
-          if grep -RInE --exclude-dir=.git '(C:\\+Users\\+[A-Za-z0-9._-]+|/home/[A-Za-z0-9._-]+|/Users/[A-Za-z0-9._-]+)' . ; then
-            echo "::error::個人パスらしき文字列を検出（tools/sanitize.ps1 を確認）"; fail=1
-          fi
-          # メールアドレス
-          if grep -RInE --exclude-dir=.git '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' . ; then
-            echo "::warning::メールアドレスらしき文字列を検出"
-          fi
-          [ "$fail" -eq 0 ] && echo "OK: 個人パスの露出なし"
-          exit $fail
+      - shell: pwsh
+        run: ./tools/ci/hygiene.ps1
