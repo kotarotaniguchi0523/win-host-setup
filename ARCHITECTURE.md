@@ -174,7 +174,7 @@ win-host-setup/
 ```
   push / PR                      schedule (週次)               skills/** 変更
   +--------------------+         +--------------------+       +--------------------+
-  | validate.yml       |         | renovate.yml       |       | skills.yml         |
+  | validate.yml       |         | (Renovate App)      |       | skills.yml         |
   |  - mise lock 整合  |         |  - グループ別 PR   |       |  - APM lock ドリフト|
   |  - 設定の構文      |         +--------------------+       |  - apm audit(SARIF)|
   |  - PSScriptAnalyzer|         | winget-outdated.yml|       |  - waza check      |

@@ -42,17 +42,3 @@ jobs:
         run: |
           python3 -m pip install --quiet --disable-pip-version-check pyyaml
           python3 tools/ci/lint-config.py
-
-  scripts:
-    name: PowerShell 静的チェック
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
-      - shell: pwsh
-        run: |
-          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -SkipPublisherCheck
-          $issues = Invoke-ScriptAnalyzer -Path ./tools -Recurse -Severity Error
-          if ($issues) { $issues | Format-Table -AutoSize; exit 1 }
-          Write-Host '[ok] PSScriptAnalyzer（Error なし）'

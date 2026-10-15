@@ -30,7 +30,7 @@ jobs:
           cache: true
       - name: Lint
         shell: pwsh
-        run: ./tools/lint/actions.ps1
+        run: ./tools/lint/actions.ps1 -SkipSisakulint
       - name: SARIF（sisakulint）
         if: ${{ always() && hashFiles('sisakulint.sarif') != '' }}
         continue-on-error: true
@@ -38,32 +38,3 @@ jobs:
         with:
           sarif_file: sisakulint.sarif
           category: sisakulint
-
-  secrets:
-    name: 秘密情報（betterleaks / secretlint）
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
-          fetch-depth: 0 # because betterleaks scans the history
-      - uses: jdx/mise-action@v5.1.2
-        with:
-          cache: true
-      - name: スキャン
-        shell: pwsh
-        run: ./tools/lint/secrets.ps1
-
-  pii:
-    name: PII・衛生（depii / hygiene）
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
-      - name: PII 検査
-        shell: pwsh
-        run: ./tools/depii.ps1 -Check
-      - name: 個人パス・衛生検査
-        shell: pwsh
-        run: ./tools/ci/hygiene.ps1

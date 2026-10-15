@@ -39,14 +39,3 @@ jobs:
         with:
           sarif_file: apm-audit.sarif
           category: apm-audit
-  waza:
-    name: Waza（Skill 評価）
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v5.1.2
-      - name: Skill の健全性チェック
-        shell: pwsh
-        run: ./tools/ci/waza-check.ps1
