@@ -34,4 +34,7 @@ requires = ["uv_build>=0.13,<0.14"]
 build-backend = "uv_build"
 
 [tool.ty.environment]
+# pathctl is a Windows tool: the registry API (winreg) is only visible when the target platform
+# is win32. Without this, `ty check` on the Linux runner reports unresolved attributes.
 python-version = "3.15"
+python-platform = "win32"
