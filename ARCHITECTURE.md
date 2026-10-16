@@ -101,7 +101,6 @@ win-host-setup/
 |   |   +-- winget-outdated.yml
 |   |   +-- release.yml        pathctl-v* タグで wheel/sdist を Release へ（PyPI は任意）
 |   |   +-- healthcheck.yml
-|   |   +-- actions.lock      gh actions-lock が生成 (タグ -> コミット)
 |   +-- jactionlint.yaml      profile pedantic（baseline なし = 指摘ゼロで緑）
 |
 +-- .agent/                   [local only / gitignore]
@@ -216,7 +215,7 @@ win-host-setup/
 ```
   1. 入手時    msstore 公式  ->  mise/aqua (checksum/attestations/cosign/gpg)
                               ->  winget (Installer SHA256)
-  2. 再現性    mise.lock / (pypi は uv 依存グラフ) / actions.lock / apm.lock.yaml
+  2. 再現性    mise.lock / (pypi は uv 依存グラフ) / commit SHA 固定 (pinact) / apm.lock.yaml
   3. PII       pii-rules (汎用 + .agent の実値) -> depii -> sanitize
   4. 秘密      betterleaks + GitHub secret scanning / push protection（secretlint は任意）
   5. CI        validate / lint / skills (SARIF を Code Scanning へ)

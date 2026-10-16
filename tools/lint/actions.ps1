@@ -5,9 +5,9 @@
 #
 # Division of labor:
 #   jactionlint ... static checker for GitHub Actions (includes actionlint checks, zizmor-style
-#                 security rules, Dependabot config, and the Actions lock (.github/workflows/actions.lock))
-#   sisakulint ... extra SAST. **Disables the actionlint-equivalent rules that jactionlint already covers**
-#   pinact     ... verify SHA pinning of uses:, version comments, and the minimum release age
+#                 security rules, Dependabot config)
+#   sisakulint ... extra SAST (every rule on; overlap with jactionlint is intentional)
+#   pinact     ... verify that every uses: is pinned to a full commit SHA (tag kept as a comment)
 
 [CmdletBinding()]
 param([switch]$Fix)
@@ -26,7 +26,7 @@ Push-Location $repo
 try {
     $failed = $false
 
-    # --- jactionlint (syntax, expressions, shellcheck, security, Dependabot, Actions lock) ---
+    # --- jactionlint (syntax, expressions, shellcheck, security, Dependabot) ---
     if (-not (Get-Command jactionlint -ErrorAction SilentlyContinue)) { throw 'jactionlint が見つかりません（mise install）' }
     Write-Host '=== jactionlint ===' -ForegroundColor Cyan
     if ($Fix) {
@@ -61,19 +61,18 @@ try {
         }
     }
 
-    # --- pinact (optional. After adopting the Actions lock, tag references are canonical, so it does not run by default) ---
-    if ($env:JACTIONLINT_USE_PINACT -eq '1') {
-        if (Get-Command pinact -ErrorAction SilentlyContinue) {
-            Write-Host '=== pinact ===' -ForegroundColor Cyan
-            if ($Fix) { & pinact run --fix; if ($LASTEXITCODE -ne 0) { $failed = $true } }
-            else {
-                & pinact run --fix=false --no-api
-                if ($LASTEXITCODE -ne 0) { $failed = $true; Write-Warning 'pinact: SHA 未固定のアクションがあります' }
-                else { Write-Host '[ok] pinact' }
-            }
+    # --- pinact: every uses: must be pinned to a full commit SHA (the tag stays as a comment) ---
+    # Runs by default now that SHA pinning is the policy (the Actions lock file was removed).
+    if (Get-Command pinact -ErrorAction SilentlyContinue) {
+        Write-Host '=== pinact ===' -ForegroundColor Cyan
+        if ($Fix) { & pinact run; if ($LASTEXITCODE -ne 0) { $failed = $true } }
+        else {
+            & pinact run --fix=false --no-api
+            if ($LASTEXITCODE -ne 0) { $failed = $true; Write-Warning 'pinact: SHA 未固定のアクションがあります' }
+            else { Write-Host '[ok] pinact' }
         }
     } else {
-        Write-Host '[i] pinact はスキップ（Actions lock が不変性を保証。実行するには JACTIONLINT_USE_PINACT=1）'
+        Write-Warning 'pinact が見つかりません（mise install）'
     }
 
     if ($failed) { throw 'actions lint で問題を検出しました（-Fix で自動修正できます）' }
