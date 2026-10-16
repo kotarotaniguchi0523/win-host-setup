@@ -1,0 +1,11 @@
+# Dependabot is used for its **security alerts** only.
+#   - 有効: "Dependabot alerts"（リポジトリ設定）
+#   - 無効: "Dependabot security updates"（bot に PR を作らせない）
+#   - 更新 PR はすべて Renovate が担当（mise / GitHub Actions / Skills）
+#
+# `updates: []` は意図的に空です。バージョン更新の対象が無いことを明示し、あわせて
+# Dependabot の非セキュリティ系ジョブ（依存グラフ更新など）を走らせないためです。
+# 依存グラフの更新は `requires-python >= 3.15` を解釈できず失敗するため、ここでも塞いでいます
+# （セキュリティアラート自体は GitHub 側の依存グラフで動き続けます）。
+version: 2
+updates: []

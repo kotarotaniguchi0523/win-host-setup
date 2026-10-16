@@ -4,8 +4,8 @@ node                   = ["26.11.1", "24.21.0"]
 python                 = ["3.15.0", "3.14.8"]
 gh                     = "2.102.0"
 doppler                = "3.76.0"
-# APM: managed via winget `Microsoft.APM` 0.33.0 (Publisher: Microsoft).
-# Migrated to winget because the old `pypi:apm-cli` cannot be installed on default Python 3.15 (dependency `pyyaml` has no cp315 wheel) (see winget-vs-mise.md, section 6)
+# APM: winget `Microsoft.APM` 0.33.0 で管理（Publisher: Microsoft）。
+# 旧 `pypi:apm-cli` は既定 Python 3.15 で依存 `pyyaml` の cp315 wheel が無く導入不可のため winget へ移行（winget-vs-mise.md §6）
 "aqua:k1LoW/mo"        = "1.5.5"
 "github:microsoft/waza" = "0.38.10"
 rtk                    = "0.40.0"
@@ -26,9 +26,9 @@ nushell                = "0.116.1"
 herdr                  = "0.9.3"
 pi                     = "1.2.0"
 rust                   = "1.99.0"
-# rust-analyzer: managed via winget `Rustlang.rust-analyzer` (the aqua version has Security [none]. See winget-vs-mise.md, section 3)
+# rust-analyzer: winget `Rustlang.rust-analyzer` で管理（aqua 版は Security [none] のため。winget-vs-mise.md §3）
 npm = "12.2.0"
-# SkillSpector: yara-python 4.5.4 has no cp314/cp315 wheel -> build this tool alone with Python 3.13.16 (installed; pending runtime verification)
+# SkillSpector: yara-python 4.5.4 は cp314/cp315 の wheel が無い → このツールのみ Python 3.13.16 で構築（インストール済・動作確認待ち）
 "pypi:git+https://github.com/nvidia/skillspector.git" = { version = "v2.12.0", uvx_args = "--python 3.13.16" }
 
 [settings]
@@ -49,9 +49,9 @@ PIP_INDEX_URL = "https://pypi.flatt.tech/simple/"
 UV_INDEX_URL  = "https://pypi.flatt.tech/simple/"
 NPM_CONFIG_REGISTRY = "https://npm.flatt.tech/"
 
-# --- APM / SkillSpector (security scanners for skills / skill assets) ---
-# APM           : pypi:apm-cli@0.33.0 (= official PyPI distribution of github.com/microsoft/apm.
-#                 consolidated from the old github:microsoft/apm@0.14.0) -> locked via Takumi and the uv dependency graph (wheel hashes)
-# SkillSpector  : pypi:git+https://github.com/nvidia/skillspector.git@v2.12.0 (git source because not published on PyPI)
-#                 -> dependency yara-python 4.5.4 has no cp314 wheel, so use Python 3.13.16 for this tool only
-# Verify        : apm audit --external skillspector
+# --- APM / SkillSpector（スキル / スキル資産のセキュリティスキャナ）---
+# APM           : pypi:apm-cli@0.33.0（= github.com/microsoft/apm の公式 PyPI 配布。
+#                 旧 github:microsoft/apm@0.14.0 から一本化）→ Takumi 経由・uv 依存グラフ（wheel ハッシュ）で lock
+# SkillSpector  : pypi:git+https://github.com/nvidia/skillspector.git@v2.12.0（PyPI 未公開のため git ソース）
+#                 → 依存の yara-python 4.5.4 は cp314 wheel が無いため、このツールのみ Python 3.13.16 を使用
+# 検証          : apm audit --external skillspector

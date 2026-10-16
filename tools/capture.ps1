@@ -8,6 +8,8 @@
 [CmdletBinding()]
 param([switch]$Force)
 $ErrorActionPreference = 'Stop'
+# Run standalone too: the shared helpers (Get-HomeDir etc.) live in lib/common.ps1
+. (Join-Path $PSScriptRoot 'lib\common.ps1')
 $repo    = Split-Path $PSScriptRoot -Parent
 $miseSrc = Join-Path $env:USERPROFILE '.config\mise'
 $miseDst = Join-Path $repo 'mise'

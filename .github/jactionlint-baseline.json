@@ -2,6 +2,14 @@
   "version": 1,
   "entries": [
     {
+      "file": ".github/dependabot.yml",
+      "rule": "dependabot-syntax",
+      "fingerprint": "ca250f2a5c1522a3",
+      "context": "2bcfd448b631ea20",
+      "occurrence": 0,
+      "message": "\"updates\" section should not be empty"
+    },
+    {
       "file": ".github/workflows/healthcheck.yml",
       "rule": "missing-timeout",
       "fingerprint": "d423f9d4a0c18331",
