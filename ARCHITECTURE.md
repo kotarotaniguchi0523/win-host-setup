@@ -97,8 +97,9 @@ win-host-setup/
 |   |   +-- relock.yml
 |   |   +-- validate.yml
 |   |   +-- lint.yml
-|   |   +-- skills.yml
+|   +-- skills.yml
 |   |   +-- winget-outdated.yml
+|   |   +-- release.yml        pathctl-v* タグで wheel/sdist を Release へ（PyPI は任意）
 |   |   +-- healthcheck.yml
 |   |   +-- actions.lock      gh actions-lock が生成 (タグ -> コミット)
 |   +-- jactionlint.yaml      profile + baseline

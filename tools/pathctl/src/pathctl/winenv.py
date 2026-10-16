@@ -2,12 +2,17 @@
 
 The tool never expands ``%VARIABLES%`` when it writes back: entries are edited in their raw
 form so ``C:\\Users\\%USERNAME%\\...`` keeps meaning the same thing for every account.
+
+``ctypes`` and ``winreg`` are imported lazily (PEP 810): they are only touched on Windows, so
+``pathctl describe`` and every check run on other platforms without resolving them at all.
 """
 
-import ctypes
 import os
 import sys
 from pathlib import Path
+
+lazy import ctypes
+lazy import winreg
 
 from .model import PathEntry, Scope
 
@@ -29,30 +34,28 @@ _SMTO_ABORTIFHUNG = 0x0002
 _BROADCAST_TIMEOUT_MS = 5000
 
 
-def _winreg():
+def _require_windows() -> None:
     if not IS_WINDOWS:
         raise RuntimeError("the Windows registry is only available on Windows")
-    import winreg
-
-    return winreg
 
 
 def is_admin() -> bool:
     """True when the current process can write to HKLM."""
     if not IS_WINDOWS:
-        return os.geteuid() == 0 if hasattr(os, "geteuid") else False
+        geteuid = getattr(os, "geteuid", None)
+        return bool(geteuid()) if geteuid is not None else False
     try:
         return bool(ctypes.windll.shell32.IsUserAnAdmin())  # type: ignore[attr-defined]
-    except Exception:
+    except (OSError, AttributeError):
         return False
 
 
 def read_raw(scope: Scope) -> tuple[list[str], int | None]:
     """Return the stored entries and the registry value type (None when the value is missing)."""
+    _require_windows()
     if scope is Scope.EFFECTIVE:
         raise ValueError("the effective PATH is not stored in the registry")
 
-    winreg = _winreg()
     hive = winreg.HKEY_LOCAL_MACHINE if scope is Scope.MACHINE else winreg.HKEY_CURRENT_USER
     key_path = MACHINE_KEY if scope is Scope.MACHINE else USER_KEY
     try:
@@ -65,12 +68,12 @@ def read_raw(scope: Scope) -> tuple[list[str], int | None]:
 
 def write_raw(scope: Scope, entries: list[str], value_type: int | None) -> None:
     """Store the entries back, keeping the original value type when one is known."""
+    _require_windows()
     if scope is Scope.EFFECTIVE:
         raise ValueError("the effective PATH cannot be written")
     if scope is Scope.MACHINE and not is_admin():
         raise PermissionError("writing the machine PATH needs an elevated shell (Run as administrator)")
 
-    winreg = _winreg()
     hive = winreg.HKEY_LOCAL_MACHINE if scope is Scope.MACHINE else winreg.HKEY_CURRENT_USER
     key_path = MACHINE_KEY if scope is Scope.MACHINE else USER_KEY
     stored_type = value_type or winreg.REG_EXPAND_SZ
@@ -97,7 +100,7 @@ def broadcast_change() -> bool:
                 ctypes.byref(result),
             )
         )
-    except Exception:
+    except (OSError, AttributeError):
         return False
 
 

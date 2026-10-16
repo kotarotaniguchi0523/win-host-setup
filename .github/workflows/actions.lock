@@ -10,16 +10,17 @@ workflows:
         - 'actions/checkout@v7.0.1'
         - 'github/codeql-action@v4.38.3'
         - 'jdx/mise-action@v5.1.2'
+    '.github/workflows/release.yml':
+        - 'actions/checkout@v7.0.1'
+        - 'jdx/mise-action@v5.1.2'
     '.github/workflows/relock.yml':
         - 'actions/checkout@v7.0.1'
         - 'jdx/mise-action@v5.1.2'
-    '.github/workflows/renovate.yml':
+    '.github/workflows/skills-relock.yml':
         - 'actions/checkout@v7.0.1'
-        - 'renovatebot/github-action@v46.3.8'
     '.github/workflows/skills.yml':
         - 'actions/checkout@v7.0.1'
         - 'github/codeql-action@v4.38.3'
-        - 'jdx/mise-action@v5.1.2'
     '.github/workflows/validate.yml':
         - 'actions/checkout@v7.0.1'
         - 'jdx/mise-action@v5.1.2'
@@ -41,8 +42,3 @@ dependencies:
         commit: 'sha1-08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8'
         owner_id: 216188
         repo_id: 738284564
-    'renovatebot/github-action@v46.3.8':
-        ref: 'v46.3.8'
-        commit: 'sha1-f0f41e5f2e706165f6814b1d0f0d0e319de7d1d9'
-        owner_id: 38656520
-        repo_id: 252754603

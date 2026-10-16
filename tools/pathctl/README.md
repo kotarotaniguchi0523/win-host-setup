@@ -82,8 +82,27 @@ pathctl path add '%USERPROFILE%\.local\bin' --scope user --apply
 ```powershell
 uv sync                 # 開発環境（dev 依存は ty のみ）
 uv run ty check         # 型チェック
+uv run python -m unittest discover -s tests   # テスト（追加依存なし）
 uv run pathctl doctor   # 動作確認
 ```
+
+## リリース
+
+タグ `pathctl-v<version>` を push すると `.github/workflows/release.yml` が走ります。
+
+1. `tools/pathctl/pyproject.toml` の `version` を上げてコミット（タグと一致しないと失敗します）
+2. `git tag pathctl-v0.1.0 && git push origin pathctl-v0.1.0`
+3. GitHub Release に wheel / sdist が添付されます（`uvx` は git の subdirectory 指定でも使えます）
+
+### PyPI へも公開する場合（任意・1 回だけの設定）
+
+PyPI 側で **Trusted Publisher** を登録すると、トークン無し（OIDC）で公開できます。
+
+- Publisher: GitHub / Owner: `kotarotaniguchi0523` / Repository: `win-host-setup`
+- Workflow name: `release.yml` / Environment name: `pypi`
+
+登録後、リポジトリの変数 `PYPI_PUBLISH` を `true` にすると、以後のタグ push で
+`uv publish --trusted-publishing always` が実行されます（未設定なら GitHub Release だけが作られます）。
 
 Python 3.15 を前提に、新しい文法を使っています（下限は 3.14。理由は下の「注意」）。
 

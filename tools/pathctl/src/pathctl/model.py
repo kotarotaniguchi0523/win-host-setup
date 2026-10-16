@@ -1,7 +1,7 @@
 """Typed data model shared by the pathctl commands."""
 
 from dataclasses import dataclass, field
-from enum import StrEnum
+from enum import IntEnum, StrEnum
 
 type EntryList = list[PathEntry]
 type ScopeMap = dict[Scope, EntryList]
@@ -30,6 +30,54 @@ class Severity(StrEnum):
     INFO = "info"
     WARN = "warn"
     ERROR = "error"
+
+
+class Exit(IntEnum):
+    """Semantic exit codes (design principle 2: let the caller decide what to do next).
+
+    HTTP-like categories so an agent can branch without parsing the message:
+    ``0`` success, ``1`` unexpected failure, ``2`` usage, ``3`` not found,
+    ``4`` configuration / permission, ``5`` validation (including findings to act on).
+    """
+
+    OK = 0
+    FAILURE = 1
+    USAGE = 2
+    NOT_FOUND = 3
+    CONFIG = 4
+    VALIDATION = 5
+
+    @property
+    def category(self) -> str:
+        return {
+            Exit.OK: "ok",
+            Exit.FAILURE: "general",
+            Exit.USAGE: "usage",
+            Exit.NOT_FOUND: "not_found",
+            Exit.CONFIG: "config",
+            Exit.VALIDATION: "validation",
+        }[self]
+
+
+@dataclass(frozen=True, slots=True)
+class Error:
+    """Actionable error payload (design principle 6: say what to run next)."""
+
+    category: str
+    message: str
+    next_step: str | None = None
+    candidates: tuple[str, ...] = ()
+    required_args: tuple[str, ...] = ()
+
+    def as_dict(self) -> dict[str, object]:
+        payload: dict[str, object] = {"category": self.category, "message": self.message}
+        if self.next_step:
+            payload["next_step"] = self.next_step
+        if self.candidates:
+            payload["candidates"] = list(self.candidates)
+        if self.required_args:
+            payload["required_args"] = list(self.required_args)
+        return payload
 
 
 class FindingCode(StrEnum):
@@ -108,3 +156,6 @@ class Report:
     data: dict[str, object] = field(default_factory=dict)
     findings: tuple[Finding, ...] = ()
     hints: tuple[str, ...] = ()
+    kind: str = ""
+    exit_code: int = 0
+    error: Error | None = None

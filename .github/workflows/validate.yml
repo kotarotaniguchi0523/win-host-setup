@@ -62,5 +62,7 @@ jobs:
         run: uv sync --project tools/pathctl --frozen
       - name: 型チェック
         run: uv run --project tools/pathctl ty check tools/pathctl
+      - name: テスト（unittest）
+        run: uv run --project tools/pathctl python -m unittest discover -s tools/pathctl/tests
       - name: JSON 契約の確認
         run: uv run --project tools/pathctl pathctl schema --json > /dev/null

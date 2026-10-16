@@ -3,11 +3,25 @@ name = "pathctl"
 version = "0.1.0"
 description = "Inspect and repair the Windows global PATH, and list the tools that are usable globally (via mise, winget, npm or directly)"
 readme = "README.md"
-# The code needs 3.14 for t-strings (PEP 750); CI and the host run the pinned 3.15.0.
-# The floor is not raised to 3.15 because Dependabot's dependency-graph updater supports
-# Python up to 3.14.* only and would fail with `tool_version_not_supported`.
-requires-python = ">=3.14"
+# 3.15 is required for PEP 810 `lazy import` (used for ctypes / winreg / json / unicodedata).
+requires-python = ">=3.15"
 dependencies = []
+keywords = ["windows", "path", "environment", "cli", "mise"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.15",
+  "Topic :: System :: Installation/Setup",
+  "Topic :: System :: Shells",
+  "Typing :: Typed",
+]
+
+[project.urls]
+Repository = "https://github.com/kotarotaniguchi0523/win-host-setup"
+Issues = "https://github.com/kotarotaniguchi0523/win-host-setup/issues"
 
 [project.scripts]
 pathctl = "pathctl.cli:main"

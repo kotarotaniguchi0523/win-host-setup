@@ -5,7 +5,8 @@ function that touches the registry, and it refuses machine-scope writes without 
 """
 
 from dataclasses import dataclass, field
-from pathlib import Path
+
+lazy from pathlib import Path
 
 from .model import Scope
 from .winenv import broadcast_change, expand, is_admin, normalize, read_raw, write_raw

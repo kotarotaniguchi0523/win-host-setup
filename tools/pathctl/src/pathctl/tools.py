@@ -2,7 +2,10 @@
 
 import os
 from dataclasses import dataclass
+from functools import cache
 from pathlib import Path
+
+lazy import itertools
 
 from .model import PathEntry, Scope, Tool, ToolProvenance
 from .winenv import effective_entries, stored_entries
@@ -65,6 +68,7 @@ def _child(root: Path | None, *parts: str) -> Path | None:
     return candidate if candidate.is_dir() else None
 
 
+@cache
 def known_dirs() -> KnownDirs:
     """Resolve the installation roots from the environment (None when the tool is absent)."""
     home = _env_path("USERPROFILE") or Path.home()
@@ -139,8 +143,8 @@ def search_entries() -> list[PathEntry]:
     may be stale (an IDE or an installer can inject extra directories), so it is only a fallback.
     """
     try:
-        return [*stored_entries(Scope.MACHINE), *stored_entries(Scope.USER)]
-    except Exception:
+        return list(itertools.chain(stored_entries(Scope.MACHINE), stored_entries(Scope.USER)))
+    except (RuntimeError, OSError):
         return effective_entries()
 
 
@@ -149,6 +153,7 @@ def inventory(*, names: set[str] | None = None) -> list[Tool]:
     dirs = known_dirs()
     entries = search_entries()
     shims = shim_names(dirs)
+    shims_root = str(dirs.mise_shims).casefold() if dirs.mise_shims else "\0"
     installed = mise_install_names(dirs)
     candidates = names or (shims | installed | winget_names(dirs) | npm_global_names(dirs))
 
@@ -160,9 +165,7 @@ def inventory(*, names: set[str] | None = None) -> list[Tool]:
         if primary is None and name in installed:
             provenance = ToolProvenance.MISE_INSTALL
         shadowed = None
-        if primary is not None and name in shims and not str(primary.parent).casefold().startswith(
-            str(dirs.mise_shims).casefold() if dirs.mise_shims else "\0"
-        ):
+        if primary is not None and name in shims and not str(primary.parent).casefold().startswith(shims_root):
             shadowed = str(primary.parent)
         tools.append(
             Tool(

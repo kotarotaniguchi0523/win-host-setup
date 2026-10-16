@@ -1,23 +1,24 @@
 """Checks that turn the PATH state into structured findings."""
 
-from collections import Counter
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+lazy import itertools
+lazy from collections import Counter, defaultdict
+
 from .model import Finding, FindingCode, PathEntry, Scope, Severity, Tool
-from .tools import KnownDirs, known_dirs
+from .tools import known_dirs
 from .winenv import effective_entries, normalize, stored_entries
 
 SCOPES: tuple[Scope, ...] = (Scope.MACHINE, Scope.USER)
 
 
 def _duplicates(entries: Iterable[PathEntry]) -> dict[str, list[PathEntry]]:
-    grouped: dict[str, list[PathEntry]] = {}
+    grouped: dict[str, list[PathEntry]] = defaultdict(list)
     for entry in entries:
         if entry.empty:
             continue
-        grouped.setdefault(normalize(entry.raw), []).append(entry)
+        grouped[normalize(entry.raw)].append(entry)
     return {key: group for key, group in grouped.items() if len(group) > 1}
 
 
@@ -178,7 +179,7 @@ def worst_severity(findings: Iterable[Finding]) -> Severity | None:
 
 def effective_summary() -> dict[str, int]:
     entries = effective_entries()
-    stored = [*stored_entries(Scope.MACHINE), *stored_entries(Scope.USER)]
+    stored = list(itertools.chain(stored_entries(Scope.MACHINE), stored_entries(Scope.USER)))
     return {
         "entries": len(entries),
         "existing": sum(1 for entry in entries if entry.exists),

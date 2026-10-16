@@ -130,6 +130,46 @@
       "message": "action \"actions/checkout@v7.0.1\" must be pinned to a full-length commit SHA like \"{owner}/{repo}@{sha}\" because the \"unpinned-uses\" rule is enabled"
     },
     {
+      "file": ".github/workflows/release.yml",
+      "rule": "unpinned-uses",
+      "fingerprint": "08a82e639da3c8b8",
+      "context": "4683c9b535b03d70",
+      "occurrence": 0,
+      "message": "action \"actions/checkout@v7.0.1\" must be pinned to a full-length commit SHA like \"{owner}/{repo}@{sha}\" because the \"unpinned-uses\" rule is enabled"
+    },
+    {
+      "file": ".github/workflows/release.yml",
+      "rule": "unpinned-uses",
+      "fingerprint": "231789fcc38ed612",
+      "context": "4c7ccb77487124d0",
+      "occurrence": 0,
+      "message": "action \"jdx/mise-action@v5.1.2\" must be pinned to a full-length commit SHA like \"{owner}/{repo}@{sha}\" because the \"unpinned-uses\" rule is enabled"
+    },
+    {
+      "file": ".github/workflows/release.yml",
+      "rule": "cache-poisoning",
+      "fingerprint": "62145eb54bc9d705",
+      "context": "a8b2261452f996d3",
+      "occurrence": 0,
+      "message": "jdx/mise-action restores a cache although the workflow runs on pushed tags, so a poisoned cache entry can end up in the published artifacts. set \"cache: false\", or set \"cache-mode: none\" on the job"
+    },
+    {
+      "file": ".github/workflows/release.yml",
+      "rule": "unpinned-uses",
+      "fingerprint": "94fea2f6791a6205",
+      "context": "94e5b3f04f64d697",
+      "occurrence": 0,
+      "message": "action \"actions/checkout@v7.0.1\" must be pinned to a full-length commit SHA like \"{owner}/{repo}@{sha}\" because the \"unpinned-uses\" rule is enabled"
+    },
+    {
+      "file": ".github/workflows/release.yml",
+      "rule": "unpinned-uses",
+      "fingerprint": "9133dd8ffae17c0d",
+      "context": "ddb4d7c567f1ca40",
+      "occurrence": 0,
+      "message": "action \"jdx/mise-action@v5.1.2\" must be pinned to a full-length commit SHA like \"{owner}/{repo}@{sha}\" because the \"unpinned-uses\" rule is enabled"
+    },
+    {
       "file": ".github/workflows/relock.yml",
       "rule": "excessive-permissions",
       "fingerprint": "90b223db1cdd1688",

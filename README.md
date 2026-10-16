@@ -132,22 +132,39 @@ Dependabot 側はセキュリティアラートだけを有効にしているの
 
 Windows のグローバル PATH を点検・修復し、**どのツールがどの入手元で使えるか**（mise / winget / npm / 直置き）を一覧する CLI です。Python 3.15 の**標準ライブラリのみ**で動き、実行時の依存はありません。
 
-```powershell
-uv run --project tools/pathctl pathctl doctor --json            # 点検（JSON）
-uv run --project tools/pathctl pathctl tools --without-mise     # mise 無しでも使えるツール
-uv run --project tools/pathctl pathctl path check               # PATH の問題点
+```console
+uvx pathctl doctor --format json                # 導入せずに実行（公開後）
+uv run --project tools/pathctl pathctl doctor --format json   # このリポジトリから
+uv tool install --from tools/pathctl pathctl    # グローバルに導入
 ```
 
 | コマンド | 内容 |
 |---|---|
-| `pathctl doctor [--strict]` | PATH とツールをまとめて点検（終了コード 1 は要対応の意味） |
+| `pathctl doctor [--strict]` | PATH とツールをまとめて点検（exit 5 は要対応） |
 | `pathctl tools [--without-mise]` | ツールの入手元一覧（`without_mise` = mise が無くても起動できる） |
-| `pathctl path list / check / fix / add / remove` | PATH の一覧・検査・修復（`fix` は既定で下見のみ、`--apply` で適用） |
-| `pathctl schema --json` | エージェント向けの入出力契約 |
+| `pathctl path list / check / fix / add / remove` | PATH の一覧・検査・修復（`--apply` で適用、既定は下見） |
+| `pathctl describe --format json` | コマンドごとのフラグ一覧（自己記述） |
+| `pathctl docs list` / `docs show <name>` | 同梱ガイド（**Web Fetch 不要**でエージェントが読める） |
 
-- 詳細は **`tools/pathctl/README.md`**。JSON は `schema: "pathctl/1"` の固定形で、エージェントはまず `pathctl schema --json` を読む想定です。
-- 型チェックは **ty**（`uv run --project tools/pathctl ty check`）、環境は **uv** のみ（dev 依存も ty だけ）。
-- マシン PATH の書き換えには管理者権限が要ります。初回の大掃除は **`tools/fix-machine-path.ps1`（管理者）**、日常の点検と微修正は **`pathctl`** という使い分けです。
+**エージェント向けの設計**（Zenn「AIエージェントに使わせるCLIの設計原則8選」と
+「AI フレンドリーな CLI を開発するテクニック」を踏襲）
+
+- `--format table|json|tsv`。stdout はデータのみ、パイプ時は UTF-8、`--json` は別名
+- **セマンティック終了コード**: `0` 成功 / `1` 一般 / `2` 引数 / `3` 対象なし / `4` 設定・権限 / `5` 検証
+- **アクション可能なエラー**: `error.category` / `message` / `next_step` / `candidates` / `required_args`
+- **noun-verb**: `path <verb>` / `tools` / `docs <verb>` / `doctor` / `describe`
+- **`describe` による自己記述**、**`docs` による同梱ガイド**（Web Fetch をさせない）
+- **冪等 + 下見**: 書き換えは `--apply` のときだけ（`--dry-run` は別名）
+- **管理者権限が要る操作**は「ユーザーに依頼する」ようエラーで案内する（エージェントは昇格できない）
+
+実装は Effective Python（第2版）の項目に沿えています（`defaultdict` / `Counter`、`itertools.chain`、
+ループ不変条件の巻き上げ、例外を絞る、`functools.cache`、`zip(strict=True)`、キーワード専用引数、
+`unittest` でテスト）。Python 3.15 の `lazy import`（PEP 810）で `ctypes` / `winreg` / `json` /
+`unicodedata` を**使うときだけ**解決し、t-strings（PEP 750）と PEP 695 の `type` 文も使っています。
+
+- 詳細は **`tools/pathctl/README.md`** と同梱ガイド（`pathctl docs show agents`）。JSON は `schema: "pathctl/1"` の固定形です。
+- リリースは **`.github/workflows/release.yml`**（`pathctl-v*` タグで GitHub Release を作成、PyPI は信頼済みパブリッシャー設定後に有効化）。
+- マシン PATH の大掃除は **`tools/fix-machine-path.ps1`（管理者）**、日常の点検と微修正は **`pathctl`** という使い分けです。
 
 ## 再現手順
 

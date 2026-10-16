@@ -1,0 +1,88 @@
+# Release tools/pathctl: build the wheel / sdist, attach them to a GitHub Release, and
+# (only when the repository variable PYPI_PUBLISH is 'true') publish to PyPI with trusted
+# publishing (no token secret).
+#
+# Tag form: pathctl-v<version>, and the tag must match [project] version in
+# tools/pathctl/pyproject.toml. See tools/pathctl/README.md for the one-time PyPI setup.
+name: release
+
+on:
+  push:
+    tags:
+      - 'pathctl-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GITHUB_TOKEN: ${{ github.token }}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: ビルドと GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write # gh release create
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v5.1.2
+        with:
+          cache: true
+      - name: タグと pyproject の version が一致するか確認
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(uv version --project tools/pathctl --short)"
+          tag="${GITHUB_REF_NAME#pathctl-v}"
+          if [ "$version" != "$tag" ]; then
+            echo "タグ ($GITHUB_REF_NAME) と pyproject の version ($version) が違います" >&2
+            exit 1
+          fi
+      - name: テストと型チェック
+        run: |
+          set -euo pipefail
+          uv sync --project tools/pathctl --frozen
+          uv run --project tools/pathctl python -m unittest discover -s tools/pathctl/tests
+          uv run --project tools/pathctl ty check tools/pathctl
+      - name: ビルド
+        run: uv build --project tools/pathctl
+      - name: GitHub Release へ添付
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "pathctl ${GITHUB_REF_NAME#pathctl-v}" \
+            --generate-notes \
+            tools/pathctl/dist/*
+
+  pypi:
+    name: PyPI へ公開（任意）
+    needs: build
+    if: ${{ vars.PYPI_PUBLISH == 'true' && startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: pypi
+    permissions:
+      id-token: write # trusted publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v5.1.2
+        with:
+          cache: true
+      - name: ビルド
+        run: uv build --project tools/pathctl
+      - name: 公開（trusted publishing）
+        run: uv publish --project tools/pathctl --trusted-publishing always
