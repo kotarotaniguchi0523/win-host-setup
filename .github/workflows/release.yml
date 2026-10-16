@@ -80,7 +80,9 @@ jobs:
         run: |
           set -euo pipefail
           cd tools/pathctl/dist
-          sha256sum ./*.whl ./*.tar.gz > SHA256SUMS
+          # ファイル名は相対（./ を付けない）: 受け取った人が `sha256sum -c SHA256SUMS` を
+          # 同じディレクトリで実行できる形にする
+          sha256sum ./*.whl ./*.tar.gz | sed 's|\./||' > SHA256SUMS
           cat SHA256SUMS
           {
             echo '### pathctl build digests'

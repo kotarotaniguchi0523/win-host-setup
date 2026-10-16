@@ -135,11 +135,20 @@ uv run pathctl doctor   # 動作確認
 # GitHub の provenance（SLSA Build L3）
 gh attestation verify pathctl-0.1.2-py3-none-any.whl --repo kotarotaniguchi0523/win-host-setup
 
-# ダイジェスト
+# ダイジェスト（成果物と同じディレクトリで実行）
 sha256sum -c SHA256SUMS
 
 # PyPI の attestation はプロジェクトのファイル一覧から確認できる（PEP 740）
 ```
+
+検証結果として、provenance は次の内容を主張します（`--format json` で確認できます）。
+
+| 項目 | 値の例 |
+|---|---|
+| `predicateType` | `https://slsa.dev/provenance/v1` |
+| issuer | `https://token.actions.githubusercontent.com`（GitHub の OIDC）|
+| workflow | `.github/workflows/release.yml` @ `refs/tags/pathctl-v0.1.2` |
+| subject | 公開した wheel / sdist の sha256（`SHA256SUMS` と一致）|
 
 ### PyPI へ公開する場合（任意・1 回だけの設定）
 
