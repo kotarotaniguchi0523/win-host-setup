@@ -2,16 +2,16 @@ amends "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Config.pk
 import "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Builtins.pkl"
 
 // Lint for this repository
-//  - jactionlint : GitHub Actions (includes actionlint checks; also covers Dependabot and the Actions lock)
+//  - jactionlint : GitHub Actions, profile pedantic and no baseline (see .github/jactionlint.yaml)
 //  - betterleaks : secrets
-//  - sisakulint  : extra SAST (disables the actionlint-equivalent rules jactionlint already covers)
+//  - sisakulint  : extra SAST, every rule on (nothing suppressed)
+//  - pinact      : verify that `uses:` is pinned to a commit SHA (not a tag)
 //  - pii / secrets / powershell : run via scripts under tools/
 //
 // When it runs:
-//  - pre-commit: light only (pii / secrets)
-//  - pre-push  : everything (includes jactionlint / betterleaks / sisakulint / powershell)
-
-local sisakuArgs = "-ignore expression -ignore cond -ignore job-needs -ignore env-var -ignore workflow-call -ignore deprecated-commands -ignore commit-sha"
+//  - pre-commit: pii / secrets, plus the GitHub Actions checks when a workflow is touched
+//                (jactionlint / sisakulint / pinact). Everything else waits for pre-push.
+//  - pre-push  : everything (includes betterleaks / powershell)
 
 local all = new Mapping<String, Step> {
     ["pii"] = new Step {
@@ -26,8 +26,15 @@ local all = new Mapping<String, Step> {
     ["betterleaks"] = Builtins.betterleaks
     ["sisakulint"] = new Step {
         glob = List(".github/workflows/*.yml")
-        check = "sisakulint \(sisakuArgs)"
-        fix = "sisakulint \(sisakuArgs) -fix on"
+        check = "sisakulint"
+        fix = "sisakulint -fix on"
+    }
+    // Actions must be pinned to a full commit SHA (the tag stays as a trailing comment).
+    // --no-api keeps this offline: it checks the shape, Renovate updates the SHAs.
+    ["pinact"] = new Step {
+        glob = List(".github/workflows/*.yml")
+        check = "pinact run --fix=false --no-api"
+        fix = "pinact run"
     }
     ["powershell"] = new Step {
         glob = List("**/*.ps1")
@@ -35,10 +42,13 @@ local all = new Mapping<String, Step> {
     }
 }
 
-// pre-commit (light)
+// pre-commit: light, but workflow changes are checked before the commit is made
 steps = new Mapping<String, Step | Group> {
     ["pii"] = all["pii"]
     ["secrets"] = all["secrets"]
+    ["jactionlint"] = all["jactionlint"]
+    ["sisakulint"] = all["sisakulint"]
+    ["pinact"] = all["pinact"]
 }
 
 // pre-push (everything)

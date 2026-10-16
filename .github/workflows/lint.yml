@@ -30,12 +30,13 @@ concurrency:
 jobs:
   actions:
     name: Actions Lint（actionlint / sisakulint / pinact）
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v5.1.2
+      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
         with:
           cache: true
       - name: Lint
@@ -44,20 +45,21 @@ jobs:
       - name: SARIF（sisakulint）
         if: ${{ always() && hashFiles('sisakulint.sarif') != '' }}
         continue-on-error: true
-        uses: github/codeql-action/upload-sarif@v4.38.3
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
         with:
           sarif_file: sisakulint.sarif
           category: sisakulint
 
   secrets:
     name: 秘密情報（betterleaks / secretlint）
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 0 # because betterleaks scans the history
-      - uses: jdx/mise-action@v5.1.2
+      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
         with:
           cache: true
       - name: スキャン
@@ -66,9 +68,10 @@ jobs:
 
   pii:
     name: PII・衛生（depii / hygiene）
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       # -SkipEnvRules: on a runner the account and host name are generic, so deriving patterns from

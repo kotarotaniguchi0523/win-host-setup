@@ -102,8 +102,7 @@ win-host-setup/
 |   |   +-- release.yml        pathctl-v* タグで wheel/sdist を Release へ（PyPI は任意）
 |   |   +-- healthcheck.yml
 |   |   +-- actions.lock      gh actions-lock が生成 (タグ -> コミット)
-|   +-- jactionlint.yaml      profile + baseline
-|   +-- jactionlint-baseline.json  既知の指摘 (新規のみ失敗させる)
+|   +-- jactionlint.yaml      profile pedantic（baseline なし = 指摘ゼロで緑）
 |
 +-- .agent/                   [local only / gitignore]
 |   +-- docs/                 分析系ドキュメントの退避先
@@ -330,5 +329,7 @@ win-host-setup/
   一方、secrets と PII は GitHub 上の PR がローカルフックを通らないため、CI に残しています。
 - CI の PII 検査は `-SkipEnvRules` を付けて実行します。runner のアカウント名・ホスト名を PII パターンにすると
   一般語と衝突して誤検知するためで、一般の個人パス検出は `tools/ci/hygiene.ps1` が担当します。
-- jactionlint の指摘 45 件は **baseline 記録** (CI 緑は「新規なし」の意味)。`missing-timeout` 等は返済対象。
+- Actions の lint は **jactionlint（profile pedantic・baseline なし）** と **sisakulint（全ルール有効）** の両方を
+  緑にします。加えて **pinact** が `uses:` の commit SHA 固定を検証し、**すべてのアクションはタグではなく SHA** で固定します
+  （タグは末尾コメントとして残し、Renovate が更新します）。
 - 分析系ドキュメント (inventory/repos/migration) は公開しない (`.agent/docs/`)。

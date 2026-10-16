@@ -5,18 +5,23 @@ on:
   schedule:
     - cron: '0 18 * * 5'
   workflow_dispatch:
-permissions:
-  contents: write
-  pull-requests: write
+# Permissions are granted per job (the workflow itself needs none).
+permissions: {}
+
 concurrency:
   group: winget-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   update:
-    runs-on: windows-latest
+    name: update
+    runs-on: windows-2025
+    timeout-minutes: 30
+    permissions:
+      contents: write # 更新ブランチを push するため
+      pull-requests: write # 更新 PR を作成するため
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false   # push via gh auth setup-git
       - name: winget の最新版と突き合わせ
@@ -26,6 +31,7 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE_REF: ${{ github.ref_name }} # 直接展開せず env 経由（template injection を避ける）
         run: |
           gh auth setup-git   # authenticate via gh because persist-credentials: false
           git diff --quiet -- winget/host.dsc.yaml
@@ -37,4 +43,4 @@ jobs:
           git checkout -b $branch
           git commit -am 'chore(winget): DSC のピンを最新へ'
           git push -u origin $branch
-          gh pr create --title 'chore(winget): DSC のピンを最新へ' --body 'winget 自身で確認した最新版に更新します。' --base '${{ github.ref_name }}'
+          gh pr create --title 'chore(winget): DSC のピンを最新へ' --body 'winget 自身で確認した最新版に更新します。' --base "$env:BASE_REF"

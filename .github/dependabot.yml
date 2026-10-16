@@ -3,9 +3,18 @@
 #   - 無効: "Dependabot security updates"（bot に PR を作らせない）
 #   - 更新 PR はすべて Renovate が担当（mise / GitHub Actions / Skills）
 #
-# `updates: []` は意図的に空です。バージョン更新の対象が無いことを明示し、あわせて
-# Dependabot の非セキュリティ系ジョブ（依存グラフ更新など）を走らせないためです。
-# 依存グラフの更新は `requires-python >= 3.15` を解釈できず失敗するため、ここでも塞いでいます
-# （セキュリティアラート自体は GitHub 側の依存グラフで動き続けます）。
+# github-actions の更新を宣言しているのは、設定を「空」にできないためです
+# （空の updates は不正な設定で、GitHub はファイルごと無視し、Dependabot が
+# 全エコシステムを自動検出して uv プロジェクトの依存グラフ更新まで走らせてしまいます。
+# その更新は requires-python >= 3.15 を解釈できず失敗します）。
+# `open-pull-requests-limit: 0` なので PR は 1 件も作られません。
 version: 2
-updates: []
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0 # 更新 PR は Renovate が担当（ここでは作らない）
+    cooldown:
+      default-days: 7 # jactionlint の dependabot-cooldown が要求する下限

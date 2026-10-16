@@ -3,6 +3,7 @@
 name: skills
 on:
   push:
+    branches: [main] # pull_request と重複して同じコミットで走らないようにする
     paths:
       - 'skills/**'
       - 'tools/ci/**'
@@ -11,9 +12,9 @@ on:
     paths:
       - 'skills/**'
   workflow_dispatch:
+# Permissions are granted per job (the workflow itself only reads).
 permissions:
   contents: read
-  security-events: write # to upload SARIF to Code Scanning
 concurrency:
   group: skills-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -21,9 +22,13 @@ concurrency:
 jobs:
   verify:
     name: APM（lock ドリフト / 監査）
-    runs-on: windows-latest
+    runs-on: windows-2025
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write # SARIF を Code Scanning へアップロードするため
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: APM を導入
@@ -35,7 +40,7 @@ jobs:
       - name: SARIF を Code Scanning へ
         if: ${{ always() && hashFiles('apm-audit.sarif') != '' }}
         continue-on-error: true   # do not fail the job on a transient upload API error
-        uses: github/codeql-action/upload-sarif@v4.38.3
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
         with:
           sarif_file: apm-audit.sarif
           category: apm-audit
