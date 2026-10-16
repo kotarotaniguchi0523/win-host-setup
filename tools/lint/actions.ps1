@@ -19,7 +19,10 @@ $repo = Get-RepoRoot
 # Disable in sisakulint the rules that jactionlint (= actionlint equivalent) covers (to avoid duplicate reports)
 # Disable commit-sha because the GitHub Actions lock (.github/workflows/actions.lock) guarantees immutability
 # (Workflows use a model of tag references + a lock that pins the commit)
-$sisakuIgnore = @('expression', 'cond', 'job-needs', 'env-var', 'workflow-call', 'deprecated-commands', 'commit-sha')
+$sisakuIgnore = @('expression', 'cond', 'job-needs', 'env-var', 'workflow-call', 'deprecated-commands', 'commit-sha',
+    # dependabot-github-actions: Dependabot is used for security alerts only (Renovate owns every
+    # update PR), so dependabot.yml intentionally has an empty `updates` list.
+    'dependabot-github-actions')
 $ignoreArgs = @()
 foreach ($r in $sisakuIgnore) { $ignoreArgs += @('-ignore', $r) }
 
