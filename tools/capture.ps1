@@ -39,10 +39,15 @@ if (Test-Path $locks) {
 $secret = @('CONTEXT7_API_KEY', 'GH_TOKEN', 'GITHUB_TOKEN', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'TAKUMI_TOKEN', 'RENOVATE_TOKEN')
 $envDir = Join-Path $repo 'env'
 New-Item -ItemType Directory -Force -Path $envDir | Out-Null
+# Apply the same PII rules as depii/sanitize, so a capture alone never writes real paths into the
+# source (the values come from the live environment).
+. (Join-Path $repo 'tools\pii-rules.ps1')
+$piiRules = Get-PiiRules -Repo $repo
 $lines = @('# ユーザー環境変数（User スコープ・キャプチャ）', '', '| 変数 | 値 |', '|---|---|')
 foreach ($name in ([Environment]::GetEnvironmentVariables('User').Keys | Sort-Object)) {
     $val = [Environment]::GetEnvironmentVariable($name, 'User')
     $shown = if ($secret -contains $name) { '<secret: リポジトリに保存しない>' } else { $val }
+    foreach ($k in $piiRules.Keys) { if ($k) { $shown = $shown.Replace($k, $piiRules[$k]) } }
     $lines += ('| `' + $name + '` | `' + $shown + '` |')
 }
 $lines += @('', '> 生成: `tools/capture.ps1`。秘密値は保存していない。')
