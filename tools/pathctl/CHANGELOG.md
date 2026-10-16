@@ -2,6 +2,13 @@
 
 pathctl の変更点。形式は [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に準拠。
 
+## [0.1.3] - 2026-10-16
+
+### Changed
+
+- **PyPI への公開を有効化**（Trusted Publishing / PEP 740）。`uvx pathctl` が最短形で使えます。
+  コードの変更はありません（リリース運用の切り替えのみ）。
+
 ## [0.1.2] - 2026-10-16
 
 ### Added
