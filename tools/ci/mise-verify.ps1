@@ -36,6 +36,12 @@ try   { Invoke-Native mise @('install', 'node', '--locked') -What 'mise install 
 catch { Write-Warning "node の lock 導入に失敗したため lock 無しで再試行します: $($_.Exception.Message)"
         Invoke-Native mise @('install', 'node') -What 'mise install node' }
 
+# mise's npm install hook needs pnpm, and the locked run does not provision it by itself, so install
+# pnpm (npm's install dependency) before the full locked install.
+try   { Invoke-Native mise @('install', 'pnpm', '--locked') -What 'mise install pnpm --locked' }
+catch { Write-Warning "pnpm の lock 導入に失敗したため lock 無しで再試行します: $($_.Exception.Message)"
+        Invoke-Native mise @('install', 'pnpm') -What 'mise install pnpm' }
+
 Invoke-Native mise @('install', '--locked') -What 'mise install --locked'
 
 if ($Summary) {
