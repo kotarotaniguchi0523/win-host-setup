@@ -108,23 +108,52 @@ uv run pathctl doctor   # 動作確認
 リポジトリ直下から実行すると設定が読まれないことがあるため、CI と開発コマンドではフラグで明示します
 （Linux ランナーで `winreg` が未解決になるのを防ぐため）。
 
-## リリース
+## リリースと検証（SLSA Build Level 3）
 
 タグ `pathctl-v<version>` を push すると `.github/workflows/release.yml` が走ります。
 
-1. `tools/pathctl/pyproject.toml` の `version` を上げてコミット（タグと一致しないと失敗します）
-2. `git tag pathctl-v0.1.0 && git push origin pathctl-v0.1.0`
-3. GitHub Release に wheel / sdist が添付されます（`uvx` は git の subdirectory 指定でも使えます）
+1. `pyproject.toml` の `version` を上げてコミット（タグと一致しないと失敗します）
+2. `git tag pathctl-v0.1.2 && git push origin pathctl-v0.1.2`
+3. GitHub Release に wheel / sdist / `SHA256SUMS` が添付され、provenance が発行されます
 
-### PyPI へも公開する場合（任意・1 回だけの設定）
+### SLSA v1.0（build track）への対応
 
-PyPI 側で **Trusted Publisher** を登録すると、トークン無し（OIDC）で公開できます。
+| SLSA の要件 | この実装 |
+|---|---|
+| ビルドはコードで完全に定義される | `release.yml` のみ。手作業なし |
+| ビルドは隔離された使い捨て環境で走る | GitHub ホストの `ubuntu-latest`。**キャッシュを復元しない**（`cache: false`）ので前回の実行が成果物に影響しない |
+| 依存は固定される | ツールは `mise.toml` / `mise.lock`（`--locked`）、Python は `uv.lock`（`uv sync --frozen`） |
+| provenance はビルド基盤が発行し、改ざんできない | `actions/attest-build-provenance`（GitHub が OIDC で署名。リポジトリ内のスクリプトは関与しない）|
+| 公開される成果物はビルドしたものと同一 | 1 回ビルド → `upload-artifact` → Release / PyPI はそのファイルのみ（再ビルドしない）|
+| 成果物の完全性が検証できる | `SHA256SUMS` を添付し、公開前に `sha256sum -c` で再検証 |
+| 公開は短期トークンを使わない | **PyPI Trusted Publishing（OIDC）**。`uv publish --trusted-publishing always` |
+| 公開物に attestation が付く | `uv publish` が **PEP 740** の publish attestation を添付（PyPI の Attestations に表示）|
+
+### 利用者側の検証
+
+```console
+# GitHub の provenance（SLSA Build L3）
+gh attestation verify pathctl-0.1.2-py3-none-any.whl --repo kotarotaniguchi0523/win-host-setup
+
+# ダイジェスト
+sha256sum -c SHA256SUMS
+
+# PyPI の attestation はプロジェクトのファイル一覧から確認できる（PEP 740）
+```
+
+### PyPI へ公開する場合（任意・1 回だけの設定）
+
+PyPI 側で **Trusted Publisher** を登録します（トークンは不要です）。
 
 - Publisher: GitHub / Owner: `kotarotaniguchi0523` / Repository: `win-host-setup`
 - Workflow name: `release.yml` / Environment name: `pypi`
 
 登録後、リポジトリの変数 `PYPI_PUBLISH` を `true` にすると、以後のタグ push で
 `uv publish --trusted-publishing always` が実行されます（未設定なら GitHub Release だけが作られます）。
+環境 `pypi` には必要なら Required reviewers を設定して、公開を人手で承認する運用にもできます。
+
+なお **2026-10-16 時点では PyPI への公開は未有効**です（Trusted Publisher 未登録のため、
+`PYPI_PUBLISH` は未設定のままにしています）。
 
 Python 3.15 を前提に、新しい文法を使っています（下限は 3.14。理由は下の「注意」）。
 

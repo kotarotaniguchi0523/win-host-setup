@@ -2,6 +2,24 @@
 
 pathctl の変更点。形式は [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に準拠。
 
+## [0.1.2] - 2026-10-16
+
+### Added
+
+- **SLSA Build Level 3 相当のリリース**: GitHub ホストの使い捨てランナーで 1 回だけビルドし、
+  `actions/attest-build-provenance` で GitHub 自身が署名する provenance を発行
+  （`gh attestation verify` で検証可能）
+- `SHA256SUMS` を成果物に添付し、公開前に再検証（`sha256sum -c`）
+- **PyPI の Trusted Publishing（OIDC）** で公開（トークン不要）。`uv publish` が PEP 740 の
+  publish attestation も既定で添付する
+- リリースタグの保護（ruleset）と immutable releases を有効化
+
+### Changed
+
+- リリースは「ビルド → アップロード → Release / PyPI」の 3 ジョブに分離し、**公開するのは
+  ビルドした同一ファイル**（再ビルドしない）
+- リリース時の `mise-action` は `cache: false`（キャッシュ経由のビルド汚染を避ける）
+
 ## [0.1.1] - 2026-10-16
 
 ### Changed
