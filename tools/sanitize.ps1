@@ -42,6 +42,8 @@ $verbatimRel = @{}; foreach ($v in $verbatim) { $verbatimRel[$v] = $true }
 $total = 0
 $codeHits = 0
 $report = @()
+# Files written by this run (used to prune stale copies in public/ at the end)
+$written = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 
 foreach ($srcPath in ($targets | Sort-Object)) {
     $rel = $srcPath.Substring($repo.Length + 1)
@@ -76,6 +78,7 @@ foreach ($srcPath in ($targets | Sort-Object)) {
         New-Item -ItemType Directory -Force -Path (Split-Path $dst -Parent) | Out-Null
         # Use WriteAllText so line endings are not lost (Set-Content -NoNewline drops the final newline)
         [IO.File]::WriteAllText($dst, $new, $utf8NoBom)
+        $null = $written.Add($rel)
     }
 }
 
@@ -97,4 +100,30 @@ if (Test-Path $readme) {
     $head = "> このリポジトリは ``tools/sanitize.ps1`` の生成物です（ユーザー名・パス・ホスト名をプレースホルダ化）。`n> 実環境の値は含みません。`n`n"
     [IO.File]::WriteAllText($readme, $head + [IO.File]::ReadAllText($readme, [Text.Encoding]::UTF8), $utf8NoBom)
 }
+
+# Prune stale files: public/ is generated, so anything not produced by this run (a deleted file,
+# a file that is no longer a target, a file whose copy holds PII) must not stay published.
+# Without this, deleting a file in the source leaves the old copy on GitHub (which has happened
+# with renovate.yml, dependabot.yml and actions.lock).
+$pubFull = (Resolve-Path $pub).Path
+$pruned = 0
+Get-ChildItem $pubFull -Recurse -File -Force | ForEach-Object {
+    $relPath = $_.FullName.Substring($pubFull.Length + 1)
+    if ($relPath -like '.git\*' -or $relPath -eq '.git') { return }
+    if (-not $written.Contains($relPath)) {
+        Remove-Item $_.FullName -Force
+        Write-Host "[prune] $relPath"
+        $pruned++
+    }
+}
+if ($pruned -gt 0) { Write-Host "[i] public/ から $pruned 件の古いファイルを削除しました" }
+
+# Drop directories that became empty (keep .git)
+Get-ChildItem $pubFull -Recurse -Directory -Force |
+    Where-Object { $_.FullName -notlike "$pubFull\.git*" } |
+    Sort-Object { $_.FullName.Length } -Descending |
+    ForEach-Object {
+        if (-not (Get-ChildItem $_.FullName -Force | Select-Object -First 1)) { Remove-Item $_.FullName -Force }
+    }
+
 Write-Host "-> $pub"
