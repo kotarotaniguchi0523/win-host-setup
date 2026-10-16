@@ -91,6 +91,15 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: ビルドした wheel を実際に動かす（パッケージング回帰の検出）
+        shell: bash
+        run: |
+          set -euo pipefail
+          wheel="$(ls tools/pathctl/dist/*.whl)"
+          uvx --from "$wheel" pathctl --version
+          uvx --from "$wheel" pathctl docs show agents > /dev/null
+          uvx --from "$wheel" pathctl describe --format json > /dev/null
+
       - name: 成果物をアップロード（公開するのはこのファイルだけ）
         uses: actions/upload-artifact@v7.0.2
         with:
@@ -152,11 +161,16 @@ jobs:
       contents: read
       id-token: write # OIDC: trusted publishing + PEP 740 attestation の署名
     steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
       - uses: actions/download-artifact@v8.0.2
         with:
           name: dist
           path: dist
 
+      # mise.toml / mise.lock を読ませるために checkout が要る（ここで uv が入る）
       - uses: jdx/mise-action@v5.1.2
         with:
           cache: false

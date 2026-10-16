@@ -161,8 +161,9 @@ PyPI 側で **Trusted Publisher** を登録します（トークンは不要で�
 `uv publish --trusted-publishing always` が実行されます（未設定なら GitHub Release だけが作られます）。
 環境 `pypi` には必要なら Required reviewers を設定して、公開を人手で承認する運用にもできます。
 
-なお **2026-10-16 時点では PyPI への公開は未有効**です（Trusted Publisher 未登録のため、
-`PYPI_PUBLISH` は未設定のままにしています）。
+現在は **`PYPI_PUBLISH=true` で有効化済み**です。PyPI 側の Trusted Publisher 登録が済んでいれば
+タグ push で PyPI にも公開されます（未登録の場合は PyPI 公開ジョブだけが失敗し、
+GitHub Release と provenance はそのまま作られます）。
 
 Python 3.15 を前提に、新しい文法を使っています（下限は 3.14。理由は下の「注意」）。
 

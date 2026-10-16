@@ -2,6 +2,18 @@
 
 pathctl の変更点。形式は [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に準拠。
 
+## [0.1.4] - 2026-10-16
+
+### Fixed
+
+- リリースの PyPI 公開ジョブが `uv: command not found` で失敗していた
+  （`actions/checkout` が無く `mise.toml` を読めなかったため。checkout を追加）
+
+### Added
+
+- 公開前に**ビルドした wheel を実際に動かす**検証（`uvx --from dist/*.whl pathctl --version` /
+  `docs show` / `describe`）をリリースに追加（パッケージング回帰の検出）
+
 ## [0.1.3] - 2026-10-16
 
 ### Changed

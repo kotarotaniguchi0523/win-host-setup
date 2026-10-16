@@ -180,6 +180,14 @@
     {
       "file": ".github/workflows/release.yml",
       "rule": "unpinned-uses",
+      "fingerprint": "94fea2f6791a6205",
+      "context": "94e5b3f04f64d697",
+      "occurrence": 0,
+      "message": "action \"actions/checkout@v7.0.1\" must be pinned to a full-length commit SHA like \"{owner}/{repo}@{sha}\" because the \"unpinned-uses\" rule is enabled"
+    },
+    {
+      "file": ".github/workflows/release.yml",
+      "rule": "unpinned-uses",
       "fingerprint": "32e2cd5905aca2ca",
       "context": "8af9b4b47df730d2",
       "occurrence": 0,
