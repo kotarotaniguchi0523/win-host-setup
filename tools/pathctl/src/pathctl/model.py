@@ -2,9 +2,7 @@
 
 from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
-
-type EntryList = list[PathEntry]
-type ScopeMap = dict[Scope, EntryList]
+from typing import Final
 
 
 class Scope(StrEnum):
@@ -24,6 +22,13 @@ class ToolProvenance(StrEnum):
     NPM_GLOBAL = "npm-global"
     DIRECT = "direct"
     UNAVAILABLE = "unavailable"
+
+
+# Frozen on purpose: a set literal inside a property would rebuild the set on every access
+# (this is read once per tool per render), and frozenset is hashable so it stays a constant.
+MISE_PROVENANCES: Final[frozenset[ToolProvenance]] = frozenset(
+    {ToolProvenance.MISE_SHIM, ToolProvenance.MISE_INSTALL}
+)
 
 
 class Severity(StrEnum):
@@ -135,7 +140,7 @@ class Tool:
 
     @property
     def via_mise(self) -> bool:
-        return self.provenance in {ToolProvenance.MISE_SHIM, ToolProvenance.MISE_INSTALL}
+        return self.provenance in MISE_PROVENANCES
 
     @property
     def without_mise(self) -> bool:

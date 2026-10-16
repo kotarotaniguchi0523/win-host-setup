@@ -77,6 +77,24 @@ pathctl path add '%USERPROFILE%\.local\bin' --scope user --apply
 - `pathctl path fix` は、空エントリの削除・同一スコープ内の重複統合・末尾区切りの整理だけを既定にし、**個人パスの移動**と**存在しないパスの削除**は明示フラグが要ります
 - 書き換え後は `WM_SETTINGCHANGE` をブロードキャストします（既存のアプリは再起動が必要）
 
+## 効率性と不変性（Effective Python 第2版）
+
+| 方針 | 適用箇所 |
+|---|---|
+| **値オブジェクトは `frozen=True`** | `PathEntry` / `Finding` / `Tool` / `Report`（不変・比較可能・ハッシュ可能）|
+| **構築中に変わるものは可変** | `FixPlan`（`slots=True` のみ。`actions` / `moved` を追記する builder）|
+| **`NamedTuple`（frozen な値）** | `docs.Guide`（名前＋要約の組。unpack もできる）|
+| **`frozenset` を定数に** | `model.MISE_PROVENANCES`（プロパティ内の set リテラルはアクセスごとに作り直されるため）|
+| **`functools.cache`** | `tools.known_dirs()`、`render.display_width()`（同じセルを毎行数え直さない）|
+| **ループの不変条件を巻き上げ** | `inventory()` の shims パス正規化、`findings_block()` の色判定 |
+| **計算量の見直し** | `FixPlan.as_dict()` は key 集合を先に作る（O(n²) を回避）|
+| **例外は絞る** | `OSError` / `RuntimeError` のみ（`except Exception` を使わない）|
+| **テストは `unittest`** | 44 件（エージェント向け 8 原則の検証を含む）。追加依存なし |
+
+`freeze` の使い分けの基準は「**値か、途中状態か**」です。値（エントリ・検出結果・ツール・レポート）は
+frozen にして取り違えを防ぎ、組み立て中の `FixPlan` だけを可変にしています。集合は定数として
+`frozenset` に、辞書は `Final` にして、うっかり書き換えないようにしています。
+
 ## 開発
 
 ```powershell

@@ -32,12 +32,15 @@ class FixPlan:
         return self.scope is Scope.MACHINE
 
     def as_dict(self) -> dict[str, object]:
+        # Precompute the key sets once: rebuilding them inside the comprehensions would be O(n^2).
+        before_keys = {normalize(item) for item in self.before}
+        after_keys = {normalize(item) for item in self.after}
         return {
             "scope": self.scope.value,
             "changed": self.changed,
             "actions": list(self.actions),
-            "removed": [item for item in self.before if normalize(item) not in {normalize(x) for x in self.after}],
-            "added": [item for item in self.after if normalize(item) not in {normalize(x) for x in self.before}],
+            "removed": [item for item in self.before if normalize(item) not in after_keys],
+            "added": [item for item in self.after if normalize(item) not in before_keys],
             "moved_to_user": list(self.moved),
             "before_count": len(self.before),
             "after_count": len(self.after),

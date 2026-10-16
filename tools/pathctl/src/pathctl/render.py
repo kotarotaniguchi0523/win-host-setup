@@ -4,6 +4,7 @@ import io
 import os
 import sys
 from collections.abc import Sequence
+from functools import cache
 from string.templatelib import Interpolation, Template
 
 lazy import json
@@ -60,7 +61,9 @@ def style(template: Template, *, enabled: bool | None = None) -> str:
     return "".join(parts)
 
 
+@cache
 def display_width(text: str) -> int:
+    """Memoized: the table renderer asks for the same cells again for every row (item 27)."""
     width = 0
     for char in text:
         if unicodedata.combining(char):
@@ -190,13 +193,15 @@ def render(report: Report, *, json_mode: bool, body: str = "") -> None:
 def findings_block(findings: Sequence[Finding], *, color: bool | None = None) -> str:
     if not findings:
         return style(t"  問題は見つかりませんでした（findings 0 件）", enabled=color)
+    # Resolve the colour decision once instead of once per finding (isatty + env lookups).
+    use_color = colors_enabled() if color is None else color
     ordered = sorted(findings, key=lambda item: -_SEVERITY_ORDER[item.severity])
     lines: list[str] = []
     for finding in ordered:
         tag = {"info": "info ", "warn": "warn ", "error": "error"}[finding.severity.value]
-        lines.append(style(t"{tag} [{finding.code}] {finding.detail}", enabled=color))
+        lines.append(style(t"{tag} [{finding.code}] {finding.detail}", enabled=use_color))
         if finding.hint:
-            lines.append(style(t"        → {finding.hint}", enabled=color))
+            lines.append(style(t"        → {finding.hint}", enabled=use_color))
     return "\n".join(lines)
 
 

@@ -2,6 +2,25 @@
 
 pathctl の変更点。形式は [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に準拠。
 
+## [0.1.1] - 2026-10-16
+
+### Changed
+
+- 効率性の見直し（Effective Python 第2版を踏襲）
+  - `FixPlan.as_dict()` は key 集合を先に作る（内包表記の中での再構築をやめて O(n²) を回避）
+  - `render.display_width()` を `functools.cache` でメモ化、`findings_block()` は色判定を 1 回だけ
+  - `inventory()` は shims パスをループ外で正規化
+- 不変性（freeze）の方針を明確化
+  - 値オブジェクトは `frozen=True`（`PathEntry` / `Finding` / `Tool` / `Report`）、構築中の `FixPlan` は可変
+  - `docs.Guide` は `NamedTuple`、`model.MISE_PROVENANCES` は `frozenset`（プロパティ内の set リテラルをやめた）
+- 未使用コードを削除（`checks.SCOPES` / `checks.worst_severity` / 未使用の型エイリアス）
+
+### Added
+
+- `tests/test_agent_contract.py`: エージェント向け 8 原則を機械的に検証（構造化出力 / 終了コード /
+  非対話・ネットワーク無し / noun-verb / `describe` / アクション可能なエラー / 冪等・下見 / TSV）
+- テストは合計 44 件（追加依存なし）
+
 ## [0.1.0] - 2026-10-16
 
 ### Added

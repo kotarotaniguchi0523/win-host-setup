@@ -10,8 +10,6 @@ from .model import Finding, FindingCode, PathEntry, Scope, Severity, Tool
 from .tools import known_dirs
 from .winenv import effective_entries, normalize, stored_entries
 
-SCOPES: tuple[Scope, ...] = (Scope.MACHINE, Scope.USER)
-
 
 def _duplicates(entries: Iterable[PathEntry]) -> dict[str, list[PathEntry]]:
     grouped: dict[str, list[PathEntry]] = defaultdict(list)
@@ -166,15 +164,6 @@ def check_tools(tools: list[Tool]) -> list[Finding]:
 def summarize(findings: Iterable[Finding]) -> dict[str, int]:
     counts = Counter(finding.severity for finding in findings)
     return {severity.value: counts.get(severity, 0) for severity in Severity}
-
-
-def worst_severity(findings: Iterable[Finding]) -> Severity | None:
-    order = {Severity.INFO: 0, Severity.WARN: 1, Severity.ERROR: 2}
-    worst: Severity | None = None
-    for finding in findings:
-        if worst is None or order[finding.severity] > order[worst]:
-            worst = finding.severity
-    return worst
 
 
 def effective_summary() -> dict[str, int]:

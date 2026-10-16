@@ -5,7 +5,7 @@ matches the version that is running. Keep each file short: agents pay for every 
 """
 
 from importlib.resources import files
-from typing import Final
+from typing import Final, NamedTuple
 
 DOC_EXTENSION: Final = ".md"
 PACKAGE: Final = "pathctl"
@@ -16,6 +16,16 @@ class DocError(LookupError):
     """Raised when a guide does not exist."""
 
 
+class Guide(NamedTuple):
+    """A bundled guide: name and one-line summary.
+
+    A frozen record on purpose: it is a value (hashable, comparable, unpackable) and never mutated.
+    """
+
+    name: str
+    summary: str
+
+
 _SUMMARIES: Final[dict[str, str]] = {
     "overview": "何をする CLI か、インストール方法、代表的な使い方",
     "agents": "エージェント向けの契約（終了コード / JSON / 探索順序 / 安全策）",
@@ -23,9 +33,9 @@ _SUMMARIES: Final[dict[str, str]] = {
 }
 
 
-def available() -> tuple[tuple[str, str], ...]:
+def available() -> tuple[Guide, ...]:
     """(name, one-line summary) for every bundled guide, sorted by name."""
-    return tuple((name, _SUMMARIES.get(name, "")) for name in sorted(_SUMMARIES))
+    return tuple(Guide(name, _SUMMARIES.get(name, "")) for name in sorted(_SUMMARIES))
 
 
 def _path(name: str):
