@@ -52,7 +52,7 @@ jobs:
           set -euo pipefail
           uv sync --project tools/pathctl --frozen
           uv run --project tools/pathctl python -m unittest discover -s tools/pathctl/tests
-          uv run --project tools/pathctl ty check tools/pathctl
+          uv run --project tools/pathctl ty check --python-platform win32 tools/pathctl
       - name: ビルド
         run: uv build --project tools/pathctl
       - name: GitHub Release へ添付

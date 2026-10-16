@@ -81,10 +81,14 @@ pathctl path add '%USERPROFILE%\.local\bin' --scope user --apply
 
 ```powershell
 uv sync                 # 開発環境（dev 依存は ty のみ）
-uv run ty check         # 型チェック
+uv run ty check --python-platform win32 tools/pathctl   # 型チェック（Windows 専用ツールのため win32 を明示）
 uv run python -m unittest discover -s tests   # テスト（追加依存なし）
 uv run pathctl doctor   # 動作確認
 ```
+
+`pyproject.toml` の `[tool.ty.environment]` でも `python-platform = "win32"` を指定していますが、
+リポジトリ直下から実行すると設定が読まれないことがあるため、CI と開発コマンドではフラグで明示します
+（Linux ランナーで `winreg` が未解決になるのを防ぐため）。
 
 ## リリース
 
