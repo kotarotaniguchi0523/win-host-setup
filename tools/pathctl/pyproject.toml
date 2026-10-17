@@ -1,6 +1,6 @@
 [project]
 name = "pathctl"
-version = "0.2.2"
+version = "0.2.3"
 description = "Inspect and repair the Windows global PATH, and list the tools that are usable globally (via mise, winget, npm or directly)"
 readme = "README.md"
 # 3.15 is required for PEP 810 `lazy import` (used for ctypes / winreg / json / unicodedata).

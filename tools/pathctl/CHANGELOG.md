@@ -2,6 +2,15 @@
 
 pathctl の変更点。形式は [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に準拠。
 
+## [0.2.3] - 2026-10-17
+
+### Fixed
+
+- PyPI に **PEP 740 の publish attestation が添付されていなかった**問題を修正。`uv publish` は
+  attestation を自分では生成しないため、公開ステップの直前に **`astral-sh/attest-action`** を追加した
+  （`dist/` に生成し、`uv publish` が同じファイル名で拾って一緒に公開する）。
+  0.2.2 までは wheel / sdist だけが公開され、`.../provenance` は 404 だった。
+
 ## [0.2.2] - 2026-10-17
 
 ### Added
