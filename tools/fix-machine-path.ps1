@@ -26,6 +26,20 @@ foreach ($p in $cur) {
     $seen[$n] = $true; $keep += $p
 }
 
+# 個人パス（C:\Users\*）は、Machine PATH から外すだけだと届かなくなる（実際に "code" /
+# "cursor" が使えなくなった）。先に User PATH へ移してから Machine PATH から外す。
+$userCur = @([Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | Where-Object { $_ })
+$userKeys = @{}
+$userCur | ForEach-Object { $userKeys[(Norm $_)] = $true }
+$move = @($cur | Where-Object {
+    (Norm $_) -like 'c:\users\*' -and (Test-Path $_) -and -not $userKeys.ContainsKey((Norm $_))
+})
+
+if ($move.Count -gt 0) {
+    Write-Host "=== User PATH へ移動 ($($move.Count)) ===" -ForegroundColor Cyan
+    $move | ForEach-Object { Write-Host "  + $_" }
+}
+
 Write-Host "=== 除去予定 ($($drop.Count)) ===" -ForegroundColor Yellow
 $drop | ForEach-Object { Write-Host "  - $_" }
 Write-Host "`n=== 残る ($($keep.Count)) ===" -ForegroundColor Green
@@ -39,6 +53,12 @@ New-Item -ItemType Directory -Force -Path $bakDir | Out-Null
 $bak = Join-Path $bakDir ("machine-path-backup-" + (Get-Date -Format 'yyyyMMdd-HHmmss') + ".txt")
 $cur -join "`n" | Set-Content $bak -Encoding UTF8
 Write-Host "[bak] $bak"
+
+if ($move.Count -gt 0) {
+    # 昇格しても同じユーザーなので HKCU は本人のもの
+    [Environment]::SetEnvironmentVariable('Path', (($userCur + $move) -join ';'), 'User')
+    Write-Host "[ok] User PATH へ移動（$($move.Count) 件）" -ForegroundColor Green
+}
 
 [Environment]::SetEnvironmentVariable('Path', ($keep -join ';'), 'Machine')
 Write-Host "[ok] Machine PATH を更新（$($cur.Count) → $($keep.Count) 件）" -ForegroundColor Green
