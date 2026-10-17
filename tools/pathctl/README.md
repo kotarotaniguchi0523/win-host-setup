@@ -145,6 +145,9 @@ uv run pathctl doctor   # 動作確認
 2. `git tag pathctl-v0.1.2 && git push origin pathctl-v0.1.2`
 3. GitHub Release に wheel / sdist / `SHA256SUMS` が添付され、provenance が発行されます
 
+> **タグは消さない**: Release を作ったあとにタグを削除しても、同じ名前は作り直せません
+> （リポジトリの `protect release tags` ルールセット）。やり直すときは版を上げてください。
+
 ### SLSA v1.0（build track）への対応
 
 | SLSA の要件 | この実装 |
@@ -155,8 +158,8 @@ uv run pathctl doctor   # 動作確認
 | provenance はビルド基盤が発行し、改ざんできない | `actions/attest-build-provenance`（GitHub が OIDC で署名。リポジトリ内のスクリプトは関与しない）|
 | 公開される成果物はビルドしたものと同一 | 1 回ビルド → `upload-artifact` → Release / PyPI はそのファイルのみ（再ビルドしない）|
 | 成果物の完全性が検証できる | `SHA256SUMS` を添付し、公開前に `sha256sum -c` で再検証 |
-| 公開は短期トークンを使わない | **PyPI Trusted Publishing（OIDC）**。`uv publish --trusted-publishing always` |
-| 公開物に attestation が付く | `uv publish` が **PEP 740** の publish attestation を添付（PyPI の Attestations に表示）|
+| 公開は短期トークンを使わない | **PyPI Trusted Publishing（OIDC）**。公式の `pypa/gh-action-pypi-publish`（コンテナ内で実行）|
+| 公開物に attestation が付く | 同じアクションが **PEP 740** の publish attestation を生成・添付。ランナー側に Python の依存ツリー（twine → sigstore など）を持ち込まない |
 
 ### 利用者側の検証
 
@@ -167,7 +170,8 @@ gh attestation verify pathctl-0.1.2-py3-none-any.whl --repo kotarotaniguchi0523/
 # ダイジェスト（成果物と同じディレクトリで実行）
 sha256sum -c SHA256SUMS
 
-# PyPI の attestation はプロジェクトのファイル一覧から確認できる（PEP 740）
+# PyPI の attestation（PEP 740）: 200 なら添付されている
+curl -s -o /dev/null -w '%{http_code}\n' https://pypi.org/integrity/pathctl/<version>/pathctl-<version>-py3-none-any.whl/provenance
 ```
 
 検証結果として、provenance は次の内容を主張します（`--format json` で確認できます）。
@@ -187,7 +191,7 @@ PyPI 側で **Trusted Publisher** を登録します（トークンは不要で�
 - Workflow name: `release.yml` / Environment name: `pypi`
 
 登録後、リポジトリの変数 `PYPI_PUBLISH` を `true` にすると、以後のタグ push で
-`uv publish --trusted-publishing always` が実行されます（未設定なら GitHub Release だけが作られます）。
+`pypa/gh-action-pypi-publish` が実行されます（未設定なら GitHub Release だけが作られます）。
 環境 `pypi` には必要なら Required reviewers を設定して、公開を人手で承認する運用にもできます。
 
 現在は **`PYPI_PUBLISH=true` で有効化済み**です。PyPI 側の Trusted Publisher 登録が済んでいれば
