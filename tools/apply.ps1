@@ -73,5 +73,6 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "`n次の手順:"
 Write-Host "  winget configure winget/host.dsc.yaml"
+Write-Host "  tools/overrides.ps1 -Apply     # Windows 同梱コマンドの上書き（管理者で実行）"
 Write-Host "  tools/skills-apply.ps1 -Lock   # Skills（APM）を ~/.apm へ適用"
 Write-Host "  tools/fix-machine-path.ps1 （管理者で実行）"

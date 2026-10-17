@@ -34,7 +34,9 @@ $i = 0; $keep | ForEach-Object { $i++; Write-Host ("  {0,2}. {1}" -f $i, $_) }
 if (-not $Apply) { Write-Host "`nプレビューのみ。-Apply を付けると適用します。" -ForegroundColor Cyan; return }
 if (-not $elev)  { throw "Machine PATH の変更には管理者権限が必要です。管理者の PowerShell で再実行してください。" }
 
-$bak = Join-Path (Split-Path $PSScriptRoot -Parent) ("machine-path-backup-" + (Get-Date -Format 'yyyyMMdd-HHmmss') + ".txt")
+$bakDir = Join-Path (Split-Path $PSScriptRoot -Parent) '.agent'
+New-Item -ItemType Directory -Force -Path $bakDir | Out-Null
+$bak = Join-Path $bakDir ("machine-path-backup-" + (Get-Date -Format 'yyyyMMdd-HHmmss') + ".txt")
 $cur -join "`n" | Set-Content $bak -Encoding UTF8
 Write-Host "[bak] $bak"
 

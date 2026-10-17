@@ -166,6 +166,25 @@ uv tool install --from tools/pathctl pathctl    # グローバルに導入
 - リリースは **`.github/workflows/release.yml`**（`pathctl-v*` タグで GitHub Release を作成、PyPI は信頼済みパブリッシャー設定後に有効化）。
 - マシン PATH の大掃除は **`tools/fix-machine-path.ps1`（管理者）**、日常の点検と微修正は **`pathctl`** という使い分けです。
 
+### Windows 同梱コマンドの上書き（管理者）
+
+有効な PATH は **Machine PATH → User PATH** の順に連結されるため、ユーザー単位の shim（mise shims、winget Links）では
+`C:\Windows\System32` のコマンドを**上書きできません**。上書きしたいコマンドは、全ユーザー共通のディレクトリ
+`C:\ProgramData\win-host-setup\bin` に**コピー**を置き、Machine PATH の**先頭**に登録します。ディレクトリ名は固定なので、
+パッケージを更新しても PATH の記載は変わりません。
+
+| 上書きするコマンド | 入手元（`winget/host.dsc.yaml`） | 理由 |
+|---|---|---|
+| `curl` | `cURL.cURL` | Windows 同梱の `curl.exe`（System32）は Windows Update 任せで古い版が残りやすい |
+
+```powershell
+pwsh -File tools/overrides.ps1            # プレビュー（現在の PATH と配置予定を表示）
+pwsh -File tools/overrides.ps1 -Apply     # 管理者で適用（コピー + Machine PATH の先頭に登録）
+```
+
+`tools/update-winget-dsc.ps1 -Apply` でパッケージを更新したあとは、同じく `overrides.ps1 -Apply` を実行して
+コピーを差し替えます（バックアップは `.agent/machine-path-backup-*.txt`）。
+
 ## 再現手順
 
 ```powershell
@@ -175,7 +194,11 @@ pwsh -File tools/apply.ps1
 # 2) winget の宣言的構成を適用
 winget configure winget/host.dsc.yaml
 
-# 3) 検証
+# 3) 管理者で PATH を整える（大掃除 → 同梱コマンドの上書き）
+pwsh -File tools/fix-machine-path.ps1 -Apply
+pwsh -File tools/overrides.ps1 -Apply
+
+# 4) 検証
 mise doctor
 ```
 
