@@ -10,6 +10,8 @@ pathctl の変更点。形式は [Keep a Changelog](https://keepachangelog.com/j
   attestation を自分では生成しないため、公開ステップの直前に **`astral-sh/attest-action`** を追加した
   （`dist/` に生成し、`uv publish` が同じファイル名で拾って一緒に公開する）。
   0.2.2 までは wheel / sdist だけが公開され、`.../provenance` は 404 だった。
+- そのアクションには `UV_PYTHON: '3.12'` を渡す。内部で導入する `sigstore` → `pydantic-core`
+  （pyo3）が Python 3.15 に未対応で、mise が入れた 3.15 のままだとビルドに失敗するため。
 
 ## [0.2.2] - 2026-10-17
 

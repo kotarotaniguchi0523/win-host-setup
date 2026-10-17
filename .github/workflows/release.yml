@@ -192,6 +192,10 @@ jobs:
       # 生成し、uv publish に拾わせる（uv 0.9.12 以降 + id-token: write が前提）。
       - name: PEP 740 の attestation を生成
         uses: astral-sh/attest-action@f589a42a7efb6fe400b4f400de60b4bc90390027 # v0.0.6
+        env:
+          # このアクションは sigstore（pydantic-core = pyo3）を自前の venv に導入する。
+          # pyo3 は Python 3.15 に未対応なので、mise の 3.15 ではなく 3.12 を使わせる。
+          UV_PYTHON: '3.12'
 
       - name: PyPI へ公開
         shell: bash
