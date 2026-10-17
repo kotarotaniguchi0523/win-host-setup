@@ -2,6 +2,14 @@
 
 pathctl の変更点。形式は [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に準拠。
 
+## [0.2.2] - 2026-10-17
+
+### Added
+
+- `path add --prepend`: PATH の**末尾ではなく先頭**に追加する。Windows 同梱の `curl.exe`
+  （`C:\Windows\System32`）より新しい版を優先させたいときなど、システム側のコマンドを
+  上書きする用途。マシン PATH への書き込みは管理者権限が要る。
+
 ## [0.2.1] - 2026-10-17
 
 ### Added

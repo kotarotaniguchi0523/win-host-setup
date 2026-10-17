@@ -261,7 +261,12 @@ def cmd_path_add(args: argparse.Namespace) -> Output:
             ),
             Exit.NOT_FOUND,
         )
-    return _mutate(add_entry(Scope(args.scope), directory), args, command="path.add", kind="add")
+    return _mutate(
+        add_entry(Scope(args.scope), directory, prepend=bool(getattr(args, "prepend", False))),
+        args,
+        command="path.add",
+        kind="add",
+    )
 
 
 def cmd_path_remove(args: argparse.Namespace) -> Output:
@@ -616,6 +621,7 @@ def build_parser() -> argparse.ArgumentParser:
     add_parser = path_sub.add_parser("add", help="PATH にディレクトリを追加", parents=[common])
     add_parser.add_argument("directory", help="追加するディレクトリ（%%USERPROFILE%% などの変数可）")
     _scope_argument(add_parser, default="user", choices=("user", "machine"))
+    add_parser.add_argument("--prepend", action="store_true", help="末尾ではなく先頭に追加（システム同梱ツールを上書きするとき）")
     _write_flags(add_parser)
 
     remove_parser = path_sub.add_parser("remove", help="PATH からディレクトリを削除", parents=[common])

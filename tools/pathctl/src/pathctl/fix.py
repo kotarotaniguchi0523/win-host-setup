@@ -126,13 +126,17 @@ def apply(plan_: FixPlan, *, current_user: list[str] | None = None, announce: bo
     return True
 
 
-def add_entry(scope: Scope, directory: str) -> FixPlan:
+def add_entry(scope: Scope, directory: str, *, prepend: bool = False) -> FixPlan:
     raw, value_type = read_raw(scope)
     plan_ = FixPlan(scope=scope, before=list(raw), after=list(raw), value_type=value_type)
     key = normalize(directory)
     if key not in {normalize(item) for item in raw}:
-        plan_.after.append(_canonical(directory))
-        plan_.actions.append(f"追加: {directory}")
+        if prepend:
+            plan_.after.insert(0, _canonical(directory))
+            plan_.actions.append(f"先頭に追加: {directory}")
+        else:
+            plan_.after.append(_canonical(directory))
+            plan_.actions.append(f"追加: {directory}")
     return plan_
 
 
