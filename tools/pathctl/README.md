@@ -36,6 +36,7 @@ pathctl path add '%USERPROFILE%\.local\bin' --scope user --apply
 | `pathctl path add <dir> [--scope user\|machine] [--apply]` | エントリを追加（`%USERPROFILE%` などの変数可） |
 | `pathctl path remove <dir> [--scope ...] [--apply]` | エントリを削除 |
 | `pathctl tools [--without-mise] [--via <入手元>] [--name <glob>]` | ツールと入手元の一覧 |
+| `pathctl audit [--strict]` | **宣言に無いグローバル導入（野良）**を一覧 |
 | `pathctl doctor [--strict]` | PATH とツールをまとめて点検 |
 | `pathctl schema` | エージェント向けの入出力契約（コマンド・JSON・終了コード） |
 
@@ -94,6 +95,34 @@ pathctl path add '%USERPROFILE%\.local\bin' --scope user --apply
 `freeze` の使い分けの基準は「**値か、途中状態か**」です。値（エントリ・検出結果・ツール・レポート）は
 frozen にして取り違えを防ぎ、組み立て中の `FixPlan` だけを可変にしています。集合は定数として
 `frozenset` に、辞書は `Final` にして、うっかり書き換えないようにしています。
+
+## 野良グローバルを防ぐ
+
+ホストのグローバル導入は、**2 つの宣言だけ**を正とします。
+
+| 宣言 | 対象 |
+|---|---|
+| `~/.config/mise/config.toml`（このリポジトリの `mise/mise.toml`）| CLI・ランタイムの既定 |
+| `winget/host.dsc.yaml` | mise で扱えない例外（Store 版・Publisher 検証が強いもの）|
+
+それ以外の場所に入ったもの（`npm -g`、`uv tool`、インストーラが足した PATH など）は
+**野良グローバル**です。`pathctl audit` が一覧します。
+
+```console
+pathctl audit --format json     # WARN: mise/npm/uv の野良、INFO: アプリが足した PATH
+```
+
+- **mise の判定**: `mise ls -g --json` の `source.path` がグローバル設定でないものを検出します
+  （別プロジェクトの `mise.toml` で入れたものも分かります）。
+- **npm / uv**: `%APPDATA%\npm\node_modules` と `%LOCALAPPDATA%\uv\tools` を列挙します。
+- **PATH**: mise shims・winget・WindowsApps・`~/.local/bin`・Program Files 以外の**ユーザー PATH** を
+  INFO で出します（アプリのインストーラが足すことが多いため、警告にはしていません）。
+
+方針として、**ホストに入れたくないものは Docker Sandboxes（`sbx`）で実行**します
+（言語のバージョン違い、検証目的のツール、生成物のビルドなど）。ホストには mise で宣言したものだけを残します。
+
+補助として、グローバル設定に `PIP_REQUIRE_VIRTUALENV = "true"` を入れてあり、`pip install` の
+うっかりグローバル導入は失敗します（mise 経由のシェルで有効）。
 
 ## 開発
 

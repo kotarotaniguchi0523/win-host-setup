@@ -45,6 +45,7 @@ package_manager = "pnpm"
 registry_url = "https://pypi.flatt.tech/simple/{}/"
 
 [env]
+PIP_REQUIRE_VIRTUALENV = "true"  # pip install を venv 外で失敗させる（うっかりグローバル防止）
 PIP_INDEX_URL = "https://pypi.flatt.tech/simple/"
 UV_INDEX_URL  = "https://pypi.flatt.tech/simple/"
 NPM_CONFIG_REGISTRY = "https://npm.flatt.tech/"

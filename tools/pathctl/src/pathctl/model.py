@@ -97,6 +97,11 @@ class FindingCode(StrEnum):
     MISE_SHIMS_NOT_FIRST = "mise-shims-not-first"
     TOOL_SHADOWED = "tool-shadowed"
     TOOL_NOT_ON_PATH = "tool-not-on-path"
+    # audit: global installations that no declaration owns
+    STRAY_MISE_TOOL = "stray-mise-tool"
+    STRAY_NPM_GLOBAL = "stray-npm-global"
+    STRAY_UV_TOOL = "stray-uv-tool"
+    UNMANAGED_PATH_ENTRY = "unmanaged-path-entry"
 
 
 @dataclass(frozen=True, slots=True)

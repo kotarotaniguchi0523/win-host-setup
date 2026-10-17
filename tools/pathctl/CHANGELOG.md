@@ -2,6 +2,15 @@
 
 pathctl の変更点。形式は [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に準拠。
 
+## [0.2.0] - 2026-10-17
+
+### Added
+
+- **`pathctl audit`**: 宣言（mise のグローバル設定 / winget の DSC）に無いグローバル導入＝
+  **野良グローバル**を一覧する。mise の `source.path`、npm の `node_modules`、uv tool、
+  ユーザー PATH の項目を突き合わせ、パッケージマネージャ由来は WARN、PATH は INFO で返す。
+  `--format json` でそのまま記録・自動化できる。
+
 ## [0.1.4] - 2026-10-16
 
 ### Fixed

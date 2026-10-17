@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 
 lazy import fnmatch
 
-from . import __version__, docs
+from . import __version__, audit, docs
 from .checks import check_path, check_tools, effective_summary, summarize
 from .fix import add_entry, apply, plan, remove_entry
 from .model import Error, Exit, Finding, Report, Scope, Severity, Tool, ToolProvenance
@@ -63,6 +63,7 @@ EXAMPLES: dict[str, list[str]] = {
     "describe": ["pathctl describe", "pathctl describe path fix --format json"],
     "docs list": ["pathctl docs list", "pathctl docs list --format tsv"],
     "docs show": ["pathctl docs show agents"],
+    "audit": ["pathctl audit", "pathctl audit --format json"],
 }
 
 NOTES: dict[str, list[str]] = {
@@ -76,6 +77,11 @@ NOTES: dict[str, list[str]] = {
     "describe": ["エージェントは最初にこれを読む（フラグ一覧を JSON で返す）"],
     "docs list": ["同梱ガイド。Web Fetch せずにここから読む"],
     "docs show": ["ガイド本文を stdout に出す（--format json なら data.text）"],
+    "audit": [
+        "宣言（mise のグローバル設定 / winget の DSC）に無いグローバル導入＝野良を一覧する",
+        "WARN はパッケージマネージャ由来、PATH の項目は INFO（アプリのインストーラが足すため）",
+        "方針: グローバルは mise か winget に集約し、それ以外は SBX（Docker Sandboxes）で実行する",
+    ],
 }
 
 # Shown in --help: agents should read the machine-readable contract instead of scraping help.
@@ -402,6 +408,41 @@ def cmd_docs_show(args: argparse.Namespace) -> Output:
     return Output(_report("docs.show", kind="docs.doc", data=data), table_text=text)
 
 
+# ------------------------------------------------------------------------------- audit
+
+
+def cmd_audit(args: argparse.Namespace) -> Output:
+    try:
+        user_entries = stored_entries(Scope.USER)
+    except RuntimeError:  # non-Windows: still able to audit mise / npm / uv
+        user_entries = []
+    strays = audit.collect(user_entries)
+    found = tuple(audit.findings(strays))
+    exit_code = _severity_exit(found, Severity.WARN)
+    counts = {kind: sum(1 for item in strays if item.kind == kind) for kind in ("mise", "npm", "uv", "path")}
+    data: dict[str, object] = {
+        "strays": [
+            {"kind": item.kind, "name": item.name, "location": item.location, "hint": item.hint} for item in strays
+        ],
+        "counts": counts,
+        "mise_config": str(audit.mise_config()),
+    }
+    rows = [[item.kind, item.name, item.location] for item in strays]
+    body = "\n".join(
+        [
+            style(t"野良グローバル: {len(strays)} 件（mise {counts['mise']} / npm {counts['npm']} / uv {counts['uv']} / PATH {counts['path']}）"),
+            table(["KIND", "NAME", "LOCATION"], rows) if rows else "  宣言に無いグローバル導入はありません",
+            findings_block(found),
+        ]
+    )
+    hints = (
+        "方針: グローバルは mise（~/.config/mise/config.toml）と winget（winget/host.dsc.yaml）に集約し、"
+        "それ以外は SBX（Docker Sandboxes）で実行してください",
+    )
+    report = _report("audit", kind="audit", data=data, exit_code=exit_code, findings=found, hints=hints)
+    return Output(report, table_text=body)
+
+
 # ----------------------------------------------------------------------------- describe
 
 
@@ -589,6 +630,13 @@ def build_parser() -> argparse.ArgumentParser:
     doctor_parser = subparsers.add_parser("doctor", help="PATH とツールをまとめて点検", parents=[common])
     doctor_parser.add_argument("--strict", action="store_true", help="info/warn でも終了コード 5 にする")
 
+    audit_parser = subparsers.add_parser(
+        "audit", help="宣言に無いグローバル導入（野良グローバル）を一覧", parents=[common]
+    )
+    audit_parser.add_argument(
+        "--strict", action="store_true", help="info だけでも終了コード 5 にする"
+    )
+
     docs_parser = subparsers.add_parser("docs", help="同梱ガイド（Web Fetch 不要）", parents=[common])
     docs_sub = docs_parser.add_subparsers(dest="action", required=True)
     docs_sub.add_parser("list", help="ガイドの一覧", parents=[common])
@@ -652,6 +700,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 output = cmd_tools(args)
             case ("doctor", _):
                 output = cmd_doctor(args)
+            case ("audit", _):
+                output = cmd_audit(args)
             case ("docs", "list"):
                 output = cmd_docs_list(args)
             case ("docs", "show"):

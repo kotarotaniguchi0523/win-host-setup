@@ -39,7 +39,10 @@ Windows ホスト OS へのソフトウェア導入・更新では、**サプラ
 - **mise**: `~/.config/mise/config.toml` + `mise.lock`（`paranoid`/`locked`/`minimum_release_age="2d"`/`pin`）。検証は `mise tool <name>` の `Security:` 行で**実効性を確認**する。
 - **winget**: 宣言は WinGet Configuration（DSC）。Store 版があるものは `--source msstore` を明示。
 - **Chocolatey / Scoop は使わない**。
-- 監査結果は `AUDIT.md` と `inventory.md` に記録する。
+- **グローバル導入は「宣言」にだけ置く**。CLI・ランタイムは mise（`~/.config/mise/config.toml`、このリポジトリでは `mise/mise.toml`）、
+  mise で扱えない例外だけ winget（`winget/host.dsc.yaml`）。それ以外の場所に入れると「野良グローバル」として扱う。
+- **野良は `pathctl audit` で検出する**（`npm -g` / `uv tool` / インストーラが足した PATH など）。
+  見つけたら、mise に宣言するか、winget の DSC に入れるか、**SBX（Docker Sandboxes）で実行する**ように移す。
 
 ---
 
