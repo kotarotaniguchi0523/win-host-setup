@@ -166,6 +166,20 @@ uv tool install --from tools/pathctl pathctl    # グローバルに導入
 - リリースは **`.github/workflows/release.yml`**（`pathctl-v*` タグで GitHub Release を作成、PyPI は信頼済みパブリッシャー設定後に有効化）。
 - マシン PATH の大掃除は **`tools/fix-machine-path.ps1`（管理者）**、日常の点検と微修正は **`pathctl`** という使い分けです。
 
+### グローバル導入の運用メモ
+
+実際に運用して踏んだ落とし穴です。
+
+| 場面 | 必要なこと |
+|---|---|
+| mise にツールを追加した | **`mise lock --global`** を実行する。`locked = true` なので、ロックに無いツールは shim が解決できず失敗します（`is not in the lockfile`）|
+| `npm -g` / `go install` で入れたものを見つけた | mise の `npm:` / `go:` へ移す（`pathctl audit` が WARN で示します）|
+| postinstall で実体を取得する npm パッケージ | mise は既定で `--ignore-scripts=true`、npm 11.16+ は `--allow-scripts` も必要。**そのツールだけ** `npm_args` で明示許可します（例: `"npm:@opencode/cli" = { version = "2.0.29", npm_args = "--ignore-scripts=false --allow-scripts=@opencode/cli" }`）。`npm.package_manager` が pnpm だと lifecycle script が実行されず、スタブのまま入ります |
+| 個人パスが Machine PATH に混ざっている | `tools/fix-machine-path.ps1`（管理者）。**User PATH へ移してから** Machine PATH から外します |
+| Windows 同梱コマンドより新しい版を使いたい | 下の「Windows 同梱コマンドの上書き」へ |
+
+> **公開済みのタグは消さない**: GitHub Release を作ったあとにタグを削除しても、同じ名前は作り直せません（`protect release tags` ルールセット）。やり直すときは版を上げます。
+
 ### Windows 同梱コマンドの上書き（管理者）
 
 有効な PATH は **Machine PATH → User PATH** の順に連結されるため、ユーザー単位の shim（mise shims、winget Links）では

@@ -43,6 +43,9 @@ Windows ホスト OS へのソフトウェア導入・更新では、**サプラ
   mise で扱えない例外だけ winget（`winget/host.dsc.yaml`）。それ以外の場所に入れると「野良グローバル」として扱う。
 - **野良は `pathctl audit` で検出する**（`npm -g` / `uv tool` / インストーラが足した PATH など）。
   見つけたら、mise に宣言するか、winget の DSC に入れるか、**SBX（Docker Sandboxes）で実行する**ように移す。
+- **mise にツールを足したら `mise lock --global`** を実行する（`locked = true` のため、ロックに無いツールは shim が解決できず失敗する）。
+- **postinstall で実体を取得する npm パッケージ**は、そのツールだけ `npm_args` で script を許可する
+  （mise の既定 `--ignore-scripts=true` と npm 11.16+ の `--allow-scripts`。pnpm では lifecycle script が動かない）。
 
 ---
 

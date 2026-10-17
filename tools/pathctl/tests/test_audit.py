@@ -61,17 +61,17 @@ class PackageDirAuditTest(unittest.TestCase):
 class PathAuditTest(unittest.TestCase):
     def test_managed_roots_are_allowed(self) -> None:
         allowed = [
-            make_entry(r"C:\Users\x\AppData\Local\mise\shims"),
-            make_entry(r"C:\Users\x\AppData\Local\Microsoft\WinGet\Packages\Vendor.Tool_abc\bin"),
-            make_entry(r"C:\Users\x\.local\bin"),
+            make_entry(r"%USERPROFILE%\AppData\Local\mise\shims"),
+            make_entry(r"%USERPROFILE%\AppData\Local\Microsoft\WinGet\Packages\Vendor.Tool_abc\bin"),
+            make_entry(r"%USERPROFILE%\.local\bin"),
             make_entry(r"C:\Program Files\Git\cmd"),
         ]
         self.assertEqual(audit.path_strays(allowed), [])
 
     def test_inventory_leftovers_are_reported(self) -> None:
         entries = [
-            make_entry(r"C:\Users\x\AppData\Roaming\npm"),
-            make_entry(r"C:\Users\x\go\bin"),
+            make_entry(r"%USERPROFILE%\AppData\Roaming\npm"),
+            make_entry(r"%USERPROFILE%\go\bin"),
         ]
         names = sorted(item.name for item in audit.path_strays(entries))
         self.assertEqual(len(names), 2)
