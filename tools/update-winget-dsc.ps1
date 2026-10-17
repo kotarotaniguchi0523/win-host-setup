@@ -20,14 +20,24 @@ $evaluator = {
     $id  = $m.Groups['id'].Value.Trim()
     $cur = $m.Groups['ver'].Value
     $new = $cur
+    $note = ''
     try {
         $show = winget show --exact --id $id --source winget --accept-source-agreements --disable-interactivity 2>$null
         $line = $show | Where-Object { $_ -match '^\s*Version:\s' } | Select-Object -First 1
         if ($line) { $new = ($line -replace '^\s*Version:\s*', '').Trim() }
     } catch { }
-    $isNew = ($new -and $new -ne $cur)
-    $rows.Add([pscustomobject]@{ id = $id; current = $cur; latest = $new; update = $isNew })
-    if ($isNew) { $m.Value.Replace("version: '$cur'", "version: '$new'") } else { $m.Value }
+    # Only move forward: winget sometimes reports an older build than the installed one
+    # (e.g. Canonical.Ubuntu offers 22.04 while 26.04 is installed), and pinning that would
+    # downgrade the host. Unparsable versions are left alone too.
+    $isNewer = $false
+    if ($new -and $new -ne $cur) {
+        $a = $null; $b = $null
+        if ([version]::TryParse($cur, [ref]$a) -and [version]::TryParse($new, [ref]$b)) {
+            if ($b -gt $a) { $isNewer = $true } else { $note = 'installed is newer (no downgrade)' }
+        } else { $note = 'cannot compare versions (skipped)' }
+    }
+    $rows.Add([pscustomobject]@{ id = $id; current = $cur; latest = $new; update = $isNewer; note = $note })
+    if ($isNewer) { $m.Value.Replace("version: '$cur'", "version: '$new'") } else { $m.Value }
 }
 
 $out = $rx.Replace($text, $evaluator)
