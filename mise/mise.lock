@@ -369,6 +369,11 @@ url = "https://dl.google.com/go/go1.27.2.darwin-amd64.tar.gz"
 checksum = "sha256:1314008898bd40df77af4b014f777f08873dbdfbcd3d92308728ee03304fe04f"
 url = "https://dl.google.com/go/go1.27.2.windows-amd64.zip"
 
+[[tools."go:golang.org/x/tools/gopls"]]
+version = "0.23.0"
+backend = "go:golang.org/x/tools/gopls"
+specifiers = ["0.23.0"]
+
 [[tools.herdr]]
 version = "0.9.3"
 backend = "aqua:herdrdev/herdr"
@@ -526,6 +531,32 @@ url = "https://nodejs.org/dist/v24.21.0/node-v24.21.0-win-x64.zip"
 version = "12.2.0"
 backend = "npm:npm"
 specifiers = ["12.2.0"]
+
+[[tools."npm:@openai/codex"]]
+version = "0.162.1"
+backend = "npm:@openai/codex"
+specifiers = ["0.162.1"]
+
+[[tools."npm:@opencode/cli"]]
+version = "2.0.29"
+backend = "npm:@opencode/cli"
+specifiers = ["2.0.29"]
+
+[[tools."npm:@opencode/cli"]]
+version = "2.0.29"
+backend = "npm:@opencode/cli"
+specifiers = ["2.0.29"]
+
+[tools."npm:@opencode/cli".options]
+npm_args = "--ignore-scripts=false"
+
+[[tools."npm:@opencode/cli"]]
+version = "2.0.29"
+backend = "npm:@opencode/cli"
+specifiers = ["2.0.29"]
+
+[tools."npm:@opencode/cli".options]
+npm_args = "--ignore-scripts=false --allow-scripts=@opencode/cli"
 
 [[tools."npm:agent-browser"]]
 version = "0.39.0"
