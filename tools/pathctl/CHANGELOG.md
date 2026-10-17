@@ -2,7 +2,7 @@
 
 pathctl の変更点。形式は [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に準拠。
 
-## [0.2.3] - 2026-10-17
+## [0.2.4] - 2026-10-17
 
 ### Fixed
 
@@ -12,6 +12,12 @@ pathctl の変更点。形式は [Keep a Changelog](https://keepachangelog.com/j
   ランナー側に Python の依存ツリー（twine → sigstore → pydantic など）を持ち込まない。
 - ダイジェストファイル（`SHA256SUMS`）を `dist/` の外へ移動。公開アクションは `dist/*` を
   `twine check` するため、配布物以外のファイルが混ざっていると失敗する。
+- `pypi` ジョブから checkout と mise-action を削除（公開はアクションのコンテナ内で完結する）。
+
+### Note
+
+- 0.2.3 は GitHub Release を作成したあとにタグを作り直せなくなり（`protect release tags`
+  ルールセットによるタグ名の再利用不可）、**PyPI へは未公開**。同じ内容を 0.2.4 として公開した。
 
 ## [0.2.2] - 2026-10-17
 
