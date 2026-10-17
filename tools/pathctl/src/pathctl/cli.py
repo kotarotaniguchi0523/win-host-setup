@@ -18,6 +18,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 lazy import fnmatch
+lazy from pathlib import Path
 
 from . import __version__, audit, docs
 from .checks import check_path, check_tools, effective_summary, summarize
@@ -414,12 +415,14 @@ def cmd_docs_show(args: argparse.Namespace) -> Output:
 def cmd_audit(args: argparse.Namespace) -> Output:
     try:
         user_entries = stored_entries(Scope.USER)
-    except RuntimeError:  # non-Windows: still able to audit mise / npm / uv
-        user_entries = []
-    strays = audit.collect(user_entries)
+        all_entries = stored_entries(Scope.MACHINE) + user_entries
+    except RuntimeError:  # non-Windows: still able to audit mise / npm / uv / ...
+        user_entries, all_entries = [], []
+    strays = audit.collect(all_entries)
     found = tuple(audit.findings(strays))
     exit_code = _severity_exit(found, Severity.WARN)
-    counts = {kind: sum(1 for item in strays if item.kind == kind) for kind in ("mise", "npm", "uv", "path")}
+    kinds = ("mise", "npm", "uv", "pipx", "pip", "cargo", "go", "path")
+    counts = {kind: sum(1 for item in strays if item.kind == kind) for kind in kinds}
     data: dict[str, object] = {
         "strays": [
             {"kind": item.kind, "name": item.name, "location": item.location, "hint": item.hint} for item in strays

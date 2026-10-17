@@ -2,6 +2,15 @@
 
 pathctl の変更点。形式は [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に準拠。
 
+## [0.2.1] - 2026-10-17
+
+### Added
+
+- `audit` の対象を拡張: **pipx** / **pip --user** / **cargo install** / **go install** /
+  **バージョン付きの手動配置**（`curl-8.7.1_7-win64-mingw` のような展開済みアーカイブ）。機械 PATH も見る。
+- winget の突き合わせは誤検知が多い（バージョン文字列・Windows 標準アプリ）ため audit から外した。
+  winget のピン管理は `tools/update-winget-dsc.ps1` が担当する。
+
 ## [0.2.0] - 2026-10-17
 
 ### Added

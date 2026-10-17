@@ -101,6 +101,11 @@ class FindingCode(StrEnum):
     STRAY_MISE_TOOL = "stray-mise-tool"
     STRAY_NPM_GLOBAL = "stray-npm-global"
     STRAY_UV_TOOL = "stray-uv-tool"
+    STRAY_PIPX_VENV = "stray-pipx-venv"
+    STRAY_PIP_USER = "stray-pip-user"
+    STRAY_CARGO_INSTALL = "stray-cargo-install"
+    STRAY_GO_INSTALL = "stray-go-install"
+    MANUAL_INSTALL_PATH = "manual-install-path"
     UNMANAGED_PATH_ENTRY = "unmanaged-path-entry"
 
 

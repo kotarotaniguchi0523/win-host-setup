@@ -12,6 +12,7 @@ sandbox (Docker Sandboxes / ``sbx``) instead of the host.
 
 import json
 import os
+import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -119,6 +120,66 @@ def uv_strays() -> list[Stray]:
     ]
 
 
+_PIP_BASELINE: frozenset[str] = frozenset({"pip", "setuptools", "wheel", "pkg_resources"})
+
+
+def pipx_strays() -> list[Stray]:
+    """pipx venvs (the analysis docs list pipx as a legacy install path)."""
+    root = _home() / ".local" / "pipx" / "venvs"
+    return [
+        Stray("pipx", name, str(root / name), "pipx ではなく mise の pypi: で宣言するか、SBX で実行してください")
+        for name in _package_dirs(root)
+    ]
+
+
+def pip_user_strays() -> list[Stray]:
+    """`pip install --user` leftovers under %APPDATA%\\Python."""
+    root = Path(os.environ.get("APPDATA") or _home()) / "Python"
+    if not root.is_dir():
+        return []
+    strays: list[Stray] = []
+    for version in sorted(item for item in root.iterdir() if item.is_dir()):
+        site = version / "site-packages"
+        for name in _package_dirs(site):
+            key = name.casefold()
+            if key in _PIP_BASELINE or key.endswith((".dist-info", ".data", ".egg-info")):
+                continue
+            strays.append(
+                Stray("pip", name, str(site / name), "pip --user ではなく venv / uv / SBX を使ってください")
+            )
+    return strays
+
+
+# Binaries that rustup itself manages in ~/.cargo/bin (they are not `cargo install` leftovers).
+_RUSTUP_BINARIES: frozenset[str] = frozenset(
+    {
+        "cargo", "rustc", "rustdoc", "rustup", "rustfmt", "cargo-clippy", "clippy-driver",
+        "cargo-fmt", "cargo-miri", "rls", "rust-analyzer", "rust-gdb", "rust-gdbgui", "rust-lldb",
+    }
+)
+
+
+def cargo_strays() -> list[Stray]:
+    root = _home() / ".cargo" / "bin"
+    if not root.is_dir():
+        return []
+    return [
+        Stray("cargo", item.stem, str(item), "cargo install ではなく mise（cargo:）か SBX で実行してください")
+        for item in sorted(root.glob("*.exe"))
+        if item.stem.casefold() not in _RUSTUP_BINARIES
+    ]
+
+
+def go_strays() -> list[Stray]:
+    root = _home() / "go" / "bin"
+    if not root.is_dir():
+        return []
+    return [
+        Stray("go", item.stem, str(item), "go install ではなく mise（go:）か SBX で実行してください")
+        for item in sorted(root.glob("*.exe"))
+    ]
+
+
 def _is_allowed(entry: PathEntry) -> bool:
     text = entry.raw.casefold().rstrip("\\")
     # Anything below Program Files / Windows is an OS or application install.
@@ -142,8 +203,44 @@ def path_strays(entries: list[PathEntry]) -> list[Stray]:
     ]
 
 
+# A directory that carries its version in the name, e.g. curl-8.7.1_7-win64-mingw or node-v26.11.1-win-x64.
+_VERSIONED_DIR = re.compile(r"^[\w.+-]+-\d+(?:\.\d+)+", re.IGNORECASE)
+
+
+def manual_install_paths(entries: list[PathEntry]) -> list[Stray]:
+    """PATH entries pointing at an unpacked archive (a manual install nobody updates)."""
+    strays: list[Stray] = []
+    for entry in entries:
+        if entry.empty:
+            continue
+        text = entry.raw.replace("/", "\\")
+        lowered = text.casefold()
+        if "\\winget\\" in lowered or "\\mise\\" in lowered:
+            continue
+        if any(_VERSIONED_DIR.match(part) for part in text.split("\\")):
+            strays.append(
+                Stray(
+                    "manual",
+                    text,
+                    entry.value,
+                    "バージョン付きの手動配置です。winget（DSC）か mise に移し、古い PATH を外してください",
+                )
+            )
+    return strays
+
+
 def collect(user_entries: list[PathEntry]) -> list[Stray]:
-    return [*mise_strays(mise_global_json()), *npm_strays(), *uv_strays(), *path_strays(user_entries)]
+    return [
+        *mise_strays(mise_global_json()),
+        *npm_strays(),
+        *uv_strays(),
+        *pipx_strays(),
+        *pip_user_strays(),
+        *cargo_strays(),
+        *go_strays(),
+        *path_strays(user_entries),
+        *manual_install_paths(user_entries),
+    ]
 
 
 def _finding(stray: Stray, *, severity: Severity) -> Finding:
@@ -151,6 +248,11 @@ def _finding(stray: Stray, *, severity: Severity) -> Finding:
         "mise": FindingCode.STRAY_MISE_TOOL,
         "npm": FindingCode.STRAY_NPM_GLOBAL,
         "uv": FindingCode.STRAY_UV_TOOL,
+        "pipx": FindingCode.STRAY_PIPX_VENV,
+        "pip": FindingCode.STRAY_PIP_USER,
+        "cargo": FindingCode.STRAY_CARGO_INSTALL,
+        "go": FindingCode.STRAY_GO_INSTALL,
+        "manual": FindingCode.MANUAL_INSTALL_PATH,
         "path": FindingCode.UNMANAGED_PATH_ENTRY,
     }[stray.kind]
     return Finding(
