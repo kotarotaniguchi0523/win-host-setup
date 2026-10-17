@@ -198,13 +198,15 @@ PyPI 側で **Trusted Publisher** を登録します（トークンは不要で�
 タグ push で PyPI にも公開されます（未登録の場合は PyPI 公開ジョブだけが失敗し、
 GitHub Release と provenance はそのまま作られます）。
 
-Python 3.15 を前提に、新しい文法を使っています（下限は 3.14。理由は下の「注意」）。
+Python 3.15 を前提に、新しい文法を使っています（`requires-python` も `>=3.15`）。
 
 - `type` 文（PEP 695）と型パラメータ記法
 - `StrEnum` / `dataclass(slots=True, frozen=True)` / `match`
 - t-strings（PEP 750）: `render.style()` が `t"{値:ok}"` の書式指定を色として解釈します
+- **lazy import（PEP 810、3.15 の新構文）**: `lazy import ctypes` / `lazy from pathlib import Path` など 10 箇所。
+  `winreg` / `ctypes` のような Windows 専用モジュールを、実際に使う経路でだけ解決します
 - `pathlib.Path` / `winreg` / `ctypes`（標準ライブラリのみ）
 
-注意: `pyproject.toml` の `requires-python` は **`>=3.14`** です。実行環境（このホストと CI）は **3.15.0** 固定ですが、
-下限を 3.15 にすると GitHub の依存グラフ更新（Dependabot）が `tool_version_not_supported`（対応は 3.14 まで）で
-失敗するため、コードが実際に必要とする下限（t-strings = 3.14）を宣言しています。
+注意: `lazy import` は **3.15 の構文**なので、3.14 では import すらできません（`SyntaxError`）。
+`requires-python` を 3.14 に下げないのはこのためです。Dependabot の依存グラフは
+`open-pull-requests-limit: 0` で止めてあり、3.15 宣言による影響はありません。
