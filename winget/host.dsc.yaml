@@ -87,3 +87,9 @@ properties:
       directives:
         description: PowerShell 7 (MSI, Microsoft Corporation)
       settings: { id: Microsoft.PowerShell, source: winget, version: '7.6.7.0' }
+
+    # --- GUI apps (mise 対象外 / winget ピン対象外) ---
+    # T3 Code desktop (`T3Tools.T3Code`) は自己更新のため、ここにはピンしない。
+    # winget マニフェストは 0.0.45 だが実体は 0.1.0（公式サイト / GitHub Releases で導入）。
+    # ここに載せると 0.0.45 へダウングレードしかねないため、記録は winget-vs-mise.md §9 に置く。
+    # CLI 側 (`npm:t3` 0.1.0) は mise/mise.toml で管理する（同 §8.1）。

@@ -36,6 +36,11 @@ npm = "12.2.0"
 # --allow-scripts=<pkg>、組み込み aube なら aube.allowBuilds に変換される。
 "npm:@opencode/cli" = { version = "2.0.29", allow_builds = ["@opencode/cli"] }
 "npm:@openai/codex" = "0.162.1"
+# T3 Code CLI（`t3` = ローカル server + Web UI）。npm は sha512 integrity + SLSA provenance、
+# 実バイナリは optionalDependencies（@t3code/t3-win32-x64）で postinstall 不要。
+# winget の desktop 版は 0.0.45 と遅れ、CLI を PATH に載せる操作もアプリ側（mise 管理外）になるため、
+# グローバル CLI は mise の npm backend で 0.1.0 に固定する。
+"npm:t3" = "0.1.0"
 "go:golang.org/x/tools/gopls" = "0.23.0"
 "github:init-co-jp/diff-tour" = "0.5.0"
 

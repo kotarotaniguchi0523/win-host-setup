@@ -253,6 +253,34 @@
 - [x] **不採用**: `crush` / `xonsh` / `murex` / `elvish` / PowerShell **AI Shell（2026-01 にアーカイブ）**
 - [ ] **HerdrUI（`penso/herdr-gpui`）**: msstore/winget/mise **いずれも無し**。Herdr 本体とは**無関係の第三者**クライアント（署名+sha256 あり）→ **入れない**方針（TUI＋SSH で足りる）
 
+## 15. T3 Code（2026-10-18 追加）
+
+**内容**: エージェント orchestration 用の T3 Code を、ホスト方針（① msstore → ② mise/aqua の実効検証 → ③ winget）に沿って導入した記録。
+
+### 15.1 CLI（mise）
+
+- [x] `mise/mise.toml` に **`"npm:t3" = "0.1.0"`** を宣言（`npm:@opencode/cli` / `npm:@openai/codex` の並び）
+- [x] `mise lock --global` → `mise.lock` に `[[tools."npm:t3"]]` を追記（既存 147 エントリを更新）
+- [x] `mise install npm:t3` → **`t3 v0.1.0`**（shim `%LOCALAPPDATA%\mise\shims\t3.exe`）
+- 検証: npm **registry integrity（sha512）＋ SLSA provenance**（`t3` と `@t3code/t3-win32-x64` の双方に attestation）。実体は optionalDependencies のため **postinstall 不要** → `winget-vs-mise.md §8.1`
+- 注意: 更新は mise で行う。**`t3 update` は使わない**（mise のピン外へ独自ランタイムを入れて drift する）
+
+### 15.2 デスクトップアプリ（GUI・winget ピン対象外）
+
+- [x] **T3 Code (Beta) 0.1.0** を公式サイト / GitHub Releases から導入（Publisher: T3 Tools / `%LOCALAPPDATA%\Programs\t3code` / **非管理者**・ユーザー単位）
+- [x] winget マニフェストは **0.0.45** と遅れ、アプリは**自己更新** → **`winget/host.dsc.yaml` にはピンしない**（例外として `winget-vs-mise.md §9` に記録）
+- 注意: アプリ内 **「Install t3 command」は押さない**（mise の `t3` と二重になるため）。アプリのローカル server と mise `t3` の**同時起動も避ける**（既定 `~/.t3` / ポート 3773）
+
+### 15.3 sbx（Docker Sandboxes）連携
+
+- [x] **`sbx setup ssh`** を実行（`~/.ssh/config` に managed Include、`Host *.sbx`。ProxyCommand は `sbx.exe ssh proxy %n` で **`sh` 不要**）
+- [x] **サンドボックス側は追加導入なし**を実測確認: `common-opencode:dev` の使い捨てサンドボックス（`sbx create --name t3check -t common-opencode:dev opencode`）で
+      python3 3.14.4 / g++ 15.2 / make / Node 24.21.0 / curl / tar / sha256sum / shasum / git / libatomic1 / libstdc++ / libgcc_s を確認（確認後に `sbx rm --force t3check`）
+- 手順: デスクトップアプリ **Settings → Connections → Add environment → SSH → `<name>.sbx`**（**Web UI には SSH 追加 UI が無い**）。
+      初回接続でサンドボックス内 `~/.t3/runtime` に T3 server が導入される（**テンプレート変更は不要**）
+- プロバイダは**環境ごと**に設定（ローカルは `%USERPROFILE%\AppData\Local\mise\shims\opencode.exe`、サンドボックスは `opencode`、Server URL は空）
+- 注意: サンドボックス内 `~/.t3` は `sbx rm` で消える（永続化するなら `--base-dir <マウント内>/.t3`）。Windows は `t3 service` 非対応
+
 ---
 
 ## 未確定（要判断）

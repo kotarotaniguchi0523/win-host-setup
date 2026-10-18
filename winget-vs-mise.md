@@ -168,3 +168,41 @@ mise prune --yes                            # pypi:apm-cli を撤去
 
 **判定: パッケージマネージャ経路（msstore/winget）は存在しないため APM が唯一。タグ + commit SHA + ファイルハッシュで検証できる点で準拠** ✅
 （Renovate の `apm` マネージャが `owner/repo#ref` を自動更新する）
+
+---
+
+## 8. 追加分の判定（2026-10-18 追記）
+
+### 8.1 `t3`（T3 Code CLI / pingdotgg/t3code）
+
+| 経路 | 実測 |
+|---|---|
+| ① msstore | **なし**（`winget search --source msstore t3` は無関係の `T3` のみ） |
+| ② mise | ✅ **`npm:t3` 0.1.0** — 表示は `[none]` だが **registry integrity（sha512）＋ SLSA provenance**（`@t3code/t3-win32-x64` 側にも attestation）。実体は optionalDependencies で postinstall 不要 |
+| ③ winget | **CLI は無し**（winget にあるのはデスクトップアプリ `T3Tools.T3Code` のみ） |
+
+**判定: ② mise 採用（基準②準拠）** ✅
+**実施**: `mise/mise.toml` に `"npm:t3" = "0.1.0"`、`mise lock --global` で lock 更新、`mise install npm:t3` → **`t3 v0.1.0`**（shim `%LOCALAPPDATA%\mise\shims\t3.exe`）。
+**更新**: mise（`mise.toml` の版上げ → `mise lock --global`）で行う。**`t3 update` は使わない**（mise のピン外へ独自ランタイムを入れて drift する）。
+**Windows 制約（実測）**: `t3 service`（常駐）は **Linux/macOS のみ** → `unavailable on this machine`。
+
+## 9. GUI アプリ（mise 対象外）: T3 Code デスクトップ
+
+| 対象 | 実測 |
+|---|---|
+| インストール実体 | **T3 Code (Beta) 0.1.0**（Publisher: T3 Tools / `%LOCALAPPDATA%\Programs\t3code` / 非管理者・ユーザー単位） |
+| winget マニフェスト | **`T3Tools.T3Code` 0.0.45**（Release Date 2026-10-02）— **本体 0.1.0 より遅れ** |
+| 更新方式 | デスクトップアプリが**自己更新**（公式サイト / GitHub Releases のビルドと同じ） |
+
+**判定: `winget/host.dsc.yaml` にはピンしない（例外として記録）**。
+- winget の版（0.0.45）で固定すると、自己更新済みの 0.1.0 から **ダウングレード**しかねない。
+- アプリが自己更新するため、`Installer SHA256` による固定は意味を持たない。
+- → CLI は §8.1 の mise 管理、**GUI は例外**として本節に実体版（0.1.0）と入手経路（公式サイト / GitHub Releases）を記録する。
+
+### 9.1 sbx（Docker Sandboxes）連携
+
+- T3 Code に sbx 専用統合は無く、**sbx を SSH ホストとして扱う**（Docker 公式 "Connect T3 Code to a sandbox"）。
+- ホスト側: **`sbx setup ssh`** を1回実行（`~/.ssh/config` に managed Include、`Host *.sbx` の ProxyCommand は `sbx.exe ssh proxy %n`。**`sh` 不要**）。
+- サンドボックス側: **追加導入は不要**（実測: `common-opencode:dev` に python3 3.14.4 / g++ 15.2 / make / Node 24.21.0 / curl / tar / sha256sum / shasum / git / libatomic1 / libstdc++ / libgcc_s が既存）。
+- SSH 環境の追加は **デスクトップアプリの Settings → Connections → Add environment → SSH**（**Web UI には SSH 追加 UI が無い**）。プロバイダは**環境ごと**に設定する。
+- Docker Hub の `hambn/t3code`（`t3 serve` が entrypoint の非公式イメージ）は **sbx テンプレートには不向き**（sbx は `tini --` ＋ エージェント起動の独自テンプレート前提）。

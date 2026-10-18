@@ -605,6 +605,11 @@ version = "13.0.7"
 backend = "npm:secretlint"
 specifiers = ["13.0.7"]
 
+[[tools."npm:t3"]]
+version = "0.1.0"
+backend = "npm:t3"
+specifiers = ["0.1.0"]
+
 [[tools."npm:textlint"]]
 version = "15.8.0"
 backend = "npm:textlint"
