@@ -70,8 +70,7 @@
     "schedule": ["at any time"],
     "minimumReleaseAge": null,
     "dependencyDashboardApproval": false,
-    "groupName": null,
-    "prPriority": 10
+    "groupName": null
   },
   "osvVulnerabilityAlerts": true,
   "ignorePaths": ["public/**"]
