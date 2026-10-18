@@ -174,7 +174,7 @@ uv tool install --from tools/pathctl pathctl    # グローバルに導入
 |---|---|
 | mise にツールを追加した | **`mise lock --global`** を実行する。`locked = true` なので、ロックに無いツールは shim が解決できず失敗します（`is not in the lockfile`）|
 | `npm -g` / `go install` で入れたものを見つけた | mise の `npm:` / `go:` へ移す（`pathctl audit` が WARN で示します）|
-| postinstall で実体を取得する npm パッケージ | mise は既定で `--ignore-scripts=true`、npm 11.16+ は `--allow-scripts` も必要。**そのツールだけ** `npm_args` で明示許可します（例: `"npm:@opencode/cli" = { version = "2.0.29", npm_args = "--ignore-scripts=false --allow-scripts=@opencode/cli" }`）。`npm.package_manager` が pnpm だと lifecycle script が実行されず、スタブのまま入ります |
+| postinstall（build script）で実体を取得する npm パッケージ | mise は既定で dependency の build script を実行しません。**そのツールだけ** `allow_builds` で明示許可します（例: `"npm:@opencode/cli" = { version = "2.0.29", allow_builds = ["@opencode/cli"] }`）。installer（`[settings.npm] package_manager` = `pnpm` / `npm` / `bun` / `aube`）に依らず同じ書き方で、pnpm なら `--allow-build=`、npm 11.16+ なら `--allow-scripts=` に変換されます。`npm_args` での `--allow-scripts` は **npm 専用**で、pnpm では動きません |
 | 個人パスが Machine PATH に混ざっている | `tools/fix-machine-path.ps1`（管理者）。**User PATH へ移してから** Machine PATH から外します |
 | Windows 同梱コマンドより新しい版を使いたい | 下の「Windows 同梱コマンドの上書き」へ |
 

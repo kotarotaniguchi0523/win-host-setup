@@ -30,10 +30,11 @@ rust                   = "1.99.0"
 npm = "12.2.0"
 # SkillSpector: yara-python 4.5.4 は cp314/cp315 の wheel が無い → このツールのみ Python 3.13.16 で構築（インストール済・動作確認待ち）
 "pypi:git+https://github.com/nvidia/skillspector.git" = { version = "v2.12.0", uvx_args = "--python 3.13.16" }
-# postinstall で実バイナリ（約 200 MB）を取得するツール。mise は既定で
-# --ignore-scripts=true だし、npm 11.16+ は --allow-scripts の明示も要るので、
-# このツールだけ両方を指定して許可する（他は既定のまま）。
-"npm:@opencode/cli" = { version = "2.0.29", npm_args = "--ignore-scripts=false --allow-scripts=@opencode/cli" }
+# postinstall で実バイナリ（約 200 MB）を取得するツール。mise は既定で dependency の
+# build script を実行しないので、このツールだけ allow_builds で許可する（他は既定のまま）。
+# allow_builds は installer 非依存で、pnpm なら --allow-build=<pkg>、npm 11.16+ なら
+# --allow-scripts=<pkg>、組み込み aube なら aube.allowBuilds に変換される。
+"npm:@opencode/cli" = { version = "2.0.29", allow_builds = ["@opencode/cli"] }
 "npm:@openai/codex" = "0.162.1"
 "go:golang.org/x/tools/gopls" = "0.23.0"
 "github:init-co-jp/diff-tour" = "0.5.0"
@@ -46,7 +47,9 @@ minimum_release_age = "2d"
 pin                 = true
 
 [settings.npm]
-package_manager = "npm"
+# installer: npm / pnpm / bun / aube（組み込み）/ aube_cli。
+# build script の許可は tool 側の allow_builds で行う（installer 非依存）。
+package_manager = "pnpm"
 
 [settings.pypi]
 registry_url = "https://pypi.flatt.tech/simple/{}/"

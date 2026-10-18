@@ -583,7 +583,7 @@ backend = "npm:@opencode/cli"
 specifiers = ["2.0.29"]
 
 [tools."npm:@opencode/cli".options]
-npm_args = "--ignore-scripts=false --allow-scripts=@opencode/cli"
+allow_builds = '["@opencode/cli"]'
 
 [[tools."npm:agent-browser"]]
 version = "0.39.0"

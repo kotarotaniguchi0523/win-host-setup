@@ -33,6 +33,7 @@
 
 - [ ] project config は `paranoid` の内容バインド承認（`mise trust`）
 - [ ] 自動化は `MISE_SAFE=1`
+- [ ] **npm backend の installer を組み込み `aube`（`npm.package_manager = "auto"`）へ寄せるか検討**: aube は trust policy（no-downgrade）/ exotic dep 遮断 / low-download 検査 / Socket scanner 連携に加え、**`mise.lock` に依存グラフ sidecar** を持つ（pnpm/npm より統制が強い）。採用時は `mise lock --upgrade`（lock 形式 v4 相当）と CI（relock / validate）の追随が必要。
 
 ---
 
@@ -70,6 +71,8 @@
 
 > **変更履歴**: `ripgrep`→**`tgrep`**、`hk` **バイナリごと削除**、`cloudflared`/`fd`→**winget**、**`rust` を rustup から mise へ**（旧 toolchain `stable` 削除・`~\.cargo\bin` を PATH から除去。**`~\.rustup` は mise が使用するため保持**）。
 > **追加（2026-10-18）**: `diff-tour`（`github:init-co-jp/diff-tour 0.5.0`）。`mise tool` の `Security:` は **`checksum (sha256)`**（release の `checksums.txt` を照合）→ **mise 採用**。aqua / ubi / go backend はいずれも `[none]` のため **`github:` backend を選択**。winget に該当なし（**例外**）。実体は `%LOCALAPPDATA%\mise\installs\github-init-co-jp-diff-tour\0.5.0\tour.exe`（shim は `tour.exe`）。
+> **変更（2026-10-18）**: npm 系の installer を **npm → pnpm に復帰**。build script の許可を npm 専用の `npm_args = "--allow-scripts=…"` から **installer 非依存の `allow_builds = ["@opencode/cli"]`** へ変更し、**pnpm でも postinstall が実行されることを実測**（`npm:@opencode/cli` の `postinstall: Done` → 実バイナリ 212 MB ×3、`opencode v2.0.29`）。全 npm ツールの実レイアウトが pnpm に統一（npm レイアウトだった残骸は再インストール時に同一ディレクトリを書き換えるだけで、PATH 上の重複は発生しない）。
+> **落とし穴（実測）**: **`mise.lock` を消して `mise lock` を実行すると `betterleaks` / `python` / `uv` が無言で欠落**する（他の 28 ツールには "is not in the lockfile" の WARN が出るが、この 3 件は WARN も出ず脱落。`locked = true` 下では導入失敗になる）。ロックは削除せず、既存を保ったまま `mise lock --global` で更新する（→ `AGENTS.md` に追記）。
 > **バイナリ系（mise 外の例外）**: `gopls`（`go install`／mise・winget・ubi いずれも不可）。
 > **npm backend の検証（実測）**: mise の `Security:` は `[none]` 表示だが、**`~/.npmrc` の `registry=https://npm.flatt.tech/` 経由で pnpm が `dist.integrity`（sha512）を実効検証**（＝Takumi Guard 込み。`pnpm view agent-browser dist.tarball` = `npm.flatt.tech/...` で確認済）。`npm.package_manager = "pnpm"`。
 > **逸脱**: `herdr` は aqua の `Security: [none]`（winget は preview のみ、npm は予約プレースホルダ `herdr@0.0.0`）→ **§14 に記録**。
@@ -105,7 +108,8 @@
 
 - [x] `[env]` に `npm.flatt.tech` / `pypi.flatt.tech` を設定済み（**トークンは任意**）
 - [x] **User 環境変数にも配置**: `NPM_CONFIG_REGISTRY` / `UV_INDEX_URL` / `PIP_INDEX_URL` = flatt.tech（mise 非依存の全プロセスに適用）
-- [x] **実測確認（2026-10-15）**: `~\.npmrc` = `registry=https://npm.flatt.tech/` ／ `pnpm view <pkg> dist.tarball` = `https://npm.flatt.tech/...` ／ mise `npm.package_manager = "pnpm"` → **mise の `npm:` backend も Takumi 経由で `dist.integrity`(sha512) を実効検証**（純粋 npm への切替は不要）。postinstall は未実行（`Ignored build scripts`）
+- [x] **実測確認（2026-10-15）**: `~\.npmrc` = `registry=https://npm.flatt.tech/` ／ `pnpm view <pkg> dist.tarball` = `https://npm.flatt.tech/...` ／ mise `npm.package_manager = "pnpm"` → **mise の `npm:` backend も Takumi 経由で `dist.integrity`(sha512) を実効検証**（純粋 npm への切替は不要）
+- [x] **build script は `allow_builds` で個別許可（2026-10-18 修正）**: 既定では dependency の script は実行されない。必要なツールだけ `allow_builds` を付ける（installer 非依存。pnpm は `--allow-build=` に変換）。実測: `@opencode/cli` で `postinstall: Done` → 実バイナリ 212 MB ×3 が展開
 - 参考: 代替として **Aikido safe-chain**（mise `npm:@aikidosec/safe-chain` で管理可、24h minimum age 内蔵）
 
 ## 5. APM / SkillSpector

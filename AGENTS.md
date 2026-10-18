@@ -44,8 +44,12 @@ Windows ホスト OS へのソフトウェア導入・更新では、**サプラ
 - **野良は `pathctl audit` で検出する**（`npm -g` / `uv tool` / インストーラが足した PATH など）。
   見つけたら、mise に宣言するか、winget の DSC に入れるか、**SBX（Docker Sandboxes）で実行する**ように移す。
 - **mise にツールを足したら `mise lock --global`** を実行する（`locked = true` のため、ロックに無いツールは shim が解決できず失敗する）。
-- **postinstall で実体を取得する npm パッケージ**は、そのツールだけ `npm_args` で script を許可する
-  （mise の既定 `--ignore-scripts=true` と npm 11.16+ の `--allow-scripts`。pnpm では lifecycle script が動かない）。
+- **`mise.lock` を消して作り直さない**（`mise lock` をロック無しで実行すると `betterleaks` / `python` / `uv` が無言で欠落するのを実測。欠落は `locked = true` 下で導入失敗になる）。ロックは既存を保ったまま `mise lock --global` で更新する。
+- **installer は `[settings.npm] package_manager`**（`npm` / `pnpm` / `bun` / `aube`(組み込み) / `aube_cli`）。現在は **`pnpm`**。
+- **postinstall（build script）で実体を取得する npm パッケージ**は、そのツールだけ **`allow_builds`** で許可する
+  （`"npm:<pkg>" = { version = "…", allow_builds = ["<pkg>"] }`）。**installer 非依存**で、pnpm は `--allow-build=<pkg>`、
+  npm 11.16+ は `--allow-scripts=<pkg>`、組み込み aube は `aube.allowBuilds` に変換される。既定では dependency の script は実行されない。
+  `npm_args = "--allow-scripts=…"` は **npm 専用**の書き方なので使わない（pnpm に渡すと引数エラーになる）。
 
 ---
 
