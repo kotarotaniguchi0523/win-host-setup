@@ -12,7 +12,7 @@
 
 ## 3. グローバル ツール（正確ピン＋lock）
 
-**mise 管理 27 件**（内訳は下部 §3 アーカイブ参照）
+**mise 管理 28 件**（内訳は下部 §3 アーカイブ参照）
 
 - **既定 = 最新**（2026-10-15 変更）: `node = ["26.11.1", "24.21.0"]`（既定 **26.11.1**）/ `python = ["3.15.0", "3.14.8"]`（既定 **3.15.0**）。**配列は先頭が既定**（`mise which` で実測）
 - **winget へ移行（2 件）**: `apm`（`pypi:apm-cli` は既定 3.15 で `pyyaml` の cp315 wheel が無く導入不可）/ `rust-analyzer`（aqua は `Security: [none]`）
@@ -63,12 +63,13 @@
 ## 3. グローバル ツール（正確ピン＋lock）
 
 **内容**: 未固定（`"24"`/`"3.13"`）を正確版に置換し、lockfile で再現可能にする。
-**mise 管理 27 件**: `betterleaks 1.9.0`（cosign）/ `node 26.11.1 / 24.21.0`（gpg）/ `npm 12.2.0`（**[none]**）/ `pnpm 12.12.1`（attestations）/ `python 3.15.0 / 3.14.8`（attestations）/ `gh 2.102.0`（attestations）/ `uv 0.13.0`（attestations）/ `go 1.27.2`（checksum）/ `jj 0.46.0` / `jq 1.8.2`（attestations）/ **`tgrep 1.2.0`**（aqua）/ **`ax 0.1.25`**（ubi, **[none]**）/ **`dotenvx 2.34.2`**（aqua）/ **`npm:secretlint 13.0.7`** / **`npm:textlint 15.8.0`** / **`npm:ctx7 0.6.0`**（Context7 CLI）/ **`rust 1.99.0`**（core:rust）/ `doppler 3.76.0` / `mo 1.5.5` / `waza 0.33.0` / `rtk 0.40.0` / **`nushell 0.116.1`**（aqua, checksum）/ **`npm:agent-browser 0.39.0`**（npm, integrity+provenance）/ **`herdr 0.9.3`**（aqua, **[none]**）/ **`pi 1.2.0`**（aqua, checksum）/ **`npm:openclaw 2026.10.3`**（npm, integrity+provenance）/ **`pypi:git+…/skillspector v2.12.0`**（git ソース, Python 3.13.16 固定）
+**mise 管理 28 件**: `betterleaks 1.9.0`（cosign）/ `node 26.11.1 / 24.21.0`（gpg）/ `npm 12.2.0`（**[none]**）/ `pnpm 12.12.1`（attestations）/ `python 3.15.0 / 3.14.8`（attestations）/ `gh 2.102.0`（attestations）/ `uv 0.13.0`（attestations）/ `go 1.27.2`（checksum）/ `jj 0.46.0` / `jq 1.8.2`（attestations）/ **`tgrep 1.2.0`**（aqua）/ **`ax 0.1.25`**（ubi, **[none]**）/ **`dotenvx 2.34.2`**（aqua）/ **`npm:secretlint 13.0.7`** / **`npm:textlint 15.8.0`** / **`npm:ctx7 0.6.0`**（Context7 CLI）/ **`rust 1.99.0`**（core:rust）/ `doppler 3.76.0` / `mo 1.5.5` / `waza 0.33.0` / `rtk 0.40.0` / **`nushell 0.116.1`**（aqua, checksum）/ **`npm:agent-browser 0.39.0`**（npm, integrity+provenance）/ **`herdr 0.9.3`**（aqua, **[none]**）/ **`pi 1.2.0`**（aqua, checksum）/ **`npm:openclaw 2026.10.3`**（npm, integrity+provenance）/ **`pypi:git+…/skillspector v2.12.0`**（git ソース, Python 3.13.16 固定）/ **`github:init-co-jp/diff-tour 0.5.0`**（github, checksum）
 
 > **winget へ移行（2026-10-15）**: `apm` → winget **`Microsoft.APM 0.33.0`**（Publisher: Microsoft Corporation）/ `rust-analyzer` → winget **`Rustlang.rust-analyzer 2026-10-12`**（aqua は `Security: [none]` のため）。判定は **`winget-vs-mise.md`**
 > **既定バージョン**: `node` = `["26.11.1", "24.21.0"]` / `python` = `["3.15.0", "3.14.8"]`（**先頭が既定**。`mise which` で実測確認）
 
 > **変更履歴**: `ripgrep`→**`tgrep`**、`hk` **バイナリごと削除**、`cloudflared`/`fd`→**winget**、**`rust` を rustup から mise へ**（旧 toolchain `stable` 削除・`~\.cargo\bin` を PATH から除去。**`~\.rustup` は mise が使用するため保持**）。
+> **追加（2026-10-18）**: `diff-tour`（`github:init-co-jp/diff-tour 0.5.0`）。`mise tool` の `Security:` は **`checksum (sha256)`**（release の `checksums.txt` を照合）→ **mise 採用**。aqua / ubi / go backend はいずれも `[none]` のため **`github:` backend を選択**。winget に該当なし（**例外**）。実体は `%LOCALAPPDATA%\mise\installs\github-init-co-jp-diff-tour\0.5.0\tour.exe`（shim は `tour.exe`）。
 > **バイナリ系（mise 外の例外）**: `gopls`（`go install`／mise・winget・ubi いずれも不可）。
 > **npm backend の検証（実測）**: mise の `Security:` は `[none]` 表示だが、**`~/.npmrc` の `registry=https://npm.flatt.tech/` 経由で pnpm が `dist.integrity`（sha512）を実効検証**（＝Takumi Guard 込み。`pnpm view agent-browser dist.tarball` = `npm.flatt.tech/...` で確認済）。`npm.package_manager = "pnpm"`。
 > **逸脱**: `herdr` は aqua の `Security: [none]`（winget は preview のみ、npm は予約プレースホルダ `herdr@0.0.0`）→ **§14 に記録**。

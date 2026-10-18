@@ -38,7 +38,7 @@
 
 ---
 
-## 2. 全ツール判定表（28 件）
+## 2. 全ツール判定表（29 件）
 
 `mise の検証` は `mise tool` の `Security:` 行。`winget の検証` はマニフェストの `Installer SHA256`。
 
@@ -72,6 +72,7 @@
 | 26 | rust | 1.99.0 | core:rust（rustup） | 表示 `[none]`（**rustup 自身が component を検証**） | `Rustlang.Rustup` 1.29.1 / `Rustlang.Rust.GNU` 1.99.0 | — | **例外**（winget 版は `~\.rustup` を消す恐れ・ツールチェーン前提が違う） |
 | 27 | rust-analyzer | 2026-10-12 | aqua:rust-lang/rust-analyzer | **`[none]`** | **`Rustlang.rust-analyzer`**（Publisher: The Rust Project Developers, portable zip, SHA256） | **2026-10-12（同一）** | **winget 上位 → 切替** ✅ |
 | 28 | npm | 12.2.0 | npm:npm | **`[none]`** | **なし**（単体 npm は存在せず `OpenJS.NodeJS` に同梱） | — | **例外** |
+| 29 | diff-tour | 0.5.0 | github:init-co-jp/diff-tour | **checksum (sha256)**（release の `checksums.txt` を照合） | **なし** | — | **例外**（winget に無い。aqua/ubi/go backend は `[none]` のため `github:` を採用） |
 
 ### 重要な注記
 - **`pypi:` の `[none]` は「無検証」ではない**。`mise lock` が **依存グラフ（`locks/pypi-*/**/uv.lock`）に wheel ハッシュを記録**し、`--frozen` で再現する（`apm-cli` は **sha256 1,504 行**）。表示だけが `[none]`。

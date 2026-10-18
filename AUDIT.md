@@ -36,6 +36,7 @@
 | rtk | aqua:rtk-ai/rtk | checksum (sha256) |
 | hk | packslip:github.com/jdx/hk | packslip |
 | **npm** | npm:npm | **[none]** ⚠️ **例外**（下記） |
+| diff-tour | github:init-co-jp/diff-tour | checksum (sha256) |
 
 > **`packslip` の注記（誤解しやすい点）**: `Security: packslip` は「検証なし」ではなく **署名ベースの最強クラス**。mise は展開前に ①バンドルの Sigstore 署名＋証明書＋transparency log ②manifest の構造・要求した project/version ③**artifact の digest と size** ④**signer 継続性**と **lockfile のコミットメント** ⑤release-age を検証する。
 >
@@ -116,6 +117,7 @@
 | mo | 1.5.5 | aqua:k1LoW/mo | checksum |
 | waza | 0.33.0 | github:microsoft/waza | checksum |
 | rtk | 0.40.0 | aqua:rtk-ai/rtk | checksum |
+| diff-tour | 0.5.0 | github:init-co-jp/diff-tour | checksum |
 
 ### 7.2 winget（community ソース・Publisher 明示＋SHA256）
 

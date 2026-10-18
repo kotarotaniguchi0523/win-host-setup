@@ -36,6 +36,7 @@ npm = "12.2.0"
 "npm:@opencode/cli" = { version = "2.0.29", npm_args = "--ignore-scripts=false --allow-scripts=@opencode/cli" }
 "npm:@openai/codex" = "0.162.1"
 "go:golang.org/x/tools/gopls" = "0.23.0"
+"github:init-co-jp/diff-tour" = "0.5.0"
 
 [settings]
 paranoid            = true
