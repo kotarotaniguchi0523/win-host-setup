@@ -579,6 +579,24 @@ version = "12.2.0"
 backend = "npm:npm"
 specifiers = ["12.2.0"]
 
+[tools.npm."platforms.linux-arm64"]
+url = "https://registry.npmjs.org/npm/-/npm-12.2.0.tgz"
+
+[tools.npm."platforms.linux-arm64-musl"]
+url = "https://registry.npmjs.org/npm/-/npm-12.2.0.tgz"
+
+[tools.npm."platforms.linux-x64"]
+url = "https://registry.npmjs.org/npm/-/npm-12.2.0.tgz"
+
+[tools.npm."platforms.linux-x64-musl"]
+url = "https://registry.npmjs.org/npm/-/npm-12.2.0.tgz"
+
+[tools.npm."platforms.macos-arm64"]
+url = "https://registry.npmjs.org/npm/-/npm-12.2.0.tgz"
+
+[tools.npm."platforms.macos-x64"]
+url = "https://registry.npmjs.org/npm/-/npm-12.2.0.tgz"
+
 [[tools."npm:@openai/codex"]]
 version = "0.163.0"
 backend = "npm:@openai/codex"
