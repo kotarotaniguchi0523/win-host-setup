@@ -1,5 +1,5 @@
 lockfile_version: '1'
-apm_version: 0.33.0
+apm_version: 0.34.0
 dependencies:
 - repo_url: microsoft/waza
   name: waza
@@ -10,6 +10,14 @@ dependencies:
   virtual_path: skills/waza
   is_virtual: true
   package_type: claude_skill
+  deployed_files:
+  - .agents/skills/waza
+  - .agents/skills/waza/SKILL.md
+  - .config/opencode/skills/waza
+  - .config/opencode/skills/waza/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/waza/SKILL.md: sha256:e7ef60562bbf3535d7ca4b8b8b9d5c65bd210a37a03ef00e19e43be16b4f960e
+    .config/opencode/skills/waza/SKILL.md: sha256:e7ef60562bbf3535d7ca4b8b8b9d5c65bd210a37a03ef00e19e43be16b4f960e
   content_hash: sha256:2f23489639fec953559f61dedd389a8399b06b997adc517f214daa53aab63ec9
 - repo_url: microsoft/waza
   name: waza-interactive
@@ -20,6 +28,18 @@ dependencies:
   virtual_path: skills/waza-interactive
   is_virtual: true
   package_type: claude_skill
+  deployed_files:
+  - .agents/skills/waza-interactive
+  - .agents/skills/waza-interactive/SKILL.md
+  - .agents/skills/waza-interactive/tests/eval.yaml
+  - .config/opencode/skills/waza-interactive
+  - .config/opencode/skills/waza-interactive/SKILL.md
+  - .config/opencode/skills/waza-interactive/tests/eval.yaml
+  deployed_file_hashes:
+    .agents/skills/waza-interactive/SKILL.md: sha256:6976d7c90efce2fa934871265085abaceb59bc722d6218307c7a1d962838be71
+    .agents/skills/waza-interactive/tests/eval.yaml: sha256:fdb84af4a57da4ad360f1bbf35d34b7ae786586f3c73f8abff2a5ff63ced8e00
+    .config/opencode/skills/waza-interactive/SKILL.md: sha256:6976d7c90efce2fa934871265085abaceb59bc722d6218307c7a1d962838be71
+    .config/opencode/skills/waza-interactive/tests/eval.yaml: sha256:fdb84af4a57da4ad360f1bbf35d34b7ae786586f3c73f8abff2a5ff63ced8e00
   content_hash: sha256:a6b13d067eb1e4ace721316c4fbb31a8f20ed994104fc6864de90d1982a1b5b4
 - repo_url: mizchi/explainer
   name: explainer
@@ -198,9 +218,9 @@ dependencies:
   name: yomiyasu
   host: github.com
   resolved_commit: 602a3690dadd5d620bb21524353b8d192914eabb
-  resolved_ref: v1.1.2
+  resolved_ref: 602a3690dadd5d620bb21524353b8d192914eabb
   version: 1.1.2
-  package_type: skill_bundle
+  package_type: marketplace_plugin
   deployed_files:
   - .agents/skills/yomiyasu
   - .agents/skills/yomiyasu/.claude-plugin/marketplace.json
@@ -304,12 +324,12 @@ dependencies:
     .config/opencode/skills/nushell/references/types-and-syntax.md: sha256:c24386f664b9c525457ab2265a1510af286b8abbaa05476fcb84cff8584f8f13
   content_hash: sha256:fe1825bf3dc5dd5111c0dfb78eea681cf008591040a151fa3ae54fa22a5b5571
 - repo_url: vercel-labs/agent-browser
-  name: 7806f76343b67d4b
+  name: agent-browser
   host: github.com
   resolved_commit: 1165952d74ceed98fdc2dd97190ad41f44dd0e24
-  resolved_ref: v0.39.1
+  resolved_ref: 1165952d74ceed98fdc2dd97190ad41f44dd0e24
   version: '1165952'
-  package_type: skill_bundle
+  package_type: marketplace_plugin
   deployed_files:
   - .agents/skills/agent-browser
   - .agents/skills/agent-browser/SKILL.md
@@ -318,12 +338,12 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/agent-browser/SKILL.md: sha256:3a7520e64de2dfaa516b6721c001e84e06e3c06a187b82af029ae721540ebfac
     .config/opencode/skills/agent-browser/SKILL.md: sha256:3a7520e64de2dfaa516b6721c001e84e06e3c06a187b82af029ae721540ebfac
-  content_hash: sha256:eedd4c66d5a5a8546fdcca141c7f1215e02998b0fa9283f5911f31a67cc9c5c8
+  content_hash: sha256:97b7bc716dadfedbbc9511583c4b861102fbdf510388d17491e651a32824f08c
 - repo_url: yusukebe/ax
   name: ax
   host: github.com
   resolved_commit: 0ddd8a748ae2401ae344f536f6e8dded890fcdbf
-  resolved_ref: v0.1.25
+  resolved_ref: 0ddd8a748ae2401ae344f536f6e8dded890fcdbf
   version: unknown
   package_type: skill_bundle
   deployed_files:
@@ -831,6 +851,51 @@ deployments:
   - nushell/nu_scripts
   active_owner: nushell/nu_scripts
   content_hash: sha256:c24386f664b9c525457ab2265a1510af286b8abbaa05476fcb84cff8584f8f13
+- kind: project-relative
+  target: codex
+  value: .agents/skills/waza
+  runtime: null
+  scope: project
+  owners:
+  - microsoft/waza/skills/waza
+  active_owner: microsoft/waza/skills/waza
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/waza-interactive
+  runtime: null
+  scope: project
+  owners:
+  - microsoft/waza/skills/waza-interactive
+  active_owner: microsoft/waza/skills/waza-interactive
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/waza-interactive/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - microsoft/waza/skills/waza-interactive
+  active_owner: microsoft/waza/skills/waza-interactive
+  content_hash: sha256:6976d7c90efce2fa934871265085abaceb59bc722d6218307c7a1d962838be71
+- kind: project-relative
+  target: codex
+  value: .agents/skills/waza-interactive/tests/eval.yaml
+  runtime: null
+  scope: project
+  owners:
+  - microsoft/waza/skills/waza-interactive
+  active_owner: microsoft/waza/skills/waza-interactive
+  content_hash: sha256:fdb84af4a57da4ad360f1bbf35d34b7ae786586f3c73f8abff2a5ff63ced8e00
+- kind: project-relative
+  target: codex
+  value: .agents/skills/waza/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - microsoft/waza/skills/waza
+  active_owner: microsoft/waza/skills/waza
+  content_hash: sha256:e7ef60562bbf3535d7ca4b8b8b9d5c65bd210a37a03ef00e19e43be16b4f960e
 - kind: project-relative
   target: codex
   value: .agents/skills/yomiyasu
@@ -1461,6 +1526,51 @@ deployments:
   - nushell/nu_scripts
   active_owner: nushell/nu_scripts
   content_hash: sha256:c24386f664b9c525457ab2265a1510af286b8abbaa05476fcb84cff8584f8f13
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/waza
+  runtime: null
+  scope: project
+  owners:
+  - microsoft/waza/skills/waza
+  active_owner: microsoft/waza/skills/waza
+  content_hash: null
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/waza-interactive
+  runtime: null
+  scope: project
+  owners:
+  - microsoft/waza/skills/waza-interactive
+  active_owner: microsoft/waza/skills/waza-interactive
+  content_hash: null
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/waza-interactive/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - microsoft/waza/skills/waza-interactive
+  active_owner: microsoft/waza/skills/waza-interactive
+  content_hash: sha256:6976d7c90efce2fa934871265085abaceb59bc722d6218307c7a1d962838be71
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/waza-interactive/tests/eval.yaml
+  runtime: null
+  scope: project
+  owners:
+  - microsoft/waza/skills/waza-interactive
+  active_owner: microsoft/waza/skills/waza-interactive
+  content_hash: sha256:fdb84af4a57da4ad360f1bbf35d34b7ae786586f3c73f8abff2a5ff63ced8e00
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/waza/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - microsoft/waza/skills/waza
+  active_owner: microsoft/waza/skills/waza
+  content_hash: sha256:e7ef60562bbf3535d7ca4b8b8b9d5c65bd210a37a03ef00e19e43be16b4f960e
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/yomiyasu
