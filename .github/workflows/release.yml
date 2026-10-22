@@ -179,6 +179,6 @@ jobs:
       # ランナー側に Python の依存ツリー（sigstore / pydantic など）を持ち込まない。
       # dist/ には配布物だけを置くこと（中の `twine check dist/*` が余分なファイルで落ちる）。
       - name: PyPI へ公開（PEP 740 の attestation 込み）
-        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
           packages-dir: dist
