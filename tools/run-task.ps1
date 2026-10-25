@@ -46,6 +46,7 @@ $status = [ordered]@{
     log        = if ($NoLog) { $null } else { $log }
     aiFallback = $null
     aiExit     = $null
+    changes    = @()
     finishedAt = (Get-Date).ToString('o')
 }
 
@@ -67,6 +68,7 @@ last-run.json: $(Join-Path $logDir 'last-run.json')
 "@
         $aiLog = Join-Path $logDir ("ai-{0}-{1}.json" -f $Task, (Get-Date -Format 'yyyyMMdd-HHmmss'))
         Write-Host "[i] AI フォールバックを実行します（agent: host-fixer）"
+        $before = @(& git -C $repo status --porcelain 2>$null)
         Push-Location $repo
         try {
             # Do not stream the JSON event log to the console: it contains every tool result.
@@ -74,6 +76,12 @@ last-run.json: $(Join-Path $logDir 'last-run.json')
             $aiExit = $LASTEXITCODE
         } finally {
             Pop-Location
+        }
+        $after = @(& git -C $repo status --porcelain 2>$null)
+        $changes = @($after | Where-Object { $before -notcontains $_ })
+        $status.changes = $changes
+        if ($changes.Count -gt 0) {
+            Write-Host ("[i] AI が変更したファイル: {0}" -f (($changes | Select-Object -First 10) -join ', '))
         }
         $status.aiFallback = $true
         $status.aiExit = $aiExit

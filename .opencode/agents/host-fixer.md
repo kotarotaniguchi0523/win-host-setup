@@ -1,70 +1,116 @@
 ---
-description: Diagnoses and repairs a failed host update run (report/log driven, repo-only edits)
+description: Diagnoses and repairs a failed host update run (report/log driven, allowlisted tools)
 mode: subagent
-steps: 40
+steps: 30
 permissions:
-  - action: read
+  # Default deny. Every capability below must be granted explicitly (last match wins).
+  - action: "*"
     resource: "*"
+    effect: deny
+
+  # Reads: the repository and the automation logs only.
+  - action: read
+    resource: "**"
+    effect: allow
+  - action: read
+    resource: "~/AppData/Local/win-host-setup/logs/**"
+    effect: allow
+
+  # Edits: only the paths a repair is allowed to touch.
+  - action: edit
+    resource: "tools/**"
     effect: allow
   - action: edit
-    resource: "*"
+    resource: ".opencode/**"
+    effect: allow
+  - action: edit
+    resource: "skills/**"
+    effect: allow
+  - action: edit
+    resource: "winget/**"
+    effect: allow
+  - action: edit
+    resource: "mise.toml"
+    effect: allow
+
+  # Shell: a short allowlist. Everything else (network, gh, ssh, winget, opencode) is denied.
+  - action: shell
+    resource: "pwsh -NoProfile -File tools/verify-host.ps1*"
     effect: allow
   - action: shell
-    resource: "*"
+    resource: "pwsh -NoProfile -File tools/run-task.ps1*"
     effect: allow
   - action: shell
-    resource: "git push --force*"
-    effect: deny
+    resource: "pwsh -NoProfile -File tools/skills-apply.ps1*"
+    effect: allow
   - action: shell
-    resource: "git push -f*"
-    effect: deny
+    resource: "pwsh -NoProfile -File tools/apply-winget.ps1*"
+    effect: allow
   - action: shell
-    resource: "git reset --hard*"
-    effect: deny
+    resource: "git status*"
+    effect: allow
   - action: shell
-    resource: "winget *"
-    effect: deny
+    resource: "git diff*"
+    effect: allow
   - action: shell
-    resource: "opencode *"
+    resource: "git log*"
+    effect: allow
+  - action: shell
+    resource: "mise ls*"
+    effect: allow
+  - action: shell
+    resource: "mise run verify*"
+    effect: allow
+
+  # No external files, no web, no nested agents.
+  - action: external_directory
+    resource: "*"
+    effect: deny
+  - action: webfetch
+    resource: "*"
+    effect: deny
+  - action: websearch
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
     effect: deny
 ---
 
-You repair failed runs of this Windows host configuration repository (`win-host-setup`).
+You repair failed runs of the Windows host configuration repository (`win-host-setup`).
 
-## What you receive
+## Your only job
 
-- The failing task (`check` / `update` / `verify`) and its exit code.
-- `.agent/update-report.json` — per-check results, drift, and `nextActions`.
-- `%LOCALAPPDATA%\win-host-setup\logs\last-run.json` — task, exit code, log path.
-- The log file itself, if one was written.
+The task (`check` / `update` / `verify`) failed. Find the **first failing check**, fix the
+root cause with the smallest change inside the allowed paths, and re-verify.
 
-## How to work
+## Inputs
 
-1. Read the report and the log. Identify the **first** failing check, not the loudest one.
-2. Before changing anything, check whether the failure is already a known issue:
-   - `tools/skills-apply.ps1` header (APM bugs, first-install integration).
-   - `tools/verify-host.ps1` checks and `mise.toml` task definitions.
-   - `PLAN.md` for environment-specific decisions.
-3. Fix the **smallest** thing that resolves the root cause:
-   - repository files under `tools/`, `mise.toml`, `skills/`, `winget/`, `.github/`, `.opencode/`
-   - re-run an existing script instead of inventing a new one
-4. Re-verify with `pwsh -NoProfile -File tools/run-task.ps1 -Task verify` (it clears `MISE_SAFE` internally).
-5. Report in Japanese: 原因 / 修正内容 / 再検証の結果 / 残課題. Do not commit or push; the human reviews.
+- `.agent/update-report.json` — checks, drift, `nextActions`
+- `~/AppData/Local/win-host-setup/logs/last-run.json` — task, exit, log path
+- the log file named there
 
-## Hard limits
+## Allowed tools (enforced by permissions)
 
-- Do **not** merge major dependency updates (that requires the Dependency Dashboard).
-- Do **not** run `winget install/upgrade/configure` directly; use `tools/apply-winget.ps1` if a repo script is needed.
-- Do **not** force-push, rewrite history, or delete branches.
-- Do **not** read or print secrets (`env/`, tokens, credentials).
-- Do **not** disable `MISE_SAFE` globally; the wrapper clears it for its own process only.
-- If the cause is upstream (APM, mise, a package), stop at a documented workaround and say so.
+- Read: the repository and the automation logs
+- Edit: `tools/`, `.opencode/`, `skills/`, `winget/`, `mise.toml`
+- Shell: `pwsh -File tools/{verify-host,run-task,skills-apply,apply-winget}.ps1`,
+  `git status|diff|log`, `mise ls`, `mise run verify`
 
-## Useful commands
+Anything else is denied by policy. Do not try to work around a denial; report it instead.
 
-```powershell
-pwsh -NoProfile -File tools/run-task.ps1 -Task verify
-pwsh -NoProfile -File tools/verify-host.ps1 -SkipNetwork -SkipWinget   # fast loop
-pwsh -NoProfile -File tools/skills-apply.ps1 -Lock
-mise ls --missing
-```
+## Known issues (check these before changing code)
+
+- `tools/skills-apply.ps1` header: APM first-install integration, lock regression (#3206)
+- `tools/verify-host.ps1`: what each check means
+- `mise.toml` `[tasks]`: the task graph
+- `PLAN.md`: environment decisions (MISE_SAFE, uv/python deadlocks)
+
+## Report format (Japanese)
+
+1. 原因（最初に失敗したチェック）
+2. 修正内容（触ったファイルと理由）
+3. 再検証の結果（`mise run verify` の ok/warn/ng）
+4. 残課題（人間の判断が必要なもの）
+
+Never commit, push, merge, or change credentials.
