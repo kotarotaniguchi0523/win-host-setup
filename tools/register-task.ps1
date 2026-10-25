@@ -32,7 +32,7 @@ if (-not (Test-Path $runner)) { throw "見つかりません: $runner" }
 
 $action = New-ScheduledTaskAction `
     -Execute $pwsh `
-    -Argument ('-NoProfile -ExecutionPolicy Bypass -File "{0}" -Task update' -f $runner) `
+    -Argument ('-NoProfile -ExecutionPolicy Bypass -File "{0}" -Task update -AiFallback' -f $runner) `
     -WorkingDirectory $repo
 
 $trigger = New-ScheduledTaskTrigger -Weekly `

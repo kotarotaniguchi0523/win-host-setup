@@ -139,6 +139,7 @@ pwsh -File tools/run-task.ps1 -Task verify   # 検証のみ（.agent/update-repo
 - 平日 6:30 の自動実行は `pwsh -File tools/register-task.ps1`（管理者）で登録、`-Unregister` で削除します。
 - 検証結果は `.agent/update-report.json`（ローカル専用・コミットしません）。`exit 1` のときは `nextActions` に従ってください。
 - `winget` の適用は管理者権限が必要です。非管理者で実行した場合は警告を出してスキップします。
+- 失敗時は AI フォールバック: `pwsh -File tools/run-task.ps1 -Task update -AiFallback`（TUI では `/update-host`）。エージェント定義は `.opencode/agents/host-fixer.md`。
 
 ### 必要な Secrets
 
