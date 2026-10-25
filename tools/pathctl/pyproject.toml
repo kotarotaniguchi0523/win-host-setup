@@ -30,7 +30,7 @@ pathctl = "pathctl.cli:main"
 dev = ["ty"]
 
 [build-system]
-requires = ["uv_build==0.13.4"]
+requires = ["uv_build==0.13.5"]
 build-backend = "uv_build"
 
 [tool.ty.environment]
