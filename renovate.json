@@ -49,8 +49,8 @@
       "dependencyDashboardApproval": true
     },
     {
-      "description": "minor 以下（minor / patch / pin / digest）は CI が通れば自動マージする",
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "description": "minor / patch のみ CI が通れば自動マージする（pin / digest と major は手動）",
+      "matchUpdateTypes": ["minor", "patch"],
       "automerge": true,
       "platformAutomerge": true
     }

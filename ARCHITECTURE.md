@@ -163,8 +163,10 @@ win-host-setup/
                             | GitHub main    |
                             +----------------+
 
-  自動マージ: minor 以下 (minor/patch/pin/digest) は CI の通過後に GitHub の auto-merge でマージ。
-              major は Dependency Dashboard で承認してから。
+  自動マージ: minor / patch のみ CI の通過後に GitHub の auto-merge でマージ。
+              pin / digest と major は手動（major は Dependency Dashboard で承認してから）。
+  CI 承認:    bot PR の必須チェックが action_required で止まらないよう、Actions の
+              fork PR 承認ポリシーは「first-time contributors who are new to GitHub」にする。
 
   注意: 現状は source -> public の一方通行。
         GitHub 側の更新を実環境へ反映するには public から pull して apply する。
