@@ -202,6 +202,24 @@ try {
     }
 
     # --- 7. winget DSC ----------------------------------------------------------
+    # Resource allowlist first (offline): the configuration must only use WinGetPackage.
+    $dscPath = Join-Path $repo 'winget/host.dsc.yaml'
+    if (Test-Path $dscPath) {
+        $allowedResource = 'Microsoft.WinGet.DSC/WinGetPackage'
+        $badResources = @()
+        foreach ($line in (Get-Content $dscPath -Encoding UTF8)) {
+            if ($line -match '^\s*-\s*resource:\s*(\S+)\s*$' -and $Matches[1] -ne $allowedResource) { $badResources += $Matches[1] }
+            if ($line -match '^\s*module:\s*(\S+)\s*$' -and $Matches[1] -ne 'Microsoft.WinGet.DSC') { $badResources += "module:$($Matches[1])" }
+        }
+        if ($badResources.Count -eq 0) {
+            Add-Check 'dsc-resources' 'ok' 'WinGetPackage のみ'
+        } else {
+            $drift.dscResources = @($badResources | Select-Object -Unique)
+            Add-Check 'dsc-resources' 'ng' (($badResources | Select-Object -Unique) -join ', ')
+            $actions.Add('winget/host.dsc.yaml は WinGetPackage 以外の resource を許可しない')
+        }
+    }
+
     if ($SkipWinget) {
         Add-Check 'winget-dsc' 'skip' '-SkipWinget'
     } elseif (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
