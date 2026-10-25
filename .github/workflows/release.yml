@@ -54,7 +54,7 @@ jobs:
 
       # cache: false is deliberate: SLSA Build L3 builds must not be influenced by a cache
       # that an earlier (possibly untrusted) run could have written to.
-      - uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
+      - uses: jdx/mise-action@fc42bcc7ddbf51124c30f95a877a0c5168a3bfde # v5.2.1
         with:
           cache: false
 
@@ -101,9 +101,9 @@ jobs:
         run: |
           set -euo pipefail
           wheel="$(ls tools/pathctl/dist/*.whl)"
-          uvx --from "$wheel" pathctl --version
-          uvx --from "$wheel" pathctl docs show agents > /dev/null
-          uvx --from "$wheel" pathctl describe --format json > /dev/null
+          uvx --exclude-newer="3 days" --from "$wheel" pathctl --version
+          uvx --exclude-newer="3 days" --from "$wheel" pathctl docs show agents > /dev/null
+          uvx --exclude-newer="3 days" --from "$wheel" pathctl describe --format json > /dev/null
 
       - name: 成果物をアップロード（公開するのはこのファイルだけ）
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -179,6 +179,6 @@ jobs:
       # ランナー側に Python の依存ツリー（sigstore / pydantic など）を持ち込まない。
       # dist/ には配布物だけを置くこと（中の `twine check dist/*` が余分なファイルで落ちる）。
       - name: PyPI へ公開（PEP 740 の attestation 込み）
-        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
           packages-dir: dist

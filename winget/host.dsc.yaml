@@ -28,13 +28,13 @@ properties:
       id: cloudflared
       directives:
         description: cloudflared (Cloudflare) — mise は検証 [none] のため winget
-      settings: { id: Cloudflare.cloudflared, source: winget, version: '2026.10.1' }
+      settings: { id: Cloudflare.cloudflared, source: winget, version: '2026.10.3' }
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: curl
       directives:
         description: curl (curl.se) — 手動 zip の古い 8.7.1 を置き換える（CVE 対応のため winget で管理）
-      settings: { id: cURL.cURL, source: winget, version: '8.23.0.1' }
+      settings: { id: cURL.cURL, source: winget, version: '8.23.0.5' }
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: fd
@@ -60,13 +60,13 @@ properties:
       id: docker-desktop
       directives:
         description: Docker Desktop (Docker Inc.)
-      settings: { id: Docker.DockerDesktop, source: winget, version: '4.95.0' }
+      settings: { id: Docker.DockerDesktop, source: winget, version: '4.96.3' }
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: docker-sbx
       directives:
         description: Docker Sandboxes / sbx (Docker Inc.) — sandboxes\ のデータは保持
-      settings: { id: Docker.sbx, source: winget, version: '0.48.0' }
+      settings: { id: Docker.sbx, source: winget, version: '0.49.2' }
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: wsl
@@ -86,7 +86,7 @@ properties:
       id: powershell
       directives:
         description: PowerShell 7 (MSI, Microsoft Corporation)
-      settings: { id: Microsoft.PowerShell, source: winget, version: '7.6.7.0' }
+      settings: { id: Microsoft.PowerShell, source: winget, version: '7.6.8' }
 
     # --- GUI apps (mise 対象外 / winget ピン対象外) ---
     # T3 Code desktop (`T3Tools.T3Code`) は自己更新のため、ここにはピンしない。

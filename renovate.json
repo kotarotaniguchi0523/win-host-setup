@@ -49,8 +49,8 @@
       "dependencyDashboardApproval": true
     },
     {
-      "description": "minor 以下（minor / patch / pin / digest）は CI が通れば自動マージする",
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "description": "minor / patch のみ CI が通れば自動マージする（pin / digest と major は手動）",
+      "matchUpdateTypes": ["minor", "patch"],
       "automerge": true,
       "platformAutomerge": true
     }
@@ -66,11 +66,13 @@
   "vulnerabilityAlerts": {
     "enabled": true,
     "labels": ["security"],
-    "description": "Security fixes bypass the regular schedule and the release-age gate so they land as soon as the advisory is known",
+    "description": "Dependabot / OSV のアラート由来の更新は、スケジュール・リリース経過日数・Dashboard 承認・automerge 制限をすべて迂回して、即座に PR を作り即座にマージする",
     "schedule": ["at any time"],
     "minimumReleaseAge": null,
     "dependencyDashboardApproval": false,
-    "groupName": null
+    "groupName": null,
+    "automerge": true,
+    "platformAutomerge": true
   },
   "osvVulnerabilityAlerts": true,
   "ignorePaths": ["public/**"]

@@ -13,10 +13,10 @@ targets:
 dependencies:
   apm:
     # Browser automation / web fetching
-    - vercel-labs/agent-browser#v0.39.1
-    - yusukebe/ax#v0.1.25
+    - vercel-labs/agent-browser#1165952d74ceed98fdc2dd97190ad41f44dd0e24 # v0.39.1
+    - yusukebe/ax#0ddd8a748ae2401ae344f536f6e8dded890fcdbf # v0.1.25
     # Japanese proofreading (rewrite AI-generated Japanese into natural Japanese)
-    - nanaism/yomiyasu#v1.1.2
+    - nanaism/yomiyasu#602a3690dadd5d620bb21524353b8d192914eabb # v1.1.2
     # Official Nushell skills (nushell org / nu_scripts)
     - nushell/nu_scripts#main
     # Explanation / diagram skills (by mizchi; no tags, so pinned to main + commit via lock)
