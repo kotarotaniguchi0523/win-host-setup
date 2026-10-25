@@ -124,6 +124,22 @@ pwsh -File tools/sync.ps1 -Message "..."   # コミットメッセージ指定
 3. `tools/sanitize.ps1` — `public/` を再生成（個人情報を伏せる）
 4. source リポジトリをコミット → public リポジトリをコミットして push
 
+### ホストの更新（GitHub → ホスト）
+
+Renovate が public に入れた更新を、ホストへ取り込んで検証します。
+
+```powershell
+pwsh -File tools/run-task.ps1 -Task check    # 読み取りのみ（差分とドリフトを表示）
+pwsh -File tools/run-task.ps1 -Task update   # pull → mise → skills → winget → verify
+pwsh -File tools/run-task.ps1 -Task verify   # 検証のみ（.agent/update-report.json を出力）
+```
+
+- タスク定義は `mise.toml` の `[tasks.*]`（`mise run update` など）。
+- `MISE_SAFE=1` がユーザー環境変数で設定されているため、`mise run` を直接叩く場合は `$env:MISE_SAFE=0` が必要です。`tools/run-task.ps1` は自動化の入口として、この設定を**自前の実行だけ**解除します。
+- 平日 6:30 の自動実行は `pwsh -File tools/register-task.ps1`（管理者）で登録、`-Unregister` で削除します。
+- 検証結果は `.agent/update-report.json`（ローカル専用・コミットしません）。`exit 1` のときは `nextActions` に従ってください。
+- `winget` の適用は管理者権限が必要です。非管理者で実行した場合は警告を出してスキップします。
+
 ### 必要な Secrets
 
 ありません。Renovate App（Mend hosted）は PAT を使わないため、以前使っていた `RENOVATE_TOKEN` は削除しました。

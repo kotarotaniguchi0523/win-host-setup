@@ -18,3 +18,56 @@ pinact                              = "5.0.0"
 # uv + Python only for tools/pathctl (the PATH CLI is type-checked with ty in CI)
 uv                                  = "0.13.1"
 python                              = "3.15.0"
+
+# --- Host update automation (see docs/automation.md) -------------------------
+# Entry points:
+#   mise run check   : read-only drift check
+#   mise run update  : pull -> apply -> skills -> winget -> verify
+#   mise run verify  : verify only (also used by CI)
+# Internal step tasks are hidden from `mise tasks` output.
+
+[tasks.check]
+description = "public との差分とホストの状態を確認する（変更しない）"
+alias = "c"
+run = [
+  "git -C public fetch --prune",
+  "pwsh -NoProfile -File tools/verify-host.ps1",
+]
+
+[tasks.update]
+description = "public を取り込み、ホストへ適用して検証する"
+alias = "u"
+run = [
+  "mise run update:pull",
+  "mise run update:mise",
+  "mise run update:skills",
+  "mise run update:winget",
+  "mise run verify",
+]
+
+[tasks.verify]
+description = "ホストが pin どおりかを検証して .agent/update-report.json を書く"
+run = "pwsh -NoProfile -File tools/verify-host.ps1"
+
+[tasks."update:pull"]
+hide = true
+run = [
+  "git -C public fetch --prune",
+  "git -C public pull --ff-only",
+  "pwsh -NoProfile -File tools/pull.ps1",
+]
+
+[tasks."update:mise"]
+hide = true
+# Known issue: uv's interpreter probe can deadlock on mise shims during `mise install`.
+env = { UV_PYTHON_PREFERENCE = "only-managed", MISE_NOT_FOUND_AUTO_INSTALL = "0" }
+run = "pwsh -NoProfile -File tools/apply.ps1"
+
+[tasks."update:skills"]
+hide = true
+run = "pwsh -NoProfile -File tools/skills-apply.ps1 -Lock"
+
+[tasks."update:winget"]
+hide = true
+# Applies the pinned DSC. Skips itself with a warning when not elevated.
+run = "pwsh -NoProfile -File tools/apply-winget.ps1"
