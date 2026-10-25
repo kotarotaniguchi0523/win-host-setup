@@ -69,7 +69,8 @@ last-run.json: $(Join-Path $logDir 'last-run.json')
         Write-Host "[i] AI フォールバックを実行します（agent: host-fixer）"
         Push-Location $repo
         try {
-            & opencode run --agent host-fixer --format json $prompt *>&1 | Tee-Object -FilePath $aiLog
+            # Do not stream the JSON event log to the console: it contains every tool result.
+            & opencode run --agent host-fixer --format json $prompt *> $aiLog
             $aiExit = $LASTEXITCODE
         } finally {
             Pop-Location
