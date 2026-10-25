@@ -50,9 +50,35 @@ Write-Host "[ok] ~/.apm/apm.yml"
 # Note: do not name this variable $lock - PowerShell is case-insensitive, so it would be the
 #       same variable as the -Lock switch parameter and assigning a string to it fails.
 if ($Lock) {
+    # Guard against microsoft/apm#3206: a stale apm_modules/ makes `apm lock` write an older
+    # apm_version and drop deployed_files. Keep the repository copy in that case.
+    $repoLock = Join-Path $src 'apm.lock.yaml'
+    $backup = $null
+    if (Test-Path $repoLock) {
+        $backup = Get-Content $repoLock -Raw -Encoding UTF8
+    }
+
     & $apm lock --global | Out-Null
     $lockPath = Join-Path $dst 'apm.lock.yaml'
-    if (Test-Path $lockPath) { Copy-Item $lockPath (Join-Path $src 'apm.lock.yaml') -Force; Write-Host '[ok] skills/apm.lock.yaml を更新' }
+    if (Test-Path $lockPath) {
+        $newLock = Get-Content $lockPath -Raw -Encoding UTF8
+        $regressed = $false
+        if ($backup) {
+            $oldVer = if ($backup -match '(?m)^apm_version:\s*([0-9.]+)') { $Matches[1] } else { $null }
+            $newVer = if ($newLock -match '(?m)^apm_version:\s*([0-9.]+)') { $Matches[1] } else { $null }
+            $oldCount = ([regex]::Matches($backup, '(?m)^\s*-\s+\.(?:agents|config)/')).Count
+            $newCount = ([regex]::Matches($newLock, '(?m)^\s*-\s+\.(?:agents|config)/')).Count
+            if ($oldVer -and $newVer -and ([version]$newVer -lt [version]$oldVer)) { $regressed = $true }
+            if ($newCount -lt $oldCount) { $regressed = $true }
+        }
+        if ($regressed) {
+            [IO.File]::WriteAllText($repoLock, $backup, (New-Object System.Text.UTF8Encoding($false)))
+            Write-Warning 'apm lock が劣化したため、リポジトリ版の apm.lock.yaml を維持しました（microsoft/apm#3206）'
+        } else {
+            Copy-Item $lockPath $repoLock -Force
+            Write-Host '[ok] skills/apm.lock.yaml を更新'
+        }
+    }
 }
 
 # --- deploy (compare the lock's deployed_files with the actual state and re-run if anything is missing) ---
