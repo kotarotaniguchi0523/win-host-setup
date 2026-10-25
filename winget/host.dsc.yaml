@@ -46,7 +46,7 @@ properties:
       id: rustup
       directives:
         description: Rustup (Rust Project)
-      settings: { id: Rustlang.Rustup, source: winget, version: '1.29.1' }
+      settings: { id: Rustlang.Rustup, source: winget, version: '1.29.2' }
 
     # --- Official Store versions (explicit msstore) ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage
@@ -86,7 +86,7 @@ properties:
       id: powershell
       directives:
         description: PowerShell 7 (MSI, Microsoft Corporation)
-      settings: { id: Microsoft.PowerShell, source: winget, version: '7.6.8' }
+      settings: { id: Microsoft.PowerShell, source: winget, version: '7.6.8.0' }
 
     # --- GUI apps (mise 対象外 / winget ピン対象外) ---
     # T3 Code desktop (`T3Tools.T3Code`) は自己更新のため、ここにはピンしない。
