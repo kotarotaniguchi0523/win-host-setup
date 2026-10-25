@@ -84,8 +84,11 @@ last-run.json: $(Join-Path $logDir 'last-run.json')
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 [IO.File]::WriteAllText((Join-Path $logDir 'last-run.json'), ($status | ConvertTo-Json), $utf8)
 
-Get-ChildItem $logDir -Filter '*.log' -ErrorAction SilentlyContinue |
-    Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-$KeepDays) } |
+Get-ChildItem $logDir -File -ErrorAction SilentlyContinue |
+    Where-Object {
+        ($_.Name -like '*.log' -or $_.Name -like 'ai-*.json') -and
+        $_.LastWriteTime -lt (Get-Date).AddDays(-$KeepDays)
+    } |
     Remove-Item -Force -ErrorAction SilentlyContinue
 
 exit $code
