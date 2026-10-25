@@ -1,4 +1,4 @@
-# skills-apply.ps1 - Deploy this repository's skills/apm.yml to ~/.apm and apply it
+﻿# skills-apply.ps1 - Deploy this repository's skills/apm.yml to ~/.apm and apply it
 # Usage: pwsh -File tools/skills-apply.ps1 [-Lock]
 #   -Lock : after deploying, run `apm lock --global` to regenerate apm.lock.yaml and copy it back into the repository
 #
@@ -62,8 +62,11 @@ function Test-SkillsDeployed {
     if (-not (Test-Path $lockPath)) { return $true }
     $missing = @()
     foreach ($line in (Get-Content $lockPath -Encoding UTF8)) {
-        if ($line -match '^\s*-\s+(\.(?:agents/skills|config/opencode/skills)/[^/\s]+)/?$') {
-            $rel = $Matches[1]
+        # Check every deployed entry (files as well as directories). The first install can copy
+        # only part of a package (e.g. .codex-plugin/ and references/ without SKILL.md), so
+        # checking only the top-level directory would miss that.
+        if ($line -match '^\s*-\s+(\.(?:agents/skills|config/opencode/skills)/\S+?)\s*$') {
+            $rel = $Matches[1].TrimEnd('/')
             $p = Join-Path (Get-HomeDir) ($rel -replace '/', '\')
             if (-not (Test-Path $p)) { $missing += $rel }
         }
