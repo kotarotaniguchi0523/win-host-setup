@@ -57,7 +57,7 @@
 
 - **Renovate**（Mend hosted）が mise / GitHub Actions / Skills (APM) の更新 PR を作ります。
 - **Dependabot** は**セキュリティアラートのみ**を有効にし、更新 PR は作りません。bot の版更新設定 `.github/dependabot.yml` は削除し、セキュリティ更新 PR も停止しています。
-- **脆弱性が見つかったとき**は、Renovate の `vulnerabilityAlerts`（＋`osvVulnerabilityAlerts`）が週次のスケジュールと `minimumReleaseAge` を迂回して**即時に** PR を作ります。
+- **脆弱性が見つかったとき**は、Renovate の `vulnerabilityAlerts`（＋`osvVulnerabilityAlerts`）が週次のスケジュール・`minimumReleaseAge`・Dependency Dashboard 承認・automerge 制限をすべて迂回し、**即時に PR を作って即時にマージ**します。
 - **minor / patch** の更新は、**CI が通れば自動でマージ**します。pin / digest と major は手動です（major は Dependency Dashboard で承認してから PR を作ります）。
 - bot（Renovate / GitHub Actions）の PR は、リポジトリ設定 **Actions → Fork pull request workflows → Require approval for first-time contributors who are new to GitHub** にしておきます。厳しすぎる設定だと bot の CI が `action_required` で止まり、必須チェックが走らないため auto-merge されません。
 
