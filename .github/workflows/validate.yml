@@ -48,10 +48,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: jdx/mise-action@fc42bcc7ddbf51124c30f95a877a0c5168a3bfde # v5.2.1
+        with:
+          cache: true
+          install: false # uv だけを入れる（全ツールの導入は重い）
       - name: JSON / YAML / TOML の検証
         run: |
-          python3 -m pip install --quiet --disable-pip-version-check 'pyyaml==6.0.3'
-          python3 tools/ci/lint-config.py
+          mise install uv
+          uv run --no-project --python 3.13 --with 'pyyaml==6.0.3' --exclude-newer="3 days" python tools/ci/lint-config.py
 
   python:
     name: Python（pathctl の型チェック）

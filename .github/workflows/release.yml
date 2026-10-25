@@ -101,9 +101,9 @@ jobs:
         run: |
           set -euo pipefail
           wheel="$(ls tools/pathctl/dist/*.whl)"
-          uvx --from "$wheel" pathctl --version
-          uvx --from "$wheel" pathctl docs show agents > /dev/null
-          uvx --from "$wheel" pathctl describe --format json > /dev/null
+          uvx --exclude-newer="3 days" --from "$wheel" pathctl --version
+          uvx --exclude-newer="3 days" --from "$wheel" pathctl docs show agents > /dev/null
+          uvx --exclude-newer="3 days" --from "$wheel" pathctl describe --format json > /dev/null
 
       - name: 成果物をアップロード（公開するのはこのファイルだけ）
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
