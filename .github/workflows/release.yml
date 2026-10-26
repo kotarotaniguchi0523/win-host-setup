@@ -25,6 +25,7 @@ on:
   workflow_dispatch:
 
 permissions: {}
+cache-mode: none
 
 env:
   GITHUB_TOKEN: ${{ github.token }}
@@ -69,12 +70,14 @@ jobs:
             exit 1
           fi
 
-      - name: テストと型チェック（ビルド前に検証する）
-        run: |
-          set -euo pipefail
-          uv sync --project tools/pathctl --frozen
-          uv run --project tools/pathctl python -m unittest discover -s tools/pathctl/tests
-          uv run --project tools/pathctl ty check --python-platform win32 tools/pathctl
+      - name: 依存を同期
+        run: uv sync --project tools/pathctl --frozen
+
+      - parallel:
+          - name: テスト（ビルド前）
+            run: uv run --no-sync --project tools/pathctl python -m unittest discover -s tools/pathctl/tests
+          - name: 型チェック（ビルド前）
+            run: uv run --no-sync --project tools/pathctl ty check --python-platform win32 tools/pathctl
 
       - name: ビルド（sdist / wheel）
         run: uv build --project tools/pathctl
