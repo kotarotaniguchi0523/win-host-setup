@@ -1,5 +1,5 @@
-# Lint (parallel jobs): run Actions / secrets / PII in independent jobs at the same time
-#  - Each job just calls a script in tools/lint/ or tools/ci/ (reproducible locally with the same command)
+# Lint: actions/SARIF is isolated; secret scanning and PII share a runner using parallel steps.
+#  - Scripts are invoked directly and remain reproducible locally.
 #  - Delegate tool caching to jdx/mise-action (the mise tool store)
 #    (do not use actions/cache because a PR could poison the cache)
 #
@@ -53,7 +53,7 @@ jobs:
   secrets:
     permissions:
       contents: read
-    name: 秘密情報（betterleaks / secretlint）
+    name: 秘密情報・PII・衛生
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
@@ -64,23 +64,11 @@ jobs:
       - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
         with:
           cache: true
-      - name: スキャン
-        shell: pwsh
-        run: ./tools/lint/secrets.ps1
-
-  pii:
-    permissions:
-      contents: read
-    name: PII・衛生（depii / hygiene）
-    runs-on: ubuntu-26.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      # -SkipEnvRules: on a runner the account and host name are generic, so deriving patterns from
-      # them only produces false positives. Generic personal paths are covered by hygiene.ps1 below.
+      # Share the full-history checkout and tool bootstrap; independent checks run concurrently.
       - parallel:
+          - name: 秘密情報スキャン
+            shell: pwsh
+            run: ./tools/lint/secrets.ps1
           - name: PII 検査
             shell: pwsh
             run: ./tools/depii.ps1 -Check -SkipEnvRules
