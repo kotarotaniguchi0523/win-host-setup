@@ -21,11 +21,14 @@ $evaluator = {
     $cur = $m.Groups['ver'].Value
     $new = $cur
     $note = ''
-    try {
-        $show = winget show --exact --id $id --source winget --accept-source-agreements --disable-interactivity 2>$null
-        $line = $show | Where-Object { $_ -match '^\s*Version:\s' } | Select-Object -First 1
-        if ($line) { $new = ($line -replace '^\s*Version:\s*', '').Trim() }
-    } catch { }
+    # Never interpret a network/API/parse failure as "up to date".
+    $show = & winget show --exact --id $id --source winget --accept-source-agreements --disable-interactivity 2>&1
+    $exitCode = $LASTEXITCODE
+    if ($exitCode -ne 0) { throw "winget show failed for $id (exit $exitCode)" }
+    $line = $show | Where-Object { $_ -match '^\s*Version:\s' } | Select-Object -First 1
+    if (-not $line) { throw "winget show returned no Version for $id" }
+    $new = ($line -replace '^\s*Version:\s*', '').Trim()
+    if (-not $new) { throw "winget show returned an empty Version for $id" }
     # Only move forward: winget sometimes reports an older build than the installed one
     # (e.g. Canonical.Ubuntu offers 22.04 while 26.04 is installed), and pinning that would
     # downgrade the host. Unparsable versions are left alone too.
