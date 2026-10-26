@@ -24,8 +24,7 @@ on:
       - 'pathctl-v*'
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
 
 env:
   GITHUB_TOKEN: ${{ github.token }}
