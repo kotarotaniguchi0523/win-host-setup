@@ -80,9 +80,10 @@ jobs:
           persist-credentials: false
       # -SkipEnvRules: on a runner the account and host name are generic, so deriving patterns from
       # them only produces false positives. Generic personal paths are covered by hygiene.ps1 below.
-      - name: PII 検査
-        shell: pwsh
-        run: ./tools/depii.ps1 -Check -SkipEnvRules
-      - name: 個人パス・衛生検査
-        shell: pwsh
-        run: ./tools/ci/hygiene.ps1
+      - parallel:
+          - name: PII 検査
+            shell: pwsh
+            run: ./tools/depii.ps1 -Check -SkipEnvRules
+          - name: 個人パス・衛生検査
+            shell: pwsh
+            run: ./tools/ci/hygiene.ps1
