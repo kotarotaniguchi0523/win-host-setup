@@ -7,6 +7,7 @@ on:
     paths:
       - 'skills/**'
       - 'tools/ci/**'
+      - 'tools/lib/common.ps1'
       - '.github/workflows/skills.yml'
   pull_request:
     paths:
