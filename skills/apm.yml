@@ -16,7 +16,7 @@ dependencies:
     - vercel-labs/agent-browser#50c34e78c98dbe8add0b3ff36b4bcd7a47f1022b # v0.39.2
     - yusukebe/ax#0ddd8a748ae2401ae344f536f6e8dded890fcdbf # v0.1.25
     # Japanese proofreading (rewrite AI-generated Japanese into natural Japanese)
-    - nanaism/yomiyasu#488dd37c0baa67ec65bf155aced9fa1a01d261e2 # v2.2.2
+    - nanaism/yomiyasu#15244a1369c192d6b7e74963ee9709537fadf166 # v2.3.0
     # Official Nushell skills (nushell org / nu_scripts)
     - nushell/nu_scripts#main
     # Explanation / diagram skills (by mizchi; no tags, so pinned to main + commit via lock)
