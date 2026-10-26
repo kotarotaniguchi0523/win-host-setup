@@ -8,8 +8,7 @@ on:
   schedule:
     - cron: '0 18 * * 6' # Sunday 03:00 JST
   workflow_dispatch:
-permissions:
-  contents: read
+permissions: {}
 concurrency:
   group: healthcheck-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -20,6 +19,8 @@ env:
 
 jobs:
   mise:
+    permissions:
+      contents: read
     name: mise（ドリフト / 更新候補）
     runs-on: ubuntu-26.04
     timeout-minutes: 20
@@ -34,6 +35,8 @@ jobs:
       - shell: pwsh
         run: ./tools/ci/mise-verify.ps1 -Summary
   winget:
+    permissions:
+      contents: read
     name: winget（DSC の乖離）
     runs-on: windows-2025
     timeout-minutes: 20
@@ -44,6 +47,8 @@ jobs:
       - shell: pwsh
         run: ./tools/update-winget-dsc.ps1
   hygiene:
+    permissions:
+      contents: read
     name: 公開リポジトリの衛生
     runs-on: ubuntu-26.04
     timeout-minutes: 20

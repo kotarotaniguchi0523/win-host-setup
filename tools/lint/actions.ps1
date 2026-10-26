@@ -16,9 +16,9 @@ $ErrorActionPreference = 'Stop'
 
 $repo = Get-RepoRoot
 
-# Strict: every sisakulint rule is on. Overlap with jactionlint is intentional (both must stay
-# green), so nothing is suppressed here and a regression is caught by either linter.
-$sisakuIgnore = @()
+# sisakulint v0.3.8 does not yet recognize GitHub's parallel/cache-mode syntax.
+# jactionlint checks workflow syntax; keep all other sisakulint security rules on.
+$sisakuIgnore = @('syntax')
 $ignoreArgs = @()
 foreach ($r in $sisakuIgnore) { $ignoreArgs += @('-ignore', $r) }
 

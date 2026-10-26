@@ -23,9 +23,15 @@ on:
     tags:
       - 'pathctl-v*'
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Explicitly publish when manually running against a release tag
+        required: false
+        type: boolean
+        default: false
 
-permissions:
-  contents: read
+permissions: {}
+cache-mode: none
 
 env:
   GITHUB_TOKEN: ${{ github.token }}
@@ -70,12 +76,14 @@ jobs:
             exit 1
           fi
 
-      - name: テストと型チェック（ビルド前に検証する）
-        run: |
-          set -euo pipefail
-          uv sync --project tools/pathctl --frozen
-          uv run --project tools/pathctl python -m unittest discover -s tools/pathctl/tests
-          uv run --project tools/pathctl ty check --python-platform win32 tools/pathctl
+      - name: 依存を同期
+        run: uv sync --project tools/pathctl --frozen
+
+      - parallel:
+          - name: テスト（ビルド前）
+            run: uv run --no-sync --project tools/pathctl python -m unittest discover -s tools/pathctl/tests
+          - name: 型チェック（ビルド前）
+            run: uv run --no-sync --project tools/pathctl ty check --python-platform win32 tools/pathctl
 
       - name: ビルド（sdist / wheel）
         run: uv build --project tools/pathctl
@@ -127,7 +135,7 @@ jobs:
   github-release:
     name: GitHub Release へ添付
     needs: build
-    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    if: ${{ startsWith(github.ref, 'refs/tags/') && (github.event_name == 'push' || inputs.publish == true) }}
     runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
@@ -156,7 +164,7 @@ jobs:
   pypi:
     name: PyPI へ公開（trusted publishing / PEP 740）
     needs: build
-    if: ${{ vars.PYPI_PUBLISH == 'true' && startsWith(github.ref, 'refs/tags/') }}
+    if: ${{ vars.PYPI_PUBLISH == 'true' && startsWith(github.ref, 'refs/tags/') && (github.event_name == 'push' || inputs.publish == true) }}
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     environment: pypi # PyPI 側の Trusted Publisher と同じ Environment 名にする
