@@ -11,6 +11,10 @@ on:
   pull_request:
     paths:
       - 'skills/**'
+      - 'tools/ci/install-apm.ps1'
+      - 'tools/ci/skills-verify.ps1'
+      - 'tools/lib/common.ps1'
+      - '.github/workflows/skills.yml'
   workflow_dispatch:
 # Permissions are granted per job (the workflow itself only reads).
 permissions: {}
