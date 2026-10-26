@@ -13,8 +13,7 @@ on:
       - 'skills/**'
   workflow_dispatch:
 # Permissions are granted per job (the workflow itself only reads).
-permissions:
-  contents: read
+permissions: {}
 concurrency:
   group: skills-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
