@@ -53,7 +53,7 @@ jobs:
   secrets:
     permissions:
       contents: read
-    name: 秘密情報・PII・衛生
+    name: 秘密情報（betterleaks / secretlint）
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
@@ -75,3 +75,27 @@ jobs:
           - name: 個人パス・衛生検査
             shell: pwsh
             run: ./tools/ci/hygiene.ps1
+
+  # Preserve the pre-optimization required check name without provisioning
+  # another full toolchain. The actual PII and hygiene scans run as parallel
+  # steps inside the read-only secrets job; this bridge fails closed if that
+  # job does not succeed.
+  pii:
+    name: PII・衛生（depii / hygiene）
+    needs: secrets
+    if: ${{ always() }}
+    permissions: {}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    steps:
+      - name: Verify PII and hygiene checks completed successfully
+        env:
+          SECRETS_RESULT: ${{ needs.secrets.result }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$SECRETS_RESULT" != "success" ]]; then
+            echo "::error::The combined secrets, PII, and hygiene scans did not succeed ($SECRETS_RESULT)"
+            exit 1
+          fi
+          echo "PII and hygiene scans passed as part of the secrets job"
