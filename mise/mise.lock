@@ -628,30 +628,6 @@ version = "12.2.1"
 backend = "npm:npm"
 specifiers = ["12.2.1"]
 
-[tools.npm."platforms.linux-arm64"]
-checksum = "sha256:228bd64aaef23270dbdbd2cf3d5ef5c467602ef38c4066246cef1984adab9a67"
-url = "https://registry.npmjs.org/npm/-/npm-12.2.1.tgz"
-
-[tools.npm."platforms.linux-arm64-musl"]
-checksum = "sha256:228bd64aaef23270dbdbd2cf3d5ef5c467602ef38c4066246cef1984adab9a67"
-url = "https://registry.npmjs.org/npm/-/npm-12.2.1.tgz"
-
-[tools.npm."platforms.linux-x64"]
-checksum = "sha256:228bd64aaef23270dbdbd2cf3d5ef5c467602ef38c4066246cef1984adab9a67"
-url = "https://registry.npmjs.org/npm/-/npm-12.2.1.tgz"
-
-[tools.npm."platforms.linux-x64-musl"]
-checksum = "sha256:228bd64aaef23270dbdbd2cf3d5ef5c467602ef38c4066246cef1984adab9a67"
-url = "https://registry.npmjs.org/npm/-/npm-12.2.1.tgz"
-
-[tools.npm."platforms.macos-arm64"]
-checksum = "sha256:228bd64aaef23270dbdbd2cf3d5ef5c467602ef38c4066246cef1984adab9a67"
-url = "https://registry.npmjs.org/npm/-/npm-12.2.1.tgz"
-
-[tools.npm."platforms.macos-x64"]
-checksum = "sha256:228bd64aaef23270dbdbd2cf3d5ef5c467602ef38c4066246cef1984adab9a67"
-url = "https://registry.npmjs.org/npm/-/npm-12.2.1.tgz"
-
 [[tools."npm:@openai/codex"]]
 version = "0.164.0"
 backend = "npm:@openai/codex"
