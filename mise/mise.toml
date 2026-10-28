@@ -3,6 +3,9 @@ betterleaks            = "1.9.0"
 node                   = ["26.12.1", "24.22.1"]
 python                 = ["3.15.2", "3.14.8"]
 gh                     = "2.103.2"
+# ghtkn: GitHub App user access token provider. Used as the git credential helper
+# (`!ghtkn git-credential`) instead of stored PATs / OAuth tokens.
+"aqua:suzuki-shunsuke/ghtkn" = "0.4.2"
 doppler                = "3.77.1"
 # APM: winget `Microsoft.APM` 0.33.0 で管理（Publisher: Microsoft）。
 # 旧 `pypi:apm-cli` は既定 Python 3.15 で依存 `pyyaml` の cp315 wheel が無く導入不可のため winget へ移行（winget-vs-mise.md §6）
