@@ -61,6 +61,7 @@ function Get-PiiTargets {
         'mise/mise.toml', 'mise/mise.lock',
         'skills/apm.yml', 'skills/apm.lock.yaml', 'skills/local',
         'env/variables.md',
+        'docs',
         'shell',
         '.github',
         '.opencode',
