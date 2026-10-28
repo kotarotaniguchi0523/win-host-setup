@@ -43,6 +43,14 @@
       "groupSlug": "skills-apm"
     },
     {
+      "description": "mise / APM の lock は relock ワークフローが再生成する。Mend hosted の Renovate は mise lock / apm install を実行できない（unsafe execution / CLI 無し）ため、artifact 更新は試行しない",
+      "matchManagers": ["mise", "apm"],
+      "skipArtifactsUpdate": true,
+      "lockFileMaintenance": {
+        "enabled": false
+      }
+    },
+    {
       "description": "メジャー更新はまとめず、Dependency Dashboard で承認してから PR を作る",
       "matchUpdateTypes": ["major"],
       "groupName": null,

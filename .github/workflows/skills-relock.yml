@@ -23,13 +23,20 @@ jobs:
     name: relock
     runs-on: windows-2025
     timeout-minutes: 30
+    # The default token stays read-only: the commit is pushed with a short-lived
+    # GitHub App token instead. Pushes made with GITHUB_TOKEN are authored by
+    # github-actions[bot], which GitHub treats as an outside contributor, so every
+    # workflow on that PR would sit in "action_required" (approval) until a maintainer
+    # approves it. An App installation token is not gated.
     permissions:
-      contents: write # 再生成した apm.lock.yaml を同じ PR へコミットするため
+      contents: read
+    # The App private key lives in an environment secret (no protection rules).
+    environment: relock
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.event.pull_request.head.sha }}   # 可変 ref を避ける（TOCTOU）
           persist-credentials: false # push via gh auth setup-git
 
       - name: APM を導入
@@ -41,19 +48,30 @@ jobs:
         run: |
           ./tools/ci/skills-verify.ps1 -SkipAudit -Relock
 
+      - name: push 用の App トークンを取得
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.RELOCK_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELOCK_APP_PRIVATE_KEY }}
+          permission-contents: write
+
       - name: ロックをコミット
         shell: bash
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
         run: |
           set -euo pipefail
           gh auth setup-git
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          bot_id="$(gh api "users/${APP_SLUG}%5Bbot%5D" --jq .id)"
+          git config user.name  "${APP_SLUG}[bot]"
+          git config user.email "${bot_id}+${APP_SLUG}[bot]@users.noreply.github.com"
           git add skills
           if git diff --cached --quiet; then
             echo "ロックに変更なし"
           else
             git commit -m "chore(skills): apm.lock.yaml を再生成"
-            git push
+            git push origin "HEAD:refs/heads/${HEAD_REF}"
           fi

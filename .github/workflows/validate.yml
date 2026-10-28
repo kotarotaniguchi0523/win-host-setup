@@ -57,6 +57,9 @@ jobs:
         run: |
           mise install uv
           uv run --no-project --python 3.13 --with 'pyyaml==6.0.3' --exclude-newer="3 days" python tools/ci/lint-config.py
+      - name: pin の厳密性（latest / 範囲 / ブランチ ref を拒否）
+        run: |
+          uv run --no-project --python 3.13 --with 'pyyaml==6.0.3' --exclude-newer="3 days" python tools/ci/lint-pins.py
 
   python:
     permissions:

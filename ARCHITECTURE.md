@@ -155,7 +155,7 @@ win-host-setup/
            v                         v                         v
    +-------------------------------------------------------------------+
    |  PR 検証 (CI):  validate  /  lint  /  skills                       |
-   |    relock: mise/mise.toml が変わったら mise.lock を再生成して追随   |
+   |    relock: mise/mise.toml が変わったら mise.lock を再生成して追随 (App トークン)   |
    +--------------------------------+----------------------------------+
                                     | merge
                                     v
@@ -165,8 +165,9 @@ win-host-setup/
 
   自動マージ: minor / patch のみ CI の通過後に GitHub の auto-merge でマージ。
               pin / digest と major は手動（major は Dependency Dashboard で承認してから）。
-  CI 承認:    bot PR の必須チェックが action_required で止まらないよう、Actions の
-              fork PR 承認ポリシーは「first-time contributors who are new to GitHub」にする。
+  CI 承認:    fork PR 承認ポリシーは「first-time contributors who are new to GitHub」のまま。
+              ただし GITHUB_TOKEN の push は github-actions[bot] 名義になり承認待ちになるため、
+              relock / skills-relock の push は GitHub App のトークンで行う。
 
   注意: 現状は source -> public の一方通行。
         GitHub 側の更新を実環境へ反映するには public から pull して apply する。
@@ -323,7 +324,7 @@ win-host-setup/
   `tools/sync.ps1` は **pull → capture → depii → sanitize → commit → push** の順に実行する。
   （`capture` は `-Force` でホストが正として上書きする。衝突を避けたい場合は `tools/sync.ps1 -Check` で先に差分を見る）
 - **APM Skills の更新経路**: Renovate（`apm` マネージャ / グループ "Skills (APM)"）が PR を作り、
-  `skills-relock.yml` が `apm.lock.yaml` を再生成して追随、`skills.yml` がドリフトと監査を検証する。
+  `skills-relock.yml` が `apm.lock.yaml` を再生成して追随（push は App トークン）、`skills.yml` がドリフトと監査を検証する。
 - CI の `lint` が runner 側で赤だった件は、プロジェクトから npm 版 secretlint を外して解消しました
   （locked install が要求する依存グラフを Takumi Guard 経由では生成できないため）。シークレット検査はバイナリの betterleaks が担当します。
 - CI から外した検査: `validate.yml` の PSScriptAnalyzer と `skills.yml` の waza。どちらも hk の pre-push が同等の検査をするためです。

@@ -1,4 +1,4 @@
-﻿# apply.ps1 - repository (source) -> real environment
+# apply.ps1 - repository (source) -> real environment
 # Usage: pwsh -File tools/apply.ps1
 #  - mise/mise.toml  -> copy to ~/.config/mise/config.toml
 #  - mise/mise.lock  -> copy to ~/.config/mise/mise.lock

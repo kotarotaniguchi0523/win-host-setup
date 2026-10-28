@@ -14,6 +14,7 @@
 | **`AGENTS.md`** | **Package Management Policy（判断基準の本体）** |
 | **`PLAN.md`** | 計画＋実施ログ。**上=未完了 / 下=完了（同一見出しでアーカイブ）** |
 | **`AUDIT.md`** | ポリシー準拠の監査（全ツールの入手方法と `Security:` 行） |
+| **`docs/automation.md`** | **更新の仕組み（remote-complete / local-apply）の全体像** |
 | **`winget-vs-mise.md`** | **全ツールの「mise vs winget」判定**（どちらの検証が強いか） |
 | `inventory.md` / `TODO-inventory.md` | パッケージ棚卸し |
 | `repos.md` / `repos-analysis.md` | リポジトリの分析 |
@@ -47,8 +48,8 @@
 | ワークフロー | 役割 |
 |---|---|
 | **Renovate App**（Mend hosted / `github.com/apps/renovate`）| 依存更新 PR（すべての対象）。**PAT 不要**（自己ホストの workflow と `RENOVATE_TOKEN` は廃止） |
-| `.github/workflows/relock.yml` | `mise/config.toml` が変わった PR で **`mise lock` を実行し `mise.lock` を同じ PR に積む** |
-| `.github/workflows/validate.yml` | push / PR で **`mise install --locked`（ロックのドリフト検出）** ＋ JSON/YAML/TOML の構文検証（PSScriptAnalyzer は hk の pre-push が担当） |
+| `.github/workflows/relock.yml` | `mise/config.toml` が変わった PR で **`mise lock` を実行し `mise.lock` を同じ PR に積む**（push は relock 用 GitHub App の短命トークン） |
+| `.github/workflows/validate.yml` | push / PR で **`mise install --locked`（ロックのドリフト検出）** ＋ JSON/YAML/TOML の構文検証 ＋ **pin の厳密性（`latest` / 範囲指定 / ブランチ ref を拒否。APM 管理の2件のみ例外）**（PSScriptAnalyzer は hk の pre-push が担当） |
 | `.github/workflows/winget-outdated.yml` | 週次（Windows ランナー）で **`winget` 自身を情報源に `host.dsc.yaml` のピンを更新**し PR を作成 |
 | `.github/workflows/skills.yml` | `skills/**` の変更で **APM のマニフェスト検証・`apm.lock.yaml` ドリフト検出・`apm audit`（セキュリティ監査）** |
 | `.github/workflows/healthcheck.yml` | 週次で **`mise` のドリフト／更新候補・winget の乖離・公開リポジトリの衛生（個人パス混入検査）** を点検 |
@@ -59,18 +60,37 @@
 - **Dependabot** は**セキュリティアラートのみ**を有効にし、更新 PR は作りません。bot の版更新設定 `.github/dependabot.yml` は削除し、セキュリティ更新 PR も停止しています。
 - **脆弱性が見つかったとき**は、Renovate の `vulnerabilityAlerts`（＋`osvVulnerabilityAlerts`）が週次のスケジュール・`minimumReleaseAge`・Dependency Dashboard 承認・automerge 制限をすべて迂回し、**即時に PR を作って即時にマージ**します。
 - **minor / patch** の更新は、**CI が通れば自動でマージ**します。pin / digest と major は手動です（major は Dependency Dashboard で承認してから PR を作ります）。
-- bot（Renovate / GitHub Actions）の PR は、リポジトリ設定 **Actions → Fork pull request workflows → Require approval for first-time contributors who are new to GitHub** にしておきます。厳しすぎる設定だと bot の CI が `action_required` で止まり、必須チェックが走らないため auto-merge されません。
+- リポジトリ設定 **Actions → Fork pull request workflows → Require approval for first-time contributors who are new to GitHub** は維持します（これが最も緩い設定です）。
+  - `secrets.GITHUB_TOKEN` で push すると作者が `github-actions[bot]` になり、GitHub はこれを「外部コントリビューター」として扱うため、**その PR の workflow が `action_required`（承認待ち）で止まります**（PR #25 で実際に発生し、10 時間 CI が走りませんでした）。
+  - そのため `relock.yml` / `skills-relock.yml` の push だけを **relock 用 GitHub App のインストールトークン**に変えています（既定の `GITHUB_TOKEN` は `contents: read` のまま）。
 
 ### Renovate が担当する範囲
 - **`mise/config.toml`**（native な `mise` マネージャ）— 25 ツール前後を継続更新。
   - **配列の先頭（＝既定バージョン）のみ**更新される（`node` / `python` の fallback 側は手動）。
   - `pypi:git+…@v2.12.0`（SkillSpector）のような **git 固定は自動更新されない**。
+- **Skills でタグが無いリポジトリ**（`nushell/nu_scripts` / `mizchi/explainer`）は `#main` のまま **APM 管理**にします（Renovate の対象外）。
+  更新は `apm update`（または `tools/skills-apply.ps1 -Lock`）で lock を再解決して行い、`#main` を許すのは `tools/ci/lint-pins.py` の `APM_BRANCH_REF_ALLOW` にある2件だけです。
 - **GitHub Actions**（`pinDigests: true` でコミット SHA 固定）。
 - **winget の DSC は Renovate 非対応**のため、上記 `winget-outdated.yml` が担当（`msstore` は対象外）。
 
 ### ポリシーとの整合
 - `minimumReleaseAge: "2 days"` を Renovate 側にも設定し、mise の `minimum_release_age = "2d"` と揃えています。
-- `mise.lock` の再生成は Renovate ではなく **CI（relock.yml）** に寄せ、`allowedUnsafeExecutions` を空にしています（実行権限を Renovate に渡さない）。
+- `mise.lock` / `apm.lock.yaml` の再生成は Renovate ではなく **CI（relock.yml / skills-relock.yml）** に寄せ、`allowedUnsafeExecutions` を空にしています（実行権限を Renovate に渡さない）。Mend hosted の Renovate は `mise lock` を unsafe execution として実行できず、`apm` CLI も持たないため、artifact 更新は失敗します。そこで `renovate.json` では mise / APM に **`skipArtifactsUpdate: true`** を設定し、失敗する artifact 更新（`renovate/artifacts` の failure）を止めています。
+
+### relock 用 GitHub App（必須）
+
+`relock.yml` / `skills-relock.yml` は PR ブランチへ push するため、`github-actions[bot]` 以外の identity が必要です。未設定の場合 relock は失敗します（fail-closed）。
+
+1. **Settings → Developer settings → GitHub Apps → New GitHub App**
+   - Permissions: **Contents: Read and write** のみ（他は No access）
+   - Webhook: 無効
+2. 作成した App を **このリポジトリだけ**にインストール
+3. **Settings → Environments** に `relock` を作成（**protection rule は付けない**＝自動実行を止めない）
+   - Environment secret `RELOCK_APP_PRIVATE_KEY` … 生成した秘密鍵（`.pem` の中身）
+4. **Settings → Secrets and variables → Actions → Variables** に登録
+   - `RELOCK_APP_CLIENT_ID` … App の **Client ID**（`Iv…`。App ID ではない）
+
+App のトークンはジョブ内で都度発行し、`contents: write` だけに絞っています（`actions/create-github-app-token`、SHA 固定）。秘密鍵は environment secret に置くため、他ワークフローからは参照できません。
 
 ### グループごとの PR
 Renovate / CI は **グループごとに 1 PR** を作ります。
@@ -82,7 +102,7 @@ Renovate / CI は **グループごとに 1 PR** を作ります。
 | **Skills (APM)** | Renovate（`apm` マネージャ） | `skills/apm.yml` の `owner/repo#ref` |
 | **winget (DSC)** | `winget-outdated.yml` | `winget/host.dsc.yaml`（`msstore` は除く） |
 
-`mise.lock` の再生成は `relock.yml`、`apm.lock.yaml` の再生成は `tools/skills-apply.ps1 -Lock`（＋`skills.yml` がドリフト検出）が担当します。
+`mise.lock` の再生成は `relock.yml`、`apm.lock.yaml` の再生成は `skills-relock.yml`（PR）または `tools/skills-apply.ps1 -Lock`（ローカル）（＋`skills.yml` がドリフト検出）が担当します。
 
 ## Skills の管理（APM）
 

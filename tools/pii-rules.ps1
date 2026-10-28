@@ -1,4 +1,4 @@
-﻿# pii-rules.ps1 - Replacement rules for personal information -> placeholders (shared by sanitize.ps1 / depii.ps1)
+# pii-rules.ps1 - Replacement rules for personal information -> placeholders (shared by sanitize.ps1 / depii.ps1)
 # Do **not write real values (PII)** here. Put specific account names / project names in .agent/pii-rules.local.ps1
 # (already in .gitignore, local only), which Get-PiiRules loads and merges in.
 

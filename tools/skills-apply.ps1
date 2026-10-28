@@ -1,4 +1,4 @@
-﻿# skills-apply.ps1 - Deploy this repository's skills/apm.yml to ~/.apm and apply it
+# skills-apply.ps1 - Deploy this repository's skills/apm.yml to ~/.apm and apply it
 # Usage: pwsh -File tools/skills-apply.ps1 [-Lock]
 #   -Lock : after deploying, run `apm lock --global` to regenerate apm.lock.yaml and copy it back into the repository
 #
