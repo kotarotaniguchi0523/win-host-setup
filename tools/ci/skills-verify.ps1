@@ -29,6 +29,9 @@ Push-Location $apmHome
 try {
     if ($Relock) {
         Invoke-Native $apm @('lock', '--global', '--update') -What 'apm lock --global --update'
+        # lock resolves refs, while install records the complete deployment
+        # inventory required by a subsequent --frozen run.
+        Invoke-Native $apm @('install', '--global') -What 'apm install --global (relock inventory)'
     } else {
         if (-not (Test-Path $repoLck)) { throw 'skills/apm.lock.yaml is required for frozen verification' }
         Invoke-Native $apm @('install', '--global', '--frozen') -What 'apm install --global --frozen'
