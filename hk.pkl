@@ -38,6 +38,8 @@ local all = new Mapping<String, Step> {
         check = "pinact run --fix=false --no-api"
         fix = "pinact run"
     }
+    // PSScriptAnalyzer is a PowerShell module, installed per user:
+    //   Install-Module PSScriptAnalyzer -Scope CurrentUser
     ["powershell"] = new Step {
         glob = List("**/*.ps1")
         check = "pwsh -NoProfile -Command \"if (Get-Module -ListAvailable PSScriptAnalyzer) { $i = Invoke-ScriptAnalyzer -Path ./tools -Recurse -Severity Error; if ($i) { $i | Format-Table -AutoSize; exit 1 } } else { Write-Host '[i] PSScriptAnalyzer 未導入のためスキップ' }\""
@@ -45,9 +47,11 @@ local all = new Mapping<String, Step> {
 }
 
 // pre-commit: light, but workflow changes are checked before the commit is made
+// betterleaks runs here too, so a secret never enters local history in the first place.
 steps = new Mapping<String, Step | Group> {
     ["pii"] = all["pii"]
     ["secrets"] = all["secrets"]
+    ["betterleaks"] = all["betterleaks"]
     ["jactionlint"] = all["jactionlint"]
     ["sisakulint"] = all["sisakulint"]
     ["pinact"] = all["pinact"]
