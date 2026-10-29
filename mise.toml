@@ -12,11 +12,11 @@
 [tools]
 "github:jdx/jactionlint"                = "v2.3.0"
 "go:github.com/sisaku-security/sisakulint/cmd/sisakulint" = "0.3.8"
-hk                                  = { version = "2.8.1", lazy = true }  # local git hooks only (not installed in CI)
+hk                                  = { version = "2.9.0", lazy = true }  # local git hooks only (not installed in CI)
 betterleaks                         = "1.9.0"
 pinact                              = "5.0.2"
 # uv + Python only for tools/pathctl (the PATH CLI is type-checked with ty in CI)
-uv                                  = "0.13.5"
+uv                                  = "0.13.6"
 python                              = "3.15.2"
 
 # --- Host update automation (see docs/automation.md) -------------------------
