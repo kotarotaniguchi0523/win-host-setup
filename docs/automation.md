@@ -63,6 +63,8 @@ Renovateの更新は、major・minor・patch・pin・digest・ロック保守を
 
 winget更新も `relock` EnvironmentのAppトークンでPRを作り、自動マージを有効にします。`GITHUB_TOKEN` を代替として使わないため、更新PRの実行承認待ちを避けます。AppのClient IDと秘密鍵の登録は初回のみ必要です。
 
+Skillsのロック更新は `skills/apm.yml` の変更だけで起動します。検証スクリプトやworkflowの変更は通常のSkills検査・Actions Lint・回帰テストで確認し、依存更新やAppトークン発行を起動しません。
+
 | 守る対象 | 場所 |
 |---|---|
 | 厳密 pin（`latest` / 範囲 / ブランチ ref の拒否） | `validate.yml` → `tools/ci/lint-pins.py` |
