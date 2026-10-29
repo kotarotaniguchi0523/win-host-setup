@@ -25,10 +25,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  actions:
+  changes:
+    name: Changed CI areas
     permissions:
       contents: read
-      security-events: write
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    outputs:
+      mise: ${{ steps.diff.outputs.mise }}
+      config: ${{ steps.diff.outputs.config }}
+      python: ${{ steps.diff.outputs.python }}
+      actions: ${{ steps.diff.outputs.actions }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - id: diff
+        shell: bash
+        run: python3 tools/ci/changes.py
+
+  actions:
+    needs: changes
+    if: ${{ needs.changes.outputs.actions == 'true' }}
+    permissions:
+      contents: read
+      security-events: write # Upload the Actions linter SARIF report
     name: Actions Lint（actionlint / sisakulint / pinact）
     runs-on: ubuntu-26.04
     timeout-minutes: 15
@@ -39,6 +61,7 @@ jobs:
       - uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5.2.4
         with:
           cache: true
+          install_args: github:jdx/jactionlint go:github.com/sisaku-security/sisakulint/cmd/sisakulint pinact
       - name: Lint
         shell: pwsh
         run: ./tools/lint/actions.ps1
@@ -64,6 +87,7 @@ jobs:
       - uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5.2.4
         with:
           cache: true
+          install_args: betterleaks
       # Share the full-history checkout and tool bootstrap; independent checks run concurrently.
       - parallel:
           - name: 秘密情報スキャン
@@ -99,3 +123,26 @@ jobs:
             exit 1
           fi
           echo "PII and hygiene scans passed as part of the secrets job"
+
+  result:
+    name: lint result
+    needs: [changes, actions, secrets, pii]
+    if: ${{ always() }}
+    permissions: {}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    steps:
+      - name: Require selected checks to succeed
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, os
+          jobs = json.loads(os.environ['RESULTS'])
+          for name in ('changes', 'secrets', 'pii'):
+              assert jobs[name]['result'] == 'success', f'{name} did not succeed'
+          selected = jobs['changes']['outputs']['actions'] == 'true'
+          expected = 'success' if selected else 'skipped'
+          assert jobs['actions']['result'] == expected, 'Actions lint did not complete as selected'
+          PY

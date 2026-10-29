@@ -7,75 +7,95 @@
     ":enableVulnerabilityAlertsWithLabel(security)"
   ],
   "timezone": "Asia/Tokyo",
-  "schedule": ["before 6am every weekday"],
+  "schedule": [
+    "before 6am every weekday"
+  ],
   "minimumReleaseAge": "2 days",
-  "labels": ["dependencies"],
-
+  "labels": [
+    "dependencies"
+  ],
   "rangeStrategy": "pin",
   "pinDigests": true,
-
   "separateMajorMinor": false,
   "separateMinorPatch": false,
   "separateMultipleMajor": false,
-  "rebaseWhen": "behind-base-branch",
+  "rebaseWhen": "auto",
   "prConcurrentLimit": 3,
   "prHourlyLimit": 0,
   "branchConcurrentLimit": 0,
-
   "packageRules": [
     {
       "description": "グループ1: mise のツール一式を 1 PR にまとめる",
-      "matchManagers": ["mise"],
+      "matchManagers": [
+        "mise"
+      ],
       "groupName": "mise tools",
       "groupSlug": "mise-tools"
     },
     {
       "description": "グループ2: GitHub Actions 一式を 1 PR にまとめる（コミット SHA 固定）",
-      "matchManagers": ["github-actions"],
+      "matchManagers": [
+        "github-actions"
+      ],
       "groupName": "GitHub Actions",
       "groupSlug": "github-actions",
       "pinDigests": true
     },
     {
       "description": "グループ3: Skills（APM）を 1 PR にまとめる（apm.yml の owner/repo#ref を更新）",
-      "matchManagers": ["apm"],
+      "matchManagers": [
+        "apm"
+      ],
       "groupName": "Skills (APM)",
       "groupSlug": "skills-apm"
     },
     {
       "description": "mise / APM の lock は relock ワークフローが再生成する。Mend hosted の Renovate は mise lock / apm install を実行できない（unsafe execution / CLI 無し）ため、artifact 更新は試行しない",
-      "matchManagers": ["mise", "apm"],
+      "matchManagers": [
+        "mise",
+        "apm"
+      ],
       "skipArtifactsUpdate": true,
       "lockFileMaintenance": {
         "enabled": false
       }
     },
     {
-      "description": "メジャー更新はまとめず、Dependency Dashboard で承認してから PR を作る",
-      "matchUpdateTypes": ["major"],
+      "description": "Major updates get separate PRs and merge after required CI succeeds",
+      "matchUpdateTypes": [
+        "major"
+      ],
       "groupName": null,
-      "dependencyDashboardApproval": true
+      "dependencyDashboardApproval": false
     },
     {
-      "description": "minor / patch のみ CI が通れば自動マージする（pin / digest と major は手動）",
-      "matchUpdateTypes": ["minor", "patch"],
+      "description": "Minor and patch updates merge after required CI succeeds",
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "automerge": true,
       "platformAutomerge": true
     }
   ],
-
   "mise": {
     "updatePinnedDependencies": true
   },
   "lockFileMaintenance": {
     "enabled": true,
-    "schedule": ["before 6am on the first day of the month"]
+    "schedule": [
+      "before 6am on the first day of the month"
+    ]
   },
   "vulnerabilityAlerts": {
     "enabled": true,
-    "labels": ["security"],
+    "labels": [
+      "security"
+    ],
     "description": "Dependabot / OSV のアラート由来の更新は、スケジュール・リリース経過日数・Dashboard 承認・automerge 制限をすべて迂回して、即座に PR を作り即座にマージする",
-    "schedule": ["at any time"],
+    "schedule": [
+      "at any time"
+    ],
     "minimumReleaseAge": null,
     "dependencyDashboardApproval": false,
     "groupName": null,
@@ -83,5 +103,11 @@
     "platformAutomerge": true
   },
   "osvVulnerabilityAlerts": true,
-  "ignorePaths": ["public/**"]
+  "ignorePaths": [
+    "public/**"
+  ],
+  "automerge": true,
+  "platformAutomerge": true,
+  "automergeStrategy": "squash",
+  "dependencyDashboardApproval": false
 }

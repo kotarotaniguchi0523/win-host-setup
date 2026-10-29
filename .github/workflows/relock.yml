@@ -4,8 +4,12 @@ name: relock
 on:
   pull_request:
     paths:
-      - 'mise/mise.toml'
-      - 'mise/mise.lock'
+      - 'mise/**'
+      - 'mise.toml'
+      - 'mise.lock'
+      - 'tools/ci/mise-verify.ps1'
+      - 'tools/lib/common.ps1'
+      - '.github/workflows/relock.yml'
 # Permissions are granted per job (the workflow itself needs none).
 permissions: {}
 concurrency:
@@ -41,15 +45,28 @@ jobs:
           install: false
       - name: lock を再生成してリポジトリへ書き戻す
         shell: pwsh
-        run: ./tools/ci/mise-verify.ps1 -Lock
+        run: |
+          mise lock
+          ./tools/ci/mise-verify.ps1 -Lock
+      - name: Check whether the lock changed
+        id: lock-diff
+        shell: bash
+        run: |
+          if git diff --quiet -- mise mise.toml mise.lock; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
       - name: push 用の App トークンを取得
         id: app-token
+        if: ${{ steps.lock-diff.outputs.changed == 'true' }}
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
-          client-id: ${{ vars.RELOCK_APP_CLIENT_ID }}
+          client-id: ${{ vars.RELOCK_APP_CLIENT_ID || secrets.RELOCK_APP_CLIENT_ID }}
           private-key: ${{ secrets.RELOCK_APP_PRIVATE_KEY }}
           permission-contents: write
       - name: ロックをコミット
+        if: ${{ steps.lock-diff.outputs.changed == 'true' }}
         shell: bash
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
@@ -61,7 +78,7 @@ jobs:
           bot_id="$(gh api "users/${APP_SLUG}%5Bbot%5D" --jq .id)"
           git config user.name  "${APP_SLUG}[bot]"
           git config user.email "${bot_id}+${APP_SLUG}[bot]@users.noreply.github.com"
-          git add mise
+          git add mise mise.toml mise.lock
           if git diff --cached --quiet; then
             echo "ロックに変更なし"
           else

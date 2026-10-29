@@ -6,7 +6,8 @@ on:
     branches: [main] # pull_request と重複して同じコミットで走らないようにする
     paths:
       - 'skills/**'
-      - 'tools/ci/**'
+      - 'tools/ci/install-apm.ps1'
+      - 'tools/ci/skills-verify.ps1'
       - 'tools/lib/common.ps1'
       - '.github/workflows/skills.yml'
   pull_request:

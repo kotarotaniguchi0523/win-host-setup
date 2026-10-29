@@ -10,7 +10,11 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot '..\lib\common.ps1')
 
 $repo    = Get-RepoRoot
-$miseDst = Join-Path (Get-HomeDir) '.config/mise'
+# Keep the CI host declaration out of the real user's global config, and run
+# outside the checkout so project tools cannot override host tools during relock.
+$scratch = Join-Path ([IO.Path]::GetTempPath()) ('host-ci-' + [guid]::NewGuid().ToString('N'))
+$miseDst = Join-Path $scratch 'config'
+$workDir = Join-Path $scratch 'work'
 $srcToml = Join-Path $repo 'mise/mise.toml'
 $srcLock = Join-Path $repo 'mise/mise.lock'
 $srcLocks = Join-Path $repo 'mise/locks'
@@ -29,42 +33,64 @@ if (Test-Path $srcLocks) {
 
 Invoke-Native mise @('--version') -What 'mise --version'
 
-if ($Lock) { Invoke-Native mise @('lock', '--global') -What 'mise lock --global' }
+New-Item -ItemType Directory -Force -Path $workDir | Out-Null
+$savedConfigDir = $env:MISE_CONFIG_DIR
+$savedGlobalConfig = $env:MISE_GLOBAL_CONFIG_FILE
+$savedLocked = $env:MISE_LOCKED
+$env:MISE_CONFIG_DIR = $miseDst
+$env:MISE_GLOBAL_CONFIG_FILE = Join-Path $miseDst 'config.toml'
+Push-Location $workDir
+try {
+    # Resolving a new lock is allowed only here; verification stays locked.
+    if ($Lock) { $env:MISE_LOCKED = '0' }
+    if ($Lock) { Invoke-Native mise @('lock', '--global') -What 'mise lock --global' }
 
-# npm depends on node in mise, so install node first and then everything else
-if ($Lock) {
-    # Relock mode is allowed to bootstrap missing tool versions before rewriting the lock.
-    Invoke-Native mise @('install', 'node') -What 'mise install node (relock)'
-} else {
-    Invoke-Native mise @('install', 'node', '--locked') -What 'mise install node --locked'
+    # npm depends on node in mise, so install node first and then everything else
+    if ($Lock) {
+        # Relock mode is allowed to bootstrap missing tool versions before rewriting the lock.
+        Invoke-Native mise @('install', 'node') -What 'mise install node (relock)'
+    } else {
+        Invoke-Native mise @('install', 'node', '--locked') -What 'mise install node --locked'
+    }
+
+    # mise's npm install hook needs pnpm, and the locked run does not provision it by itself, so install
+    # pnpm (npm's install dependency) before the full locked install.
+    if ($Lock) {
+        Invoke-Native mise @('install', 'pnpm') -What 'mise install pnpm (relock)'
+        # Bootstrap dependencies can add lock entries. Persist them before the
+        # locked verification, preserving the existing lock on every pass.
+        Invoke-Native mise @('lock', '--global') -What 'mise lock --global (after bootstrap)'
+    } else {
+        Invoke-Native mise @('install', 'pnpm', '--locked') -What 'mise install pnpm --locked'
+    }
+
+    Invoke-Native mise @('install', '--locked') -What 'mise install --locked'
+
+    # Record the effective global tools, without project overrides.
+    Invoke-Native mise @('ls', '--global') -What 'mise ls --global'
+
+    if ($Summary) {
+        $outdated = (mise outdated --global 2>&1 | Out-String)
+        $list     = (mise ls --global 2>&1 | Out-String)
+        Add-Summary "## mise: 更新候補`n``````n$outdated```````n## mise: 導入済み`n``````n$list``````"
+    }
+
+    if (-not $Lock) { return }
+
+    # Write the results back into the repository
+    Copy-Item (Join-Path $miseDst 'config.toml') $srcToml -Force
+    Copy-Item (Join-Path $miseDst 'mise.lock')   $srcLock -Force
+    $dstLocks = Join-Path $miseDst 'locks'
+    if (Test-Path $dstLocks) {
+        if (Test-Path $srcLocks) { Remove-Item $srcLocks -Recurse -Force }
+        Copy-Item $dstLocks $srcLocks -Recurse -Force
+    } elseif (Test-Path $srcLocks) {
+        Remove-Item $srcLocks -Recurse -Force
+    }
+    Write-Host '[ok] config / lock / locks をリポジトリへ書き戻しました'
+} finally {
+    Pop-Location
+    $env:MISE_CONFIG_DIR = $savedConfigDir
+    $env:MISE_GLOBAL_CONFIG_FILE = $savedGlobalConfig
+    $env:MISE_LOCKED = $savedLocked
 }
-
-# mise's npm install hook needs pnpm, and the locked run does not provision it by itself, so install
-# pnpm (npm's install dependency) before the full locked install.
-if ($Lock) {
-    Invoke-Native mise @('install', 'pnpm') -What 'mise install pnpm (relock)'
-} else {
-    Invoke-Native mise @('install', 'pnpm', '--locked') -What 'mise install pnpm --locked'
-}
-
-Invoke-Native mise @('install', '--locked') -What 'mise install --locked'
-
-if ($Summary) {
-    $outdated = (mise outdated --global 2>&1 | Out-String)
-    $list     = (mise ls --global 2>&1 | Out-String)
-    Add-Summary "## mise: 更新候補`n``````n$outdated```````n## mise: 導入済み`n``````n$list``````"
-}
-
-if (-not $Lock) { return }
-
-# Write the results back into the repository
-Copy-Item (Join-Path $miseDst 'config.toml') $srcToml -Force
-Copy-Item (Join-Path $miseDst 'mise.lock')   $srcLock -Force
-$dstLocks = Join-Path $miseDst 'locks'
-if (Test-Path $dstLocks) {
-    if (Test-Path $srcLocks) { Remove-Item $srcLocks -Recurse -Force }
-    Copy-Item $dstLocks $srcLocks -Recurse -Force
-} elseif (Test-Path $srcLocks) {
-    Remove-Item $srcLocks -Recurse -Force
-}
-Write-Host '[ok] config / lock / locks をリポジトリへ書き戻しました'
