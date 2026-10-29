@@ -28,7 +28,7 @@ if (Test-Path $repoLck) { Copy-Item $repoLck (Join-Path $apmHome 'apm.lock.yaml'
 Push-Location $apmHome
 try {
     if ($Relock) {
-        Invoke-Native $apm @('lock', '--global') -What 'apm lock --global'
+        Invoke-Native $apm @('lock', '--global', '--update') -What 'apm lock --global --update'
     } else {
         if (-not (Test-Path $repoLck)) { throw 'skills/apm.lock.yaml is required for frozen verification' }
         Invoke-Native $apm @('install', '--global', '--frozen') -What 'apm install --global --frozen'

@@ -197,9 +197,9 @@ dependencies:
 - repo_url: nanaism/yomiyasu
   name: yomiyasu
   host: github.com
-  resolved_commit: 15244a1369c192d6b7e74963ee9709537fadf166
-  resolved_ref: 15244a1369c192d6b7e74963ee9709537fadf166
-  version: 2.3.0
+  resolved_commit: ae258d7a57b335673e30b88a018ae08d4f72c449
+  resolved_ref: ae258d7a57b335673e30b88a018ae08d4f72c449
+  version: 2.4.0
   package_type: marketplace_plugin
   deployed_files:
   - .agents/skills/yomiyasu
@@ -377,14 +377,14 @@ dependencies:
     .config/opencode/skills/yomiyasu/scripts/yomiyasu_diff.py: sha256:5464fc13f3a45602babfd370ee5561ca0aead85a63cf43ab3cd1d6c35fff0a4c
     .config/opencode/skills/yomiyasu/scripts/yomiyasu_hook.py: sha256:92a4304e6d838689271566791e3e8e25ace5206c81f4509773e732b5ed33354e
     .config/opencode/skills/yomiyasu/scripts/yomiyasu_lint.py: sha256:182d2e4825922686bd2de6f07f3b7203e1a3382f8e6014306c093c90124993f5
-  content_hash: sha256:0b96c1fa3aa3bc256623d600542ae5f29e43fdb3a1937d996ba1f93e4f7681d7
+  content_hash: sha256:1fa1b00d9fd1430b5ec3eb6796b49c4f62419082be351d42ce62d20154925a07
   declared_license: MIT
 - repo_url: nushell/nu_scripts
   name: nu_scripts
   host: github.com
-  resolved_commit: 3157208885c6f4c39ec016265ddae00160ae860b
+  resolved_commit: 02cb1a2bfb8f7b6977af6914dbe44f450d6f9df2
   resolved_ref: main
-  version: unknown
+  version: 0.0.0
   package_type: skill_bundle
   deployed_files:
   - .agents/skills/nushell
@@ -418,13 +418,13 @@ dependencies:
     .config/opencode/skills/nushell/references/data-analysis.md: sha256:50e1fd9fc366ceb7cad11d78ef448b095d304a6d8e99f751daa969eab4d1236b
     .config/opencode/skills/nushell/references/http-transport.md: sha256:080ad01ee92b9e28c76be0f2d358a9deef9d84a2dd4e73ca44eb1af0373a2b1e
     .config/opencode/skills/nushell/references/types-and-syntax.md: sha256:c24386f664b9c525457ab2265a1510af286b8abbaa05476fcb84cff8584f8f13
-  content_hash: sha256:fe1825bf3dc5dd5111c0dfb78eea681cf008591040a151fa3ae54fa22a5b5571
+  content_hash: sha256:bed77416ccb0ee2ba738e106eb3c63831d6ea4bbc24a05a04a3974207a30d001
 - repo_url: vercel-labs/agent-browser
   name: agent-browser
   host: github.com
-  resolved_commit: 50c34e78c98dbe8add0b3ff36b4bcd7a47f1022b
-  resolved_ref: 50c34e78c98dbe8add0b3ff36b4bcd7a47f1022b
-  version: 50c34e7
+  resolved_commit: 04ba5264dade678062c3cdcce0f4f293e748249f
+  resolved_ref: 04ba5264dade678062c3cdcce0f4f293e748249f
+  version: 04ba526
   package_type: marketplace_plugin
   deployed_files:
   - .agents/skills/agent-browser
@@ -434,7 +434,7 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/agent-browser/SKILL.md: sha256:3a7520e64de2dfaa516b6721c001e84e06e3c06a187b82af029ae721540ebfac
     .config/opencode/skills/agent-browser/SKILL.md: sha256:3a7520e64de2dfaa516b6721c001e84e06e3c06a187b82af029ae721540ebfac
-  content_hash: sha256:22643f0d68b4442c903bd9a3032d862f9bce180795b0f1027b791902ae3a49ea
+  content_hash: sha256:28afe40e893364172dfda2577f004dc89dedd5d38af97acb6ae4af9ab9d40fa5
 - repo_url: yusukebe/ax
   name: ax
   host: github.com
