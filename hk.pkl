@@ -27,9 +27,9 @@ local all = new Mapping<String, Step> {
     ["sisakulint"] = new Step {
         glob = List(".github/workflows/*.yml")
         // v0.3.8 cannot parse parallel/cache-mode; jactionlint checks syntax.
-        // Match tools/lint/actions.ps1 while retaining every security rule.
-        check = "sisakulint -ignore syntax"
-        fix = "sisakulint -ignore syntax -fix on"
+        // The wrapper adds a ghtkn token so GitHub API checks are not limited to 60 req/h.
+        check = "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lint/sisakulint.ps1"
+        fix = "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lint/sisakulint.ps1 -Fix"
     }
     // Actions must be pinned to a full commit SHA (the tag stays as a trailing comment).
     // --no-api keeps this offline: it checks the shape, Renovate updates the SHAs.
