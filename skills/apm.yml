@@ -24,8 +24,8 @@ dependencies:
     # Explanation / diagram skills (by mizchi). No tags upstream: same APM-managed branch ref.
     - mizchi/explainer#main
     # Official Waza skills (Skill evaluation CLI operation / interaction)
-    - microsoft/waza/skills/waza#5dea0a5ce00b58b1aa7c835dd0f74defe7888acf # v0.39.0
-    - microsoft/waza/skills/waza-interactive#5dea0a5ce00b58b1aa7c835dd0f74defe7888acf # v0.39.0
+    - microsoft/waza/skills/waza#fa4bef8b688653a22b284289d541a4feec31ff97 # v0.39.1
+    - microsoft/waza/skills/waza-interactive#fa4bef8b688653a22b284289d541a4feec31ff97 # v0.39.1
 
 devDependencies:
   apm: []
