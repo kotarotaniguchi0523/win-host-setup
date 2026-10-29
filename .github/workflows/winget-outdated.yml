@@ -17,9 +17,9 @@ jobs:
     name: update
     runs-on: windows-2025
     timeout-minutes: 30
+    environment: relock
     permissions:
-      contents: write # 更新ブランチを push するため
-      pull-requests: write # 更新 PR を作成するため
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -27,20 +27,45 @@ jobs:
       - name: winget の最新版と突き合わせ
         shell: pwsh
         run: ./tools/update-winget-dsc.ps1 -Apply
+      - name: Check whether DSC changed
+        id: dsc-diff
+        shell: bash
+        run: |
+          if git diff --quiet -- winget/host.dsc.yaml; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Create update token
+        id: app-token
+        if: ${{ steps.dsc-diff.outputs.changed == 'true' }}
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.RELOCK_APP_CLIENT_ID || secrets.RELOCK_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELOCK_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
       - name: 差分があれば PR を作成
+        if: ${{ steps.dsc-diff.outputs.changed == 'true' }}
         shell: pwsh
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
           BASE_REF: ${{ github.ref_name }} # 直接展開せず env 経由（template injection を避ける）
         run: |
           gh auth setup-git   # authenticate via gh because persist-credentials: false
           git diff --quiet -- winget/host.dsc.yaml
           if ($LASTEXITCODE -eq 0) { Write-Host '更新なし'; exit 0 }
 
-          git config user.name  'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          $botId = gh api "users/$($env:APP_SLUG)%5Bbot%5D" --jq .id
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot resolve the App bot identity' }
+          git config user.name "$($env:APP_SLUG)[bot]"
+          git config user.email "$botId+$($env:APP_SLUG)[bot]@users.noreply.github.com"
           $branch = "chore/winget-dsc-" + (Get-Date -Format 'yyyyMMdd')
           git checkout -b $branch
           git commit -am 'chore(winget): DSC のピンを最新へ'
           git push -u origin $branch
           gh pr create --title 'chore(winget): DSC のピンを最新へ' --body 'winget 自身で確認した最新版に更新します。' --base "$env:BASE_REF"
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot create the update PR' }
+          gh pr merge $branch --auto --squash
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot enable auto-merge' }

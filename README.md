@@ -82,15 +82,15 @@
 `relock.yml` / `skills-relock.yml` は PR ブランチへ push するため、`github-actions[bot]` 以外の identity が必要です。未設定の場合 relock は失敗します（fail-closed）。
 
 1. **Settings → Developer settings → GitHub Apps → New GitHub App**
-   - Permissions: **Contents: Read and write** のみ（他は No access）
+   - Permissions: **Contents: Read and write**、**Pull requests: Read and write**
    - Webhook: 無効
 2. 作成した App を **このリポジトリだけ**にインストール
 3. **Settings → Environments** に `relock` を作成（**protection rule は付けない**＝自動実行を止めない）
    - Environment secret `RELOCK_APP_PRIVATE_KEY` … 生成した秘密鍵（`.pem` の中身）
 4. **Settings → Secrets and variables → Actions → Variables** に登録
-   - `RELOCK_APP_CLIENT_ID` … App の **Client ID**（`Iv…`。App ID ではない）
+   - `RELOCK_APP_CLIENT_ID` … App の **Client ID**（`Iv…`。App ID ではない）。同名のEnvironment secretでも指定可能
 
-App のトークンはジョブ内で都度発行し、`contents: write` だけに絞っています（`actions/create-github-app-token`、SHA 固定）。秘密鍵は environment secret に置くため、他ワークフローからは参照できません。
+App のトークンはジョブ内で差分があるときだけ発行します。ロック更新は `contents: write`、winget更新はこれに `pull-requests: write` を加えます。秘密鍵は `relock` Environmentのsecretに置き、このEnvironmentを指定したワークフローでのみ参照します。
 
 ### グループごとの PR
 Renovate / CI は **グループごとに 1 PR** を作ります。

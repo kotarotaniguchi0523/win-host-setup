@@ -53,6 +53,18 @@ pwsh -File tools/run-task.ps1 -Task verify   # 検証のみ（.agent/update-repo
 
 ## CI が守っているもの
 
+`validate` と `lint` はPRとmainへのpushで変更ファイルを判定します。miseはホスト宣言と検証処理、pathctlは自身のソース・テスト、Actions LintはActions定義・Lint処理が変わったときに実行します。CI用の `mise.toml` / `mise.lock` や共通処理が変わった場合は全検査を実行します。手動実行も全検査を対象にします。
+
+秘密情報・PII検査は全変更で実行します。ジョブごとに必要なツールだけを導入し、miseのホスト検証は一時的なglobal設定と作業ディレクトリを使います。ホスト宣言とプロジェクト宣言の版が異なっても、互いのロックを参照しません。APMの通常検査は `install --frozen` で保存済みロックを使い、ロックの再生成はrelockだけが行います。
+
+`validate result` / `lint result` は、選ばれた検査の失敗・取消や変更判定の失敗を検出します。ブランチ保護の必須チェックはこの集約結果を指定してください。移行中は既存のジョブ名も保持します。workflow全体をパス条件で省略せず、対象外のジョブだけをスキップするため、必須チェックが未実行のまま待ち続ける状態を避けられます。
+
+Renovateの更新は、major・minor・patch・pin・digest・ロック保守を自動マージの対象にしています。majorは個別PRとし、Dashboardでの事前承認は求めません。固定バージョンとリリース経過時間の制限は維持します。GitHub側では、必須レビューを要求せず、必要なCIの成功を必須にしてください。CIの設定変更だけではGitHub側の保護設定は変わりません。
+
+winget更新も `relock` EnvironmentのAppトークンでPRを作り、自動マージを有効にします。`GITHUB_TOKEN` を代替として使わないため、更新PRの実行承認待ちを避けます。AppのClient IDと秘密鍵の登録は初回のみ必要です。
+
+Skillsのロック更新は `skills/apm.yml` の変更だけで起動します。検証スクリプトやworkflowの変更は通常のSkills検査・Actions Lint・回帰テストで確認し、依存更新やAppトークン発行を起動しません。
+
 | 守る対象 | 場所 |
 |---|---|
 | 厳密 pin（`latest` / 範囲 / ブランチ ref の拒否） | `validate.yml` → `tools/ci/lint-pins.py` |

@@ -48,15 +48,26 @@ jobs:
         run: |
           ./tools/ci/skills-verify.ps1 -SkipAudit -Relock
 
+      - name: Check whether the lock changed
+        id: lock-diff
+        shell: bash
+        run: |
+          if git diff --quiet -- skills; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
       - name: push 用の App トークンを取得
         id: app-token
+        if: ${{ steps.lock-diff.outputs.changed == 'true' }}
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
-          client-id: ${{ vars.RELOCK_APP_CLIENT_ID }}
+          client-id: ${{ vars.RELOCK_APP_CLIENT_ID || secrets.RELOCK_APP_CLIENT_ID }}
           private-key: ${{ secrets.RELOCK_APP_PRIVATE_KEY }}
           permission-contents: write
 
       - name: ロックをコミット
+        if: ${{ steps.lock-diff.outputs.changed == 'true' }}
         shell: bash
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}

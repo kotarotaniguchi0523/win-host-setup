@@ -8,6 +8,8 @@
 [CmdletBinding()]
 param([string]$SarifPath, [switch]$StrictAudit, [switch]$SkipAudit, [switch]$Relock)
 $ErrorActionPreference = 'Stop'
+$env:PYTHONUTF8 = '1'
+$env:PYTHONIOENCODING = 'utf-8'
 . (Join-Path $PSScriptRoot '..\lib\common.ps1')
 
 $repo    = Get-RepoRoot
@@ -25,8 +27,15 @@ if (Test-Path $repoLck) { Copy-Item $repoLck (Join-Path $apmHome 'apm.lock.yaml'
 
 Push-Location $apmHome
 try {
-    Invoke-Native $apm @('lock', '--global')    -What 'apm lock --global'
-    Invoke-Native $apm @('install', '--global') -What 'apm install --global'
+    if ($Relock) {
+        Invoke-Native $apm @('lock', '--global', '--update') -What 'apm lock --global --update'
+        # lock resolves refs, while install records the complete deployment
+        # inventory required by a subsequent --frozen run.
+        Invoke-Native $apm @('install', '--global') -What 'apm install --global (relock inventory)'
+    } else {
+        if (-not (Test-Path $repoLck)) { throw 'skills/apm.lock.yaml is required for frozen verification' }
+        Invoke-Native $apm @('install', '--global', '--frozen') -What 'apm install --global --frozen'
+    }
 } finally { Pop-Location }
 
 # --- lock drift (compare by pin) ---
@@ -53,7 +62,7 @@ if (Test-Path $repoLck) {
     if ($diff -and -not $SkipAudit) {
         throw "apm.lock.yaml のピン（repo_url / resolved_commit）が一致しません。tools/skills-apply.ps1 -Lock または tools/sync.ps1 を実行してください。"
     }
-    Write-Host '[ok] apm.lock.yaml のピンは一致'
+    if (-not $diff) { Write-Host '[ok] apm.lock.yaml のピンは一致' }
 } else {
     Write-Host '[i] apm.lock.yaml が無いためドリフト検出をスキップ'
 }
