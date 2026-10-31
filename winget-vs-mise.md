@@ -49,7 +49,7 @@
 | 3 | python | 3.15.0 / 3.14.8 | core:python | **checksum + github_attestations** | `Python.Python.3.14` = 3.14.7 / **3.15 は winget に無い** | 3.14.7 | **mise 上位**（attestations＋版が新しい） |
 | 4 | gh | 2.102.0 | aqua:cli/cli | **checksum + github_attestations** | `GitHub.cli` | 2.102.0 | **mise 上位**（attestations） |
 | 5 | doppler | 3.76.0 | github:DopplerHQ/cli | checksum | `Doppler.doppler` | **3.77.0**（新しい） | **同等** → mise 継続（版上げは任意） |
-| 6 | apm | 0.33.0 | pypi:apm-cli | 表示 `[none]`／**実効: `uv.lock` に sha256 1,504 行** ＋Takumi | `Microsoft.APM` | 0.33.0 | **同等**（粒度は mise が上・発行元明示は winget）→ **mise 継続** |
+| 6 | apm | 0.33.0 | pypi:apm-cli | 表示 `[none]`／**実効: `uv.lock` に sha256 1,504 行** ＋Takumi | `Microsoft.APM` | 0.33.0 | **同等**（粒度は mise が上・発行元明示は winget）→ **mise 継続**（**2026-10-15 に winget へ移行済み。現在 0.35.0 → §10.3**） |
 | 7 | mo | 1.5.5 | aqua:k1LoW/mo | checksum | **なし** | — | **例外**（winget に無い） |
 | 8 | waza | 0.33.0 | github:microsoft/waza | checksum | **なし** | — | **例外** |
 | 9 | rtk | **0.40.0** | aqua:rtk-ai/rtk | checksum | `rtk-ai.rtk` | v0.50.0 | **同等** → mise 継続。**ただし現行 0.40.0 が古い（最新 0.51.0）→ 版上げ推奨** |
@@ -86,7 +86,7 @@
 | ツール | 変更 | 理由 | 結果 |
 |---|---|---|---|
 | **rust-analyzer** | `aqua:rust-lang/rust-analyzer 2026-10-12`（`[none]`）→ **winget `Rustlang.rust-analyzer` 2026-10-12** | **同一版**で、winget 側は **`Installer SHA256` 固定＋発行元 "The Rust Project Developers"**。aqua 側は検証なし | ✅ `rust-analyzer 0.3.3081-standalone (2ad81e72b7 2026-10-11)` / `…\WinGet\Packages\Rustlang.rust-analyzer_…\rust-analyzer.exe` |
-| **apm**（追加） | `pypi:apm-cli 0.33.0` → **winget `Microsoft.APM` 0.33.0** | **既定 Python を 3.15.0 にした結果、依存 `pyyaml` の cp315 wheel が無く `pypi:` では導入不可**（`mise` が自動導入を試みて全コマンドが停止する障害になった）。winget 版は **Publisher: Microsoft Corporation** / portable(zip) / `Installer SHA256` | ✅ `Agent Package Manager (APM) CLI version 0.33.0` |
+| **apm**（追加） | `pypi:apm-cli 0.33.0` → **winget `Microsoft.APM` 0.33.0** | **既定 Python を 3.15.0 にした結果、依存 `pyyaml` の cp315 wheel が無く `pypi:` では導入不可**（`mise` が自動導入を試みて全コマンドが停止する障害になった）。winget 版は **Publisher: Microsoft Corporation** / portable(zip) / `Installer SHA256` | ✅ `Agent Package Manager (APM) CLI version 0.33.0`（**現在 0.35.0** → §10.3） |
 
 実行済みコマンド:
 ```powershell
@@ -206,3 +206,49 @@ mise prune --yes                            # pypi:apm-cli を撤去
 - サンドボックス側: **追加導入は不要**（実測: `common-opencode:dev` に python3 3.14.4 / g++ 15.2 / make / Node 24.21.0 / curl / tar / sha256sum / shasum / git / libatomic1 / libstdc++ / libgcc_s が既存）。
 - SSH 環境の追加は **デスクトップアプリの Settings → Connections → Add environment → SSH**（**Web UI には SSH 追加 UI が無い**）。プロバイダは**環境ごと**に設定する。
 - Docker Hub の `hambn/t3code`（`t3 serve` が entrypoint の非公式イメージ）は **sbx テンプレートには不向き**（sbx は `tini --` ＋ エージェント起動の独自テンプレート前提）。
+
+---
+
+## 10. 追加分の判定（2026-10-31 追記）: ctx7 / agent-desktop / APM
+
+### 10.1 `ctx7`（Context7 CLI / Upstash）
+
+| 経路 | 実測 |
+|---|---|
+| ① msstore | **なし** |
+| ② mise | ✅ **`npm:ctx7` 0.8.2**（導入済み・`ctx7 --version` = 0.8.2）。`Security:` は `[none]` 表示だが **registry integrity（sha512）を pnpm が実効検証**（`dist.integrity` あり）。**`dist.attestations` は未公開**（provenance 無し） |
+| ③ winget | **なし**（`winget search ctx7` 該当なし） |
+
+**判定: ② mise 採用（基準②準拠。ただし検証は integrity のみで provenance は無し）** ✅
+**実施**: **宣言済みのため変更なし**（`mise/mise.toml` の `"npm:ctx7" = "0.8.2"`）。
+**注意**: 公式手順の **`npx ctx7 setup` / `npm install -g ctx7` は使わない**（mise のピン外に実体ができる＝野良グローバル）。更新は `mise.toml` の版上げ → relock。
+**要件**: Node.js **≥ 22.13**（ホストは `node 26.12.1` が既定）。postinstall は無いため `allow_builds` 不要。
+
+### 10.2 `agent-desktop`（vercel-labs / Apache-2.0）
+
+| 経路 | 実測 |
+|---|---|
+| ① msstore | **なし** |
+| ② mise | ✅ **`npm:agent-desktop` 1.0.2** — **registry integrity（sha512）+ SLSA provenance**（`dist.attestations.provenance = slsa.dev/provenance/v1`）。パッケージは**全プラットフォームの実バイナリ同梱**（unpacked 29.5 MB）で、`postinstall: node scripts/postinstall.js` が `bin/agent-desktop-win32-x64.exe` を link する |
+| ③ winget | **なし**（v1.0.0 は 2026-10-28 公開の新規プロジェクト） |
+| （参考）GitHub Releases | zip/tar のアーカイブはあるが**管理下に置けない**（更新検知・ハッシュ固定が手作業になる）ため不採用 |
+
+**判定: ② mise 採用（基準②準拠）** ✅
+**実施**: `mise/mise.toml` に **`"npm:agent-desktop" = { version = "1.0.2", allow_builds = ["agent-desktop"] }`** → `tools/ci/mise-verify.ps1 -Lock` で relock（`mise.lock` の `[[tools.*]]` ヘッダは 1 件追加のみ・欠落なし）→ `tools/apply.ps1`（**39/39 installed**）。
+**実測**: `mise which agent-desktop` → `%LOCALAPPDATA%\mise\installs\npm-agent-desktop\1.0.2\node_modules\.bin\agent-desktop`、`agent-desktop version` → `{"version":"2.5","ok":true,"command":"version","data":{"os":"windows","target":"x86_64","version":"1.0.2"}}`。
+**`allow_builds` が必要な理由**: mise は既定で dependency の build script を実行しない。`agent-desktop` は postinstall で**実バイナリを link するだけ**（ダウンロードはしない＝パッケージ同梱）だが、link しないと Node ランチャー経由になる。installer 非依存の `allow_builds` で許可する（pnpm → `--allow-build=agent-desktop`）。
+**`minimum_release_age = "2d"` との関係（実測）**: 1.0.2 の publish は 2026-10-30T21:17Z で 2 日に満たないが、**mise はこの npm 導入をブロックしなかった**（`mise install` 成功）。Renovate 側は `minimumReleaseAge: "2 days"` が効くため、PR は公開 2 日後に出る。
+**Windows の権限**: アクセシビリティ権限の付与は**不要**（macOS のみ必要）。CLI のため GUI インストーラや自動更新は無く、**更新は mise のみ**。
+
+### 10.3 APM の管理主体（`Microsoft.APM` — **mise ではない**）
+
+| 項目 | 実測（2026-10-31） |
+|---|---|
+| 導入経路 | **winget `Microsoft.APM`**（Publisher: **Microsoft Corporation**、portable(zip)、`Installer SHA256`） |
+| 実体版 | **0.35.0**（`apm --version` = `Agent Package Manager (APM) CLI version 0.35.0` / `winget list --id Microsoft.APM` = 0.35.0） |
+| mise で入らない理由 | 旧 `pypi:apm-cli` は既定 **Python 3.15** で依存 `pyyaml` の cp315 wheel が無く導入不可（§6 の実測知見）。`github:microsoft/apm` も当時は配布形態が合わず不採用 |
+| 宣言 | ✅ **`winget/host.dsc.yaml` に 0.35.0 を追加**（2026-10-31）。従来は文書とコメントにしか無く **DSC 未宣言**だった（＝`winget configure` では入らない状態） |
+| Renovate | ❌ **対象外**。Renovate に winget の manager / datasource が無い（`/modules/manager/winget/` は 404、manager・datasource 一覧にも `winget` 無し） |
+| 自動追随 | ✅ **`.github/workflows/winget-outdated.yml`**（毎週土曜 03:00 JST）が `tools/update-winget-dsc.ps1 -Apply` で DSC の `version:` を winget の最新へ書き換え、PR 作成 → auto-merge。**実測**: APM 行も走査対象として認識（`Microsoft.APM 0.35.0 → 0.35.0 update False`） |
+
+**回答（要約）**: **APM は mise 管理ではない。winget `Microsoft.APM` の管轄**で、`host.dsc.yaml` に 0.35.0 として宣言済み。更新は Renovate ではなく **`winget-outdated` ワークフロー（週次）** が winget の最新版に追随する。DSC 未宣言のままだと、この自動追随からも漏れていた（今回の修正で解消）。
