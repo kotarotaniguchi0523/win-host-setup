@@ -88,6 +88,13 @@ properties:
         description: PowerShell 7 (MSI, Microsoft Corporation)
       settings: { id: Microsoft.PowerShell, source: winget, version: '7.6.8.0' }
 
+    # --- APM: mise 不可（旧 pypi:apm-cli は既定 Python 3.15 で pyyaml の cp315 wheel が無い） ---
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: apm
+      directives:
+        description: APM - Agent Package Manager CLI (Microsoft Corporation) — Skills 配布に使用（winget-vs-mise.md §6 / §10）
+      settings: { id: Microsoft.APM, source: winget, version: '0.35.0' }
+
     # --- GUI apps (mise 対象外 / winget ピン対象外) ---
     # T3 Code desktop (`T3Tools.T3Code`) は自己更新のため、ここにはピンしない。
     # winget マニフェストは 0.0.45 だが実体は 0.1.0（公式サイト / GitHub Releases で導入）。

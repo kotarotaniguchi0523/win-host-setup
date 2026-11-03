@@ -12,7 +12,7 @@
 
 ## 3. グローバル ツール（正確ピン＋lock）
 
-**mise 管理 28 件**（内訳は下部 §3 アーカイブ参照）
+**mise 管理 34 件**（`mise/mise.toml` の `[tools]` 宣言数。内訳は下部 §3 アーカイブ参照）
 
 - **既定 = 最新**（2026-10-15 変更）: `node = ["26.11.1", "24.21.0"]`（既定 **26.11.1**）/ `python = ["3.15.0", "3.14.8"]`（既定 **3.15.0**）。**配列は先頭が既定**（`mise which` で実測）
 - **winget へ移行（2 件）**: `apm`（`pypi:apm-cli` は既定 3.15 で `pyyaml` の cp315 wheel が無く導入不可）/ `rust-analyzer`（aqua は `Security: [none]`）
@@ -66,7 +66,7 @@
 **内容**: 未固定（`"24"`/`"3.13"`）を正確版に置換し、lockfile で再現可能にする。
 **mise 管理 28 件**: `betterleaks 1.9.0`（cosign）/ `node 26.11.1 / 24.21.0`（gpg）/ `npm 12.2.0`（**[none]**）/ `pnpm 12.12.1`（attestations）/ `python 3.15.0 / 3.14.8`（attestations）/ `gh 2.102.0`（attestations）/ `uv 0.13.0`（attestations）/ `go 1.27.2`（checksum）/ `jj 0.46.0` / `jq 1.8.2`（attestations）/ **`tgrep 1.2.0`**（aqua）/ **`ax 0.1.25`**（ubi, **[none]**）/ **`dotenvx 2.34.2`**（aqua）/ **`npm:secretlint 13.0.7`** / **`npm:textlint 15.8.0`** / **`npm:ctx7 0.6.0`**（Context7 CLI）/ **`rust 1.99.0`**（core:rust）/ `doppler 3.76.0` / `mo 1.5.5` / `waza 0.33.0` / `rtk 0.40.0` / **`nushell 0.116.1`**（aqua, checksum）/ **`npm:agent-browser 0.39.0`**（npm, integrity+provenance）/ **`herdr 0.9.3`**（aqua, **[none]**）/ **`pi 1.2.0`**（aqua, checksum）/ **`npm:openclaw 2026.10.3`**（npm, integrity+provenance）/ **`pypi:git+…/skillspector v2.12.0`**（git ソース, Python 3.13.16 固定）/ **`github:init-co-jp/diff-tour 0.5.0`**（github, checksum）
 
-> **winget へ移行（2026-10-15）**: `apm` → winget **`Microsoft.APM 0.33.0`**（Publisher: Microsoft Corporation）/ `rust-analyzer` → winget **`Rustlang.rust-analyzer 2026-10-12`**（aqua は `Security: [none]` のため）。判定は **`winget-vs-mise.md`**
+> **winget へ移行（2026-10-15）**: `apm` → winget **`Microsoft.APM 0.33.0`**（Publisher: Microsoft Corporation）/ `rust-analyzer` → winget **`Rustlang.rust-analyzer 2026-10-12`**（aqua は `Security: [none]` のため）。判定は **`winget-vs-mise.md`**（**現在の APM は 0.35.0**。2026-10-31 に `winget/host.dsc.yaml` へ 0.35.0 を宣言 → §16.3）
 > **既定バージョン**: `node` = `["26.11.1", "24.21.0"]` / `python` = `["3.15.0", "3.14.8"]`（**先頭が既定**。`mise which` で実測確認）
 
 > **変更履歴**: `ripgrep`→**`tgrep`**、`hk` **バイナリごと削除**、`cloudflared`/`fd`→**winget**、**`rust` を rustup から mise へ**（旧 toolchain `stable` 削除・`~\.cargo\bin` を PATH から除去。**`~\.rustup` は mise が使用するため保持**）。
@@ -117,7 +117,7 @@
 **内容**: スキル／スキル資産のスキャナを導入。**APM は winget へ移行**（下記）。
 
 - [x] 前提: `python` / `uv` を正確ピンで導入済み
-- [x] **APM = winget `Microsoft.APM` 0.33.0**（Publisher: **Microsoft Corporation** / portable(zip) / `Installer SHA256`）→ 動作確認 `Agent Package Manager (APM) CLI version 0.33.0`
+- [x] **APM = winget `Microsoft.APM` 0.35.0**（Publisher: **Microsoft Corporation** / portable(zip) / `Installer SHA256`）→ 動作確認 `Agent Package Manager (APM) CLI version 0.35.0`（導入時は 0.33.0。宣言は 2026-10-31 に `winget/host.dsc.yaml` へ追加 → §16.3）
       - 当初 `pypi:apm-cli@0.33.0`（= `github.com/microsoft/apm` の**公式 PyPI 配布**。同一プロジェクトと確認済み）で導入したが、
         **既定 Python を 3.15.0 にした結果、依存 `pyyaml` の cp315 wheel が無く導入不可**となった
       - さらに mise は「不足ツールの自動導入」を全コマンドで試みるため、**1 ツールの導入失敗が `mise exec`／シム全体の停止（ハング）に波及**した（`git` の大量ハングは二次的）
@@ -283,9 +283,35 @@
 
 ---
 
+## 16. ctx7 / agent-desktop / APM の宣言（2026-10-31）
+
+**内容**: 追加依頼の 2 ツール（`ctx7` / vercel-labs `agent-desktop`）をホスト方針で導入し、APM の管理主体を確定させた記録。
+
+### 16.1 ctx7（Context7 CLI / Upstash）
+
+- [x] **宣言済みだった**（`mise/mise.toml` の `"npm:ctx7" = "0.8.2"`）。`mise which ctx7` → `%LOCALAPPDATA%\mise\installs\npm-ctx7\0.8.2\bin\ctx7`、`ctx7 --version` = **0.8.2** → **追加作業なし**
+- 検証: npm **registry integrity（sha512）のみ**（`dist.attestations` は未公開）。`npx ctx7 setup` / `npm i -g ctx7` は mise のピン外になるため使わない → `winget-vs-mise.md §10.1`
+
+### 16.2 agent-desktop（vercel-labs / Apache-2.0）
+
+- [x] `mise/mise.toml` に **`"npm:agent-desktop" = { version = "1.0.2", allow_builds = ["agent-desktop"] }`** を宣言（`npm:ctx7` の直後）
+- [x] `tools/ci/mise-verify.ps1 -Lock` で relock（`mise.lock` に `[[tools."npm:agent-desktop"]]` を追加。既存ツールの欠落なしを `[[tools.*]]` ヘッダの差分で確認）→ `tools/apply.ps1` で **39/39 installed**
+- [x] 動作確認: `mise which agent-desktop` → `…\installs\npm-agent-desktop\1.0.2\node_modules\.bin\agent-desktop`、`agent-desktop version` → **`"version":"1.0.2"`**（`os: windows` / `target: x86_64`）
+- 検証: npm **registry integrity（sha512）+ SLSA provenance**（`dist.attestations.provenance = slsa.dev/provenance/v1`）。実バイナリ（`agent-desktop-win32-x64.exe`）はパッケージ同梱で **postinstall が link** するため `allow_builds` が必要（installer 非依存の書き方）→ `winget-vs-mise.md §10.2`
+- 更新は mise（`mise.toml` の版上げ → relock）。**Renovate の `mise` manager が拾う**（グループ `mise tools`）
+
+### 16.3 APM は mise 管理ではない（winget）
+
+- [x] 実体確認: `apm --version` = **`Agent Package Manager (APM) CLI version 0.35.0`** / `winget list --id Microsoft.APM` = **0.35.0（source: winget）**
+- [x] **宣言漏れを修正**: `winget/host.dsc.yaml` に **`Microsoft.APM` 0.35.0**（publisher: Microsoft Corporation）を追加。従来は `PLAN.md` / `winget-vs-mise.md` / `mise.toml` のコメントにしか無く、**DSC 未宣言**だった
+- **Renovate の対象外**: Renovate には winget の manager / datasource が無い（`docs.renovatebot.com/modules/manager/winget/` は 404、manager・datasource 一覧にも `winget` 無し）
+- **代わりに週次で自動追随**: `.github/workflows/winget-outdated.yml`（土曜 03:00 JST）が `tools/update-winget-dsc.ps1 -Apply` で DSC の `version:` を winget の最新へ更新し、PR を自動作成 → auto-merge。実測: `Microsoft.APM 0.35.0 → 0.35.0 update False`（走査対象として認識）。**DSC 未宣言だったため、この自動追随からも漏れていた**
+
+---
+
 ## 未確定（要判断）
 
-- ~~`github:microsoft/apm`（mise 直）と `pypi:apm-cli` の**どちらに一本化**するか~~ → **解決（2026-10-15）**: どちらも採らず **winget `Microsoft.APM 0.33.0`** に一本化（`pypi:apm-cli` は既定 Python 3.15 で `pyyaml` の cp315 wheel が無く導入不可のため）
+- ~~`github:microsoft/apm`（mise 直）と `pypi:apm-cli` の**どちらに一本化**するか~~ → **解決（2026-10-15）**: どちらも採らず **winget `Microsoft.APM 0.33.0`** に一本化（`pypi:apm-cli` は既定 Python 3.15 で `pyyaml` の cp315 wheel が無く導入不可のため）。**現在は 0.35.0**（§16.3）
 - この **win-host-setup のドキュメント／設定をリポジトリ管理**するか（＝`~/.config/mise/config.toml` と `mise.lock` の扱い）
 - **グローバル PATH の通し方**（mise shims → winget Links → Machine/User PATH の順序設計）
 - **`paranoid` 最強のままか**（中間 `trusted_config_paths` を使うか）
