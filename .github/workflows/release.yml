@@ -60,9 +60,8 @@ jobs:
 
       # cache: false is deliberate: SLSA Build L3 builds must not be influenced by a cache
       # that an earlier (possibly untrusted) run could have written to.
-      - uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c # v5.2.6
+      - uses: ./.github/actions/mise-setup
         with:
-          version: "2026.10.12"
           cache: false
           install_args: uv python
 

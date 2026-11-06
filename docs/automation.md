@@ -57,6 +57,8 @@ pwsh -File tools/run-task.ps1 -Task verify   # 検証のみ（.agent/update-repo
 
 秘密情報・PII検査は全変更で実行します。ジョブごとに必要なツールだけを導入し、miseのホスト検証は一時的なglobal設定と作業ディレクトリを使います。ホスト宣言とプロジェクト宣言の版が異なっても、互いのロックを参照しません。APMの通常検査は `install --frozen` で保存済みロックを使い、ロックの再生成はrelockだけが行います。
 
+CIが使うmise本体の版は、`.github/actions/mise-setup` が `winget/host.dsc.yaml` の `jdx.mise` から読み取ります。workflow側に版を書かないため、`winget-outdated.yml` がDSCを更新すればCIも同じ版に追随し、ホストとCIのmiseがずれません。
+
 `validate result` / `lint result` は、選ばれた検査の失敗・取消や変更判定の失敗を検出します。ブランチ保護の必須チェックはこの集約結果を指定してください。移行中は既存のジョブ名も保持します。workflow全体をパス条件で省略せず、対象外のジョブだけをスキップするため、必須チェックが未実行のまま待ち続ける状態を避けられます。
 
 Renovateの更新は、major・minor・patch・pin・digest・ロック保守を自動マージの対象にしています。majorは個別PRとし、Dashboardでの事前承認は求めません。固定バージョンとリリース経過時間の制限は維持します。GitHub側では、必須レビューを要求せず、必要なCIの成功を必須にしてください。CIの設定変更だけではGitHub側の保護設定は変わりません。

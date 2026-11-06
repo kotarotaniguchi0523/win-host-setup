@@ -1,0 +1,32 @@
+name: mise setup
+description: >-
+  Install mise at the version pinned in winget/host.dsc.yaml (jdx.mise), so CI
+  always follows the host declaration without a second hard-coded version.
+inputs:
+  install:
+    description: Passed through to jdx/mise-action (`install`).
+    default: "true"
+  cache:
+    description: Passed through to jdx/mise-action (`cache`).
+    default: "true"
+  install_args:
+    description: Passed through to jdx/mise-action (`install_args`).
+    default: ""
+runs:
+  using: composite
+  steps:
+    - name: Resolve the pinned mise version
+      id: version
+      shell: pwsh
+      run: |
+        $text = Get-Content -Raw -Encoding utf8 winget/host.dsc.yaml
+        if ($text -notmatch "(?s)id:\s*jdx\.mise.*?version:\s*'([^']+)'") {
+          throw 'jdx.mise version not found in winget/host.dsc.yaml'
+        }
+        "version=$($Matches[1])" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+    - uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c # v5.2.6
+      with:
+        version: ${{ steps.version.outputs.version }}
+        install: ${{ inputs.install }}
+        cache: ${{ inputs.cache }}
+        install_args: ${{ inputs.install_args }}

@@ -53,10 +53,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c # v5.2.6
+      - uses: ./.github/actions/mise-setup
         with:
-          # Keep CI on the mise version pinned in winget/host.dsc.yaml (jdx.mise).
-          version: "2026.10.12"
           install: false
           cache: true
       - name: lock のドリフト検出と導入
@@ -75,9 +73,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c # v5.2.6
+      - uses: ./.github/actions/mise-setup
         with:
-          version: "2026.10.12"
           cache: true
           install: false # uv だけを入れる（全ツールの導入は重い）
       - name: JSON / YAML / TOML の検証
@@ -100,9 +97,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c # v5.2.6
+      - uses: ./.github/actions/mise-setup
         with:
-          version: "2026.10.12"
           cache: true
           install_args: uv python
       - name: 依存を同期（dev は ty のみ）
