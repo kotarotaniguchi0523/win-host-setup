@@ -1,54 +1,54 @@
 [tools]
-betterleaks            = "1.9.0"
+betterleaks            = "v1.10.0"
 node                   = ["26.13.0", "24.22.1"]
 python                 = ["3.15.2", "3.14.8"]
-gh                     = "2.103.2"
+gh                     = "2.103.3"
 # ghtkn: GitHub App user access token provider. Used as the git credential helper
 # (`!ghtkn git-credential`) instead of stored PATs / OAuth tokens.
-"aqua:suzuki-shunsuke/ghtkn" = "0.4.2"
+"aqua:suzuki-shunsuke/ghtkn" = "0.4.3"
 doppler                = "3.77.1"
 # APM: winget `Microsoft.APM` 0.35.0 で管理（Publisher: Microsoft Corporation。宣言は winget/host.dsc.yaml）。
 # 旧 `pypi:apm-cli` は既定 Python 3.15 で依存 `pyyaml` の cp315 wheel が無く導入不可のため winget へ移行（winget-vs-mise.md §6 / §10.3）
-"aqua:k1LoW/mo"        = "1.7.0"
-"github:microsoft/waza" = "v0.39.0"
-rtk                    = "v1.1.0"
-pnpm                   = "12.15.0"
-uv                     = "0.13.5"
-go                     = "1.27.3"
-"aqua:jj-vcs/jj"       = "0.46.0"
+"aqua:k1LoW/mo"        = "1.8.0"
+"github:microsoft/waza" = "v0.40.1"
+rtk                    = "v1.2.0"
+pnpm                   = "12.18.0"
+uv                     = "0.13.7"
+go                     = "1.27.4"
+"aqua:jj-vcs/jj"       = "0.47.1"
 jq                     = "1.8.2"
-"aqua:microsoft/tgrep" = "1.2.4"
+"aqua:microsoft/tgrep" = "1.2.7"
 "ubi:yusukebe/ax"      = "0.1.25"
 dotenvx                = "2.38.2"
-"npm:secretlint"       = "13.0.7"
+"npm:secretlint"       = "13.1.0"
 "npm:textlint"         = "15.8.0"
-"npm:ctx7"             = "0.8.2"
+"npm:ctx7"             = "0.11.1"
 # agent-desktop: Vercel Labs のデスクトップ操作 CLI。npm は sha512 integrity + SLSA provenance、
 # 実バイナリ（win32-x64 ほか）は同梱で postinstall が link するため allow_builds を許可する。
-"npm:agent-desktop"    = { version = "1.0.2", allow_builds = ["agent-desktop"] }
-nushell                = "0.116.1"
-"npm:agent-browser"    = "0.39.2"
-"npm:openclaw"         = "2026.10.7"
+"npm:agent-desktop"    = { version = "1.2.0", allow_builds = ["agent-desktop"] }
+nushell                = "0.117.0"
+"npm:agent-browser"    = "0.42.0"
+"npm:openclaw"         = "2026.11.3"
 herdr                  = "v0.9.5"
-pi                     = "v1.4.0"
-rust                   = "1.99.1"
+pi                     = "v1.5.2"
+rust                   = "1.100.0"
 # rust-analyzer: winget `Rustlang.rust-analyzer` で管理（aqua 版は Security [none] のため。winget-vs-mise.md §3）
-npm = "12.2.1"
+npm = "12.2.2"
 # SkillSpector: yara-python 4.5.4 は cp314/cp315 の wheel が無い → このツールのみ Python 3.13.16 で構築（インストール済・動作確認待ち）
-"pypi:git+https://github.com/nvidia/skillspector.git" = { version = "v2.13.1", uvx_args = "--python 3.13.16" }
+"pypi:git+https://github.com/nvidia/skillspector.git" = { version = "v2.13.4", uvx_args = "--python 3.13.16" }
 # postinstall で実バイナリ（約 200 MB）を取得するツール。mise は既定で dependency の
 # build script を実行しないので、このツールだけ allow_builds で許可する（他は既定のまま）。
 # allow_builds は installer 非依存で、pnpm なら --allow-build=<pkg>、npm 11.16+ なら
 # --allow-scripts=<pkg>、組み込み aube なら aube.allowBuilds に変換される。
-"npm:@opencode/cli" = { version = "2.1.4", allow_builds = ["@opencode/cli"] }
-"npm:@openai/codex" = "0.164.0"
+"npm:@opencode/cli" = { version = "2.2.7", allow_builds = ["@opencode/cli"] }
+"npm:@openai/codex" = "0.167.2"
 # T3 Code CLI（`t3` = ローカル server + Web UI）。npm は sha512 integrity + SLSA provenance、
 # 実バイナリは optionalDependencies（@t3code/t3-win32-x64）で postinstall 不要。
 # winget の desktop 版は 0.0.45 と遅れ、CLI を PATH に載せる操作もアプリ側（mise 管理外）になるため、
 # グローバル CLI は mise の npm backend で 0.1.0 に固定する。
-"npm:t3" = "0.1.2"
+"npm:t3" = "0.1.9"
 "go:golang.org/x/tools/gopls" = "v0.24.0"
-"github:init-co-jp/diff-tour" = "v0.6.0"
+"github:init-co-jp/diff-tour" = "v0.6.1"
 
 [settings]
 paranoid            = true
