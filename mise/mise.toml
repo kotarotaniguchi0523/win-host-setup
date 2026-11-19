@@ -20,7 +20,7 @@ jq                     = "1.8.2"
 "aqua:microsoft/tgrep" = "1.2.4"
 "ubi:yusukebe/ax"      = "0.1.25"
 dotenvx                = "2.38.2"
-"npm:secretlint"       = "13.0.7"
+"npm:secretlint"       = "14.0.1"
 "npm:textlint"         = "15.8.0"
 "npm:ctx7"             = "0.8.2"
 # agent-desktop: Vercel Labs のデスクトップ操作 CLI。npm は sha512 integrity + SLSA provenance、
