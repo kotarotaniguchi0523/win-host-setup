@@ -16,7 +16,7 @@ dependencies:
     - vercel-labs/agent-browser#1cc19526f3641c8543d55aa6700e7c55b37ac356 # v0.43.0
     - yusukebe/ax#0ddd8a748ae2401ae344f536f6e8dded890fcdbf # v0.1.25
     # Japanese proofreading (rewrite AI-generated Japanese into natural Japanese)
-    - nanaism/yomiyasu#29d67ccb05e370b5958d72920a9cd1aa829dee80 # v2.5.0
+    - nanaism/yomiyasu#c49d5f1bee91258e33e1febc3569c6c87be7669e # v3.2.3
     # Official Nushell skills (nushell org / nu_scripts)
     # No tags upstream, so this stays on a branch: APM updates it (`apm update`, or the
     # scheduled relock that re-resolves `main`). Renovate does not touch branch refs.
