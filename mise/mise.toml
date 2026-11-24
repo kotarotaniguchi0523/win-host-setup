@@ -1,6 +1,6 @@
 [tools]
 betterleaks            = "v1.10.1"
-node                   = ["26.13.0", "24.22.1"]
+node                   = ["26.13.1", "24.22.1"]
 python                 = ["3.15.2", "3.14.8"]
 gh                     = "2.105.0"
 # ghtkn: GitHub App user access token provider. Used as the git credential helper
