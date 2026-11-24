@@ -50,7 +50,7 @@ uv run --project tools/pathctl pathctl audit --format json
 
 ### 4. msstore は対象外
 
-`9MVS1J51GMK6` は Store が自動更新する。**差分として報告しない**（方針上信頼済み）。
+Store 版を使っているパッケージがあれば、Store が自動更新するため**差分として報告しない**（方針上信頼済み）。現在の DSC に msstore の宣言は無い（2026-11-24 に ngrok を削除）。
 
 ## 判定と次の一手
 
