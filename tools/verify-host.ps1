@@ -227,18 +227,33 @@ try {
         Add-Check 'winget-dsc' 'skip' 'winget がありません'
     } else {
         $dscPath = Join-Path $repo 'winget/host.dsc.yaml'
-        $out = & winget configure test -f $dscPath --accept-configuration-agreements 2>&1
-        $notInState = @()
-        $current = ''
-        foreach ($line in $out) {
-            if ($line -match '^WinGetPackage \[(.+?)\]') { $current = $Matches[1] }
-            elseif ($line -match 'is not in the described configuration state' -and $current) { $notInState += $current }
-        }
-        if ($notInState.Count -eq 0) {
+        # Winget prints its result text in the OS display language, so the old English-only
+        # string match ("is not in the described configuration state") silently reported "ok"
+        # on a Japanese host. Judge by the exit code (1 = drift) and name the offenders by
+        # comparing the declared pins with `winget list` (the id and versions are ASCII).
+        & winget configure test -f $dscPath --accept-configuration-agreements *> $null
+        $dscExit = $LASTEXITCODE
+        if ($dscExit -eq 0) {
             Add-Check 'winget-dsc' 'ok' '全て望ましい状態'
         } else {
-            $drift.dscNotInState = @($notInState | Select-Object -Unique)
-            Add-Check 'winget-dsc' 'ng' (($notInState | Select-Object -Unique) -join ', ')
+            $drifted = @()
+            foreach ($line in (Get-Content $dscPath -Encoding UTF8)) {
+                if ($line -match "settings:\s*\{\s*id:\s*([^,]+),\s*source:\s*winget,\s*version:\s*'([^']+)'") {
+                    $id  = $Matches[1].Trim()
+                    $pin = $Matches[2].Trim()
+                    $listOut = & winget list --id $id --exact --accept-source-agreements --disable-interactivity 2>&1 | Out-String
+                    if ($LASTEXITCODE -ne 0) { $drifted += "$id（未導入）"; continue }
+                    $tokens = @($listOut -split '\s+')
+                    $idx = [Array]::IndexOf($tokens, $id)
+                    $installed = if ($idx -ge 0 -and ($idx + 1) -lt $tokens.Count) { $tokens[$idx + 1] } else { $null }
+                    if (-not $installed -or $installed -ne $pin) {
+                        $drifted += ("{0}（{1} != {2}）" -f $id, $(if ($installed) { $installed } else { '?' }), $pin)
+                    }
+                }
+            }
+            if ($drifted.Count -eq 0) { $drifted = @("winget configure test exit=$dscExit") }
+            $drift.dscNotInState = @($drifted)
+            Add-Check 'winget-dsc' 'ng' (($drifted | Select-Object -First 4) -join ', ')
             $actions.Add('管理者で mise run update:winget（または winget configure -f winget/host.dsc.yaml）')
         }
     }

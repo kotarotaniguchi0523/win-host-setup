@@ -25,9 +25,19 @@ $evaluator = {
     $show = & winget show --exact --id $id --source winget --accept-source-agreements --disable-interactivity 2>&1
     $exitCode = $LASTEXITCODE
     if ($exitCode -ne 0) { throw "winget show failed for $id (exit $exitCode)" }
-    $line = $show | Where-Object { $_ -match '^\s*Version:\s' } | Select-Object -First 1
-    if (-not $line) { throw "winget show returned no Version for $id" }
-    $new = ($line -replace '^\s*Version:\s*', '').Trim()
+    # `winget show` prints its labels in the OS display language, and the console decoding of
+    # that text is not stable enough to match on. Parse structurally instead: the "found" line
+    # carries the id in brackets and the next line is the version (label: value).
+    $lines = @($show)
+    $new = $null
+    $startIdx = -1
+    for ($i = 0; $i -lt $lines.Count; $i++) { if ($lines[$i] -like "*[$id]*") { $startIdx = $i; break } }
+    if ($startIdx -ge 0) {
+        for ($j = $startIdx + 1; $j -lt $lines.Count; $j++) {
+            if ($lines[$j] -match '^\s*[^:：]+[:：]\s*(\S+)\s*$') { $new = $Matches[1].Trim(); break }
+        }
+    }
+    if (-not $new) { throw "winget show returned no Version for $id" }
     if (-not $new) { throw "winget show returned an empty Version for $id" }
     # Only move forward: winget sometimes reports an older build than the installed one
     # (e.g. Canonical.Ubuntu offers 22.04 while 26.04 is installed), and pinning that would
