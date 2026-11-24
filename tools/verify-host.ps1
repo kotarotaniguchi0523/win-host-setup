@@ -10,6 +10,7 @@
 #   skills-files    : every deployed_files entry in skills/apm.lock.yaml exists
 #   skills-skillmd  : every deployed skill directory has SKILL.md with a frontmatter name
 #   winget-dsc      : winget configure test reports no drift
+#   self-update-apps: exceptions.tsv entries exist and are Authenticode-signed by the declared publisher
 #   git             : public is level with origin/main and no worktree is dirty
 #   apm             : apm doctor passes / stale dependencies are reported (unless -SkipNetwork)
 
@@ -239,6 +240,38 @@ try {
             $drift.dscNotInState = @($notInState | Select-Object -Unique)
             Add-Check 'winget-dsc' 'ng' (($notInState | Select-Object -Unique) -join ', ')
             $actions.Add('管理者で mise run update:winget（または winget configure -f winget/host.dsc.yaml）')
+        }
+    }
+
+    # --- 7.5 self-updating apps (exceptions.tsv) --------------------------------
+    # Vendor installs allowed to update themselves (AGENTS.md). Each entry must exist and be
+    # Authenticode-signed by the declared publisher, so an exception cannot silently become
+    # an unsigned or replaced binary.
+    $excPath = Join-Path $repo 'exceptions.tsv'
+    if (Test-Path $excPath) {
+        $badExceptions = @()
+        $checkedExceptions = 0
+        foreach ($line in (Get-Content $excPath -Encoding UTF8)) {
+            if ($line -match '^\s*#' -or [string]::IsNullOrWhiteSpace($line)) { continue }
+            $cols = $line -split "`t"
+            if ($cols.Count -lt 3) { $badExceptions += "書式不正: $line"; continue }
+            $name   = $cols[0].Trim()
+            $signer = $cols[1].Trim()
+            $target = [Environment]::ExpandEnvironmentVariables($cols[2].Trim())
+            if ($target -match '^~') { $target = Join-Path $homeDir (($target -replace '^~[\\/]?', '') -replace '/', '\') }
+            $checkedExceptions++
+            if (-not (Test-Path $target)) { $badExceptions += "$name（未導入）"; continue }
+            $sig = Get-AuthenticodeSignature -FilePath $target -ErrorAction SilentlyContinue
+            if ($null -eq $sig -or $sig.Status -ne 'Valid' -or $sig.SignerCertificate.Subject -notlike "*$signer*") {
+                $badExceptions += "$name（署名が $signer ではない）"
+            }
+        }
+        if ($badExceptions.Count -eq 0) {
+            Add-Check 'self-update-apps' 'ok' ("{0} 件（署名確認済み）" -f $checkedExceptions)
+        } else {
+            $drift.selfUpdateApps = @($badExceptions)
+            Add-Check 'self-update-apps' 'ng' (($badExceptions | Select-Object -First 3) -join ' / ')
+            $actions.Add('exceptions.tsv の自己更新アプリを確認（導入・署名）')
         }
     }
 
