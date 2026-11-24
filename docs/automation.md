@@ -34,7 +34,6 @@
 | Skills（タグ / SHA 固定） | Renovate（`apm` マネージャ） | 同上 | `skills/apm.yml`、`skills-relock.yml` が lock（push は App トークン） |
 | Skills（**タグ無しの2件**） | **APM**（`apm update` / `skills-apply.ps1 -Lock`） | 手動、または relock | `apm.lock.yaml` の `resolved_commit` |
 | winget DSC | `winget-outdated.yml` | 週次（windows ランナー） | `winget/host.dsc.yaml` |
-| **msstore**（1件） | Store が自動更新 | — | **対象外**（信頼済みとして不問） |
 
 Renovate の設定は `renovate.json`（`rangeStrategy: pin` / `pinDigests: true` / `minimumReleaseAge: 2 days`）。
 脆弱性アラートだけは schedule・2日ルール・Dashboard 承認を迂回して即 PR・即マージです。
@@ -80,7 +79,7 @@ Skillsのロック更新は `skills/apm.yml` の変更だけで起動します�
 
 | 項目 | 状態 |
 |---|---|
-| **msstore 1件**（`9MVS1J51GMK6`、版指定なし） | Store が自動更新する。ポリシー上信頼済みなので**比較対象外**。 |
+| **msstore**（現在 0 件） | 使う場合は Store が自動更新するため比較対象外（ポリシー上信頼済み）。ngrok は 2026-11-24 に削除。 |
 | **`#main` の2件**（`nushell/nu_scripts` / `mizchi/explainer`） | 上流にタグが無い。Renovate は追えないので **APM 管理**（`apm update` で lock を再解決）。許可リストは `lint-pins.py` の `APM_BRANCH_REF_ALLOW`。 |
 | **自己更新 CLI**（`t3 update` / `opencode upgrade` / `uv self update` など） | mise の外に実体を作る。`pathctl audit` で検出できるが `verify` には未組み込み。 |
 | **source → public の同期** | `tools/sync.ps1` が唯一の経路。source は remote を持たないため、CI からは同期ズレを検出できない。 |

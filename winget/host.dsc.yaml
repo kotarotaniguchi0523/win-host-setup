@@ -25,12 +25,6 @@ properties:
       settings: { id: ShiningLight.OpenSSL.Light, source: winget, version: '4.0.3' }
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: cloudflared
-      directives:
-        description: cloudflared (Cloudflare) — mise は検証 [none] のため winget
-      settings: { id: Cloudflare.cloudflared, source: winget, version: '2026.10.3' }
-
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: curl
       directives:
         description: curl (curl.se) — 手動 zip の古い 8.7.1 を置き換える（CVE 対応のため winget で管理）
@@ -47,13 +41,6 @@ properties:
       directives:
         description: Rustup (Rust Project)
       settings: { id: Rustlang.Rustup, source: winget, version: '1.29.2' }
-
-    # --- Official Store versions (explicit msstore) ---
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: ngrok-store
-      directives:
-        description: "ngrok — 公式 Microsoft Store 版 (publisher ngrok)"
-      settings: { id: 9MVS1J51GMK6, source: msstore }
 
     # --- Foundation (must be kept) ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage
