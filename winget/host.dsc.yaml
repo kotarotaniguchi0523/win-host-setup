@@ -84,6 +84,7 @@ properties:
 
     # --- GUI apps (mise 対象外 / winget ピン対象外) ---
     # T3 Code desktop (`T3Tools.T3Code`) は自己更新のため、ここにはピンしない。
-    # winget マニフェストは 0.0.45 だが実体は 0.1.0（公式サイト / GitHub Releases で導入）。
-    # ここに載せると 0.0.45 へダウングレードしかねないため、記録は winget-vs-mise.md §9 に置く。
-    # CLI 側 (`npm:t3` 0.1.0) は mise/mise.toml で管理する（同 §8.1）。
+    # winget マニフェストは 0.0.45 だが実体は 0.1.11（公式サイト / GitHub Releases で導入）。
+    # ここに載せると 0.0.45 へダウングレードしかねないため、例外は exceptions.tsv に登録し、
+    # tools/verify-host.ps1 が存在と Authenticode 署名（T3 Tools Inc）を確認する。
+    # CLI 側 (`npm:t3` 0.1.11) は mise/mise.toml で管理する（winget-vs-mise.md §8.1）。

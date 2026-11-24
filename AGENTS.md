@@ -41,6 +41,9 @@ Windows ホスト OS へのソフトウェア導入・更新では、**サプラ
 - **Chocolatey / Scoop は使わない**。
 - **グローバル導入は「宣言」にだけ置く**。CLI・ランタイムは mise（`~/.config/mise/config.toml`、このリポジトリでは `mise/mise.toml`）、
   mise で扱えない例外だけ winget（`winget/host.dsc.yaml`）。それ以外の場所に入れると「野良グローバル」として扱う。
+- **自己更新するベンダー配布は `exceptions.tsv` に例外として登録する**（`name<TAB>署名者<TAB>パス`）。
+  `tools/verify-host.ps1` が存在と Authenticode 署名を確認する。DSC に載せると古いマニフェストへ
+  ダウングレードしたり自己更新と競合するため（例: T3 Code desktop は T3 Tools Inc 署名）。
 - **野良は `pathctl audit` で検出する**（`npm -g` / `uv tool` / インストーラが足した PATH など）。
   見つけたら、mise に宣言するか、winget の DSC に入れるか、**SBX（Docker Sandboxes）で実行する**ように移す。
 - **mise にツールを足したら `mise lock --global`** を実行する（`locked = true` のため、ロックに無いツールは shim が解決できず失敗する）。

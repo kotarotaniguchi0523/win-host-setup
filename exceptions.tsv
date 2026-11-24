@@ -1,0 +1,5 @@
+# Approved self-updating vendor installs (AGENTS.md / docs/automation.md "例外").
+# One per line, TAB-separated: name<TAB>signer subject substring<TAB>path
+# tools/verify-host.ps1 requires the path to exist and to be Authenticode-signed by that signer,
+# so an exception cannot silently turn into an unsigned or replaced binary.
+T3 Code	T3 Tools Inc	%LOCALAPPDATA%\Programs\t3code\T3 Code (Beta).exe
