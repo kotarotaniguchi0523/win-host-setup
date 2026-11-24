@@ -47,7 +47,7 @@ properties:
       id: docker-desktop
       directives:
         description: Docker Desktop (Docker Inc.)
-      settings: { id: Docker.DockerDesktop, source: winget, version: '4.96.3' }
+      settings: { id: Docker.DockerDesktop, source: winget, version: '4.99.0' }
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: docker-sbx
@@ -59,7 +59,7 @@ properties:
       id: wsl
       directives:
         description: WSL (modern, Microsoft)
-      settings: { id: Microsoft.WSL, source: winget, version: '2.7.14.0' }
+      settings: { id: Microsoft.WSL, source: winget, version: '3.0.5.0' }
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: ubuntu
@@ -73,7 +73,7 @@ properties:
       id: powershell
       directives:
         description: PowerShell 7 (MSI, Microsoft Corporation)
-      settings: { id: Microsoft.PowerShell, source: winget, version: '7.6.8.0' }
+      settings: { id: Microsoft.PowerShell, source: winget, version: '7.7.0.0' }
 
     # --- APM: mise 不可（旧 pypi:apm-cli は既定 Python 3.15 で pyyaml の cp315 wheel が無い） ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage
