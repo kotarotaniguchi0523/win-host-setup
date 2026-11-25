@@ -16,16 +16,16 @@ dependencies:
     - vercel-labs/agent-browser#1cc19526f3641c8543d55aa6700e7c55b37ac356 # v0.43.0
     - yusukebe/ax#0ddd8a748ae2401ae344f536f6e8dded890fcdbf # v0.1.25
     # Japanese proofreading (rewrite AI-generated Japanese into natural Japanese)
-    - nanaism/yomiyasu#c49d5f1bee91258e33e1febc3569c6c87be7669e # v3.2.3
+    - nanaism/yomiyasu#8831b14a5c2c12d41096495f0b8fe52d46d390c6 # v3.3.0
     # Official Nushell skills (nushell org / nu_scripts)
     # No tags upstream, so this stays on a branch: APM updates it (`apm update`, or the
     # scheduled relock that re-resolves `main`). Renovate does not touch branch refs.
-    - nushell/nu_scripts#1e6533e8c316386f9576d7220a72ab05ce48c52a # main
+    - nushell/nu_scripts#9bd0c65b9eee45ee748bfba00b2ac50c2fb62c10 # main
     # Explanation / diagram skills (by mizchi). No tags upstream: same APM-managed branch ref.
     - mizchi/explainer#752da7c687e767c3efd8ea79f63c5f4f3d76e7b5 # main
     # Official Waza skills (Skill evaluation CLI operation / interaction)
-    - microsoft/waza/skills/waza#d537bf00d4d442a1935ceba2fbc664b9ccb497b2 # v0.41.0
-    - microsoft/waza/skills/waza-interactive#d537bf00d4d442a1935ceba2fbc664b9ccb497b2 # v0.41.0
+    - microsoft/waza/skills/waza#0dffb882834bedd3c798ca9d2917a2bf20b353cf # v0.42.0
+    - microsoft/waza/skills/waza-interactive#0dffb882834bedd3c798ca9d2917a2bf20b353cf # v0.42.0
 
 devDependencies:
   apm: []
