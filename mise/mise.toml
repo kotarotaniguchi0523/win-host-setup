@@ -21,7 +21,7 @@ jq                     = "1.8.2"
 "ubi:yusukebe/ax"      = "0.1.25"
 dotenvx                = "2.38.2"
 "npm:secretlint"       = "13.0.7"
-"npm:textlint"         = "15.8.0"
+"npm:textlint"         = "16.1.3"
 "npm:ctx7"             = "0.12.2"
 # agent-desktop: Vercel Labs のデスクトップ操作 CLI。npm は sha512 integrity + SLSA provenance、
 # 実バイナリ（win32-x64 ほか）は同梱で postinstall が link するため allow_builds を許可する。
