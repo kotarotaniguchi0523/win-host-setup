@@ -1,9 +1,9 @@
-# verify-host.ps1 - Verify that this host matches the repository's pinned state
+﻿# verify-host.ps1 - Verify that this host matches the repository's pinned state
 # Usage: pwsh -File tools/verify-host.ps1 [-Report <path>] [-SkipNetwork] [-SkipWinget] [-Quiet]
 # Exit: 0 = ok / 1 = drift / 2 = error
 #
 # Checks:
-#   mise-missing    : every pinned tool is installed (mise ls --missing)
+#   mise-missing    : every pinned global tool is installed (mise ls --missing --global)
 #   mise-config     : ~/.config/mise/{config.toml,mise.lock} match mise/
 #   mise-pins       : installed versions match every pin (all array elements, e.g. node/python)
 #   mise-self-shim  : ~/.local/share/mise/shims/mise.exe must not exist (recursive shim breaks all shims)
@@ -78,7 +78,7 @@ try {
     # --- 1. mise: missing tools -------------------------------------------------
     $missingTools = @()
     try {
-        $missingTools = @(& mise ls --missing 2>$null | Where-Object { $_ -match '\(missing\)' } | ForEach-Object { $_.Trim() })
+        $missingTools = @(& mise ls --missing --global 2>$null | Where-Object { $_ -match '\(missing\)' } | ForEach-Object { $_.Trim() })
         if ($missingTools.Count -eq 0) { Add-Check 'mise-missing' 'ok' '0' }
         else {
             $drift.miseMissing = $missingTools
