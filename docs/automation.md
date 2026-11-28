@@ -83,7 +83,7 @@ Skillsのロック更新は `skills/apm.yml` の変更だけで起動します�
 | **自己更新アプリ**（T3 Code desktop） | ベンダー配布で自己更新する。DSC に入れると古いマニフェストへダウングレードするため、`exceptions.tsv` に登録し、`verify-host` が存在と Authenticode 署名（T3 Tools Inc）を確認する。CLI は mise `npm:t3`。 |
 | **`#main` の2件**（`nushell/nu_scripts` / `mizchi/explainer`） | 上流にタグが無い。Renovate は追えないので **APM 管理**（`apm update` で lock を再解決）。許可リストは `lint-pins.py` の `APM_BRANCH_REF_ALLOW`。 |
 | **自己更新 CLI**（`t3 update` / `opencode upgrade` / `uv self update` など） | mise の外に実体を作る。`pathctl audit` で検出できるが `verify` には未組み込み。 |
-| **Antigravity CLI**（`agy` / winget portable 1.5.18） | DSC にはピンするが、バイナリ自身が自己更新する（`AGY_CLI_DISABLE_AUTO_UPDATE` で停止可）。winget の ARP 版は 1.5.18 のままなので `winget configure test` では検出できず、実版は `agy --version` で確認する。DSC 再適用で 1.5.18 に戻ることはない（portable は版メタデータのみ比較）。 |
+| **Antigravity CLI**（`agy` / winget portable 1.5.18） | 既定で自己更新するため、**User 環境変数 `AGY_CLI_DISABLE_AUTO_UPDATE=1` で上流の更新を止める**（`tools/apply.ps1` が設定し、`verify-host` の `agy-self-update` が検査）。更新は winget（Renovate → PR → DSC）だけを通す。winget の ARP 版は 1.5.18 のままなので実版は `agy --version` で確認する。 |
 | **source → public の同期** | `tools/sync.ps1` が唯一の経路。source は remote を持たないため、CI からは同期ズレを検出できない。 |
 
 ## 運用ルール（1行）

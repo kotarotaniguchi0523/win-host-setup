@@ -44,6 +44,9 @@ Windows ホスト OS へのソフトウェア導入・更新では、**サプラ
 - **自己更新するベンダー配布は `exceptions.tsv` に例外として登録する**（`name<TAB>署名者<TAB>パス`）。
   `tools/verify-host.ps1` が存在と Authenticode 署名を確認する。DSC に載せると古いマニフェストへ
   ダウングレードしたり自己更新と競合するため（例: T3 Code desktop は T3 Tools Inc 署名）。
+- **上流の自己更新を切れるなら、切って「宣言だけが更新経路」にする**（例外登録より優先）。
+  例: `agy` は `AGY_CLI_DISABLE_AUTO_UPDATE=1` を User 環境変数で固定し、`tools/apply.ps1` が設定、
+  `tools/verify-host.ps1` の `agy-self-update` が検査する。止められない場合だけ上の例外登録を使う。
 - **野良は `pathctl audit` で検出する**（`npm -g` / `uv tool` / インストーラが足した PATH など）。
   見つけたら、mise に宣言するか、winget の DSC に入れるか、**SBX（Docker Sandboxes）で実行する**ように移す。
 - **mise にツールを足したら `mise lock --global`** を実行する（`locked = true` のため、ロックに無いツールは shim が解決できず失敗する）。

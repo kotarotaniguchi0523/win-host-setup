@@ -4,6 +4,7 @@
 #  - mise/mise.lock  -> copy to ~/.config/mise/mise.lock
 #  - mise/locks/     -> copy to ~/.config/mise/locks/ (pypi dependency graph)
 #  - install missing tools with mise install
+#  - set self-update guard env vars (AGY_CLI_DISABLE_AUTO_UPDATE=1)
 # Note: existing config / lock are backed up with a timestamp
 
 [CmdletBinding()]
@@ -62,6 +63,18 @@ if (Test-Path $shellSrc) {
 if (Get-Command nu -ErrorAction SilentlyContinue) {
     & nu -c 'mise activate nu' | Set-Content (Join-Path $shellDst 'autoload\mise.nu') -Encoding UTF8
     Write-Host '[ok] shell/nushell/autoload/mise.nu（再生成）'
+}
+
+# --- self-update guards (declaration → User environment) ---
+# pin は「更新経路がパッケージマネージャだけ」のときだけ意味を持つ。自己更新する CLI は
+# 上流の更新を環境変数で止める（tools/verify-host.ps1 の `agy-self-update` が同じ値を検査する）。
+$selfUpdateGuards = [ordered]@{ 'AGY_CLI_DISABLE_AUTO_UPDATE' = '1' }   # agy (Google.AntigravityCLI)
+foreach ($name in $selfUpdateGuards.Keys) {
+    $want = $selfUpdateGuards[$name]
+    if ([Environment]::GetEnvironmentVariable($name, 'User') -ne $want) {
+        [Environment]::SetEnvironmentVariable($name, $want, 'User')
+        Write-Host "[ok] $name=$want（User 環境変数）"
+    }
 }
 
 Write-Host "`n--- mise install ---"
