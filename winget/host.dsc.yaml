@@ -83,6 +83,18 @@ properties:
         description: APM - Agent Package Manager CLI (Microsoft Corporation) — Skills 配布に使用（winget-vs-mise.md §6 / §10）
       settings: { id: Microsoft.APM, source: winget, version: '0.35.0' }
 
+    # --- AI CLI: Google Antigravity CLI (`agy`) ---
+    # 公式配布は GCS（storage.googleapis.com/antigravity-public）の単体 exe。winget マニフェストは
+    # 同じ URL + SHA256 を記録した portable で、実物の Authenticode は CN=Google LLC で Valid（2026-11-28 実測）。
+    # mise github バックエンドでも同一バイナリ（zip 内 antigravity.exe）を取れるが、`mise tool` の
+    # Security は [none]（署名未検証）でコマンド名も `agy` にならないため winget を採用（AUDIT.md §3）。
+    # バイナリ自身が自己更新するため、実行版が pin より進むことがある（docs/automation.md 例外表）。
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: antigravity-cli
+      directives:
+        description: Google Antigravity CLI (`agy`, portable, Google LLC 署名・自己更新あり)
+      settings: { id: Google.AntigravityCLI, source: winget, version: '1.5.18' }
+
     # --- GUI apps (mise 対象外 / winget ピン対象外) ---
     # T3 Code desktop (`T3Tools.T3Code`) は自己更新のため、ここにはピンしない。
     # winget マニフェストは 0.0.45 だが実体は 0.1.11（公式サイト / GitHub Releases で導入）。

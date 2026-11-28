@@ -12,6 +12,7 @@
 | Docker Desktop | winget `Docker.DockerDesktop`（msstore に `XP8CBJ40XLBWKX` あり） | ⚠️ 候補だが **sbx データ依存のため非推奨** |
 | Python | mise `3.14.8`（msstore は 3.13 のみ） | ✅ mise が正当（Attestation＋固定） |
 | mise / git / openssl / cloudflared / fd | msstore に無し | — |
+| Antigravity CLI (`agy`) | msstore に CLI 無し（`Antigravity Nexus` は別物）／ npm は第三者名義の 0.0.1 のみ | winget（portable）で採用 |
 
 > 「MSIX/EXE/MSI の形式だけで安全性を判断しない」→ 発行元（Publisher）を `winget show` で確認した（下表 Rule 3）。
 
@@ -61,6 +62,7 @@
 | fd | sharkdp.fd | sharkdp | SHA256 |
 | docker | Docker.DockerDesktop | Docker Inc. | SHA256 |
 | sbx | Docker.sbx | Docker Inc. | SHA256 |
+| antigravity-cli (`agy`) | Google.AntigravityCLI | Google | SHA256（portable / マニフェスト記載値と実物一致）＋ **Authenticode: Valid, CN=Google LLC**（2026-11-28 実測） |
 
 ## 4. 検出した違反と修正
 
