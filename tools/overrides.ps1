@@ -11,7 +11,8 @@
 #   package is updated. Re-run this script after tools/update-winget-dsc.ps1.
 #
 # Managed overrides (source: winget/host.dsc.yaml):
-#   curl <- cURL.cURL   (Windows ships an older curl.exe in System32)
+#   （現在は登録なし。curl は OS 標準の System32\curl.exe（Microsoft 署名）を使う。
+#     以前は cURL.cURL をここへコピーして System32 より新しい版を優先していた）
 
 [CmdletBinding()]
 param(
@@ -22,13 +23,7 @@ $ErrorActionPreference = 'Stop'
 $repo      = Split-Path $PSScriptRoot -Parent
 $backupDir = Join-Path $repo '.agent'   # host-specific data stays out of git
 
-$overrides = @(
-    [pscustomobject]@{
-        id      = 'cURL.cURL'
-        pattern = 'curl-*win64*'
-        files   = @('curl.exe', 'libcurl-x64.dll', 'curl-ca-bundle.crt')
-    }
-)
+$overrides = @()
 
 function Find-Bin([string]$id, [string]$pattern) {
     $roots = @(
@@ -110,10 +105,4 @@ if ($pathChanged) {
     Write-Host "[ok] Machine PATH を更新（$OverrideDir を先頭に追加）" -ForegroundColor Green
 }
 
-$curl = Join-Path $OverrideDir 'curl.exe'
-if (Test-Path $curl) {
-    Write-Host "`n=== 検証 ===" -ForegroundColor Yellow
-    Write-Host "  $(& $curl --version | Select-Object -First 1)"
-    Write-Host "  新しいシェルで  where.exe curl.exe  →  $OverrideDir\curl.exe"
-}
 Write-Host "`n新しいシェル（またはサインアウト/イン）から反映されます。"
