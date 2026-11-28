@@ -67,13 +67,14 @@ properties:
         description: Ubuntu (Canonical, Store MSIX)
       settings: { id: Canonical.Ubuntu, source: winget, version: '2604.1.75.0' }
 
-    # --- PowerShell: using the MSI (winget, official Microsoft) ---
-    # Alternative: msstore 9MZ1SNWT0N5D (publisher: Microsoft Corporation). Switching is separate and careful since it is the running shell.
+    # --- PowerShell: official Microsoft Store package (msstore) ---
+    # Store 版（publisher: Microsoft Corporation）が実体で、MSI は 2026-10-15 に削除済み。
+    # msstore はバージョン固定できないが、Store が更新するため比較対象外（AGENTS.md ①）。
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: powershell
       directives:
-        description: PowerShell 7 (MSI, Microsoft Corporation)
-      settings: { id: Microsoft.PowerShell, source: winget, version: '7.7.0.0' }
+        description: PowerShell 7 (Microsoft Store, Microsoft Corporation)
+      settings: { id: 9MZ1SNWT0N5D, source: msstore }
 
     # --- APM: mise 不可（旧 pypi:apm-cli は既定 Python 3.15 で pyyaml の cp315 wheel が無い） ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage

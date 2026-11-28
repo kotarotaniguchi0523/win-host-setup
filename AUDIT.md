@@ -7,7 +7,7 @@
 | 対象 | 現状 | 判定 |
 |---|---|---|
 | **ngrok** | **msstore** `9MVS1J51GMK6`（3.39.9-msix） | ✅ 移行済み |
-| PowerShell | winget `Microsoft.PowerShell` 7.6.6（msstore に `9MZ1SNWT0N5D` あり） | ⚠️ **候補** |
+| PowerShell | **msstore** `9MZ1SNWT0N5D`（Store 版を採用。MSI は 2026-10-15 に削除） | ✅ **採用** |
 | Ubuntu | winget `Canonical.Ubuntu`（msstore に `9PDXGNCFSCZV` あり） | ⚠️ **候補** |
 | Docker Desktop | winget `Docker.DockerDesktop`（msstore に `XP8CBJ40XLBWKX` あり） | ⚠️ 候補だが **sbx データ依存のため非推奨** |
 | Python | mise `3.14.8`（msstore は 3.13 のみ） | ✅ mise が正当（Attestation＋固定） |
@@ -133,7 +133,7 @@
 | sbx | Docker.sbx | Docker Inc. |
 | WSL | Microsoft.WSL | Microsoft |
 | Ubuntu | Canonical.Ubuntu | Canonical |
-| PowerShell | Microsoft.PowerShell | Microsoft Corporation |
+| PowerShell | 9MZ1SNWT0N5D | Microsoft Corporation |
 
 ### 7.3 winget（`msstore` ソース）
 
