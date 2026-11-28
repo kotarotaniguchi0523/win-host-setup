@@ -1,0 +1,7 @@
+# betterleaks config (v1 schema). Loaded explicitly by tools/lint/secrets.ps1 with `-c`.
+#
+# mise/locks/** は aube が生成する npm の依存グラフで、パッケージ名・版・integrity しか含まない。
+# 依存パッケージ名が "password" のとき generic-password が版番号を誤検知するため、
+# 生成物ディレクトリは走査対象から外す（人が書いたファイルは従来どおり全走査）。
+[allowlist]
+paths = ['''mise/locks/''']
