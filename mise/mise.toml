@@ -50,6 +50,9 @@ npm = "12.2.3"
 "npm:t3" = "0.1.11"
 "go:golang.org/x/tools/gopls" = "v0.24.0"
 "github:init-co-jp/diff-tour" = "v0.7.0"
+# obscura: AI エージェント向けヘッドレスブラウザ（mac-host-setup と同じ github バックエンド）。
+# 上流に checksums.txt は無いが、GitHub Releases の asset digest（sha256）を lock に固定して検証する。
+"github:h4ckf0r0day/obscura" = { version = "v0.2.7", platforms = { windows-x64 = { asset_pattern = "obscura-x86_64-windows.zip" } } }
 
 [settings]
 paranoid            = true
