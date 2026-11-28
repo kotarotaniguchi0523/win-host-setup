@@ -31,7 +31,6 @@ nushell                = "0.117.0"
 "npm:openclaw"         = "2026.11.6"
 herdr                  = "v0.9.5"
 pi                     = "v1.6.0"
-rust                   = "1.100.0"
 # rust-analyzer: winget `Rustlang.rust-analyzer` で管理（aqua 版は Security [none] のため。winget-vs-mise.md §3）
 npm = "12.2.3"
 # SkillSpector: yara-python 4.5.4 は cp314/cp315 の wheel が無い → このツールのみ Python 3.13.16 で構築（インストール済・動作確認待ち）
@@ -53,6 +52,9 @@ npm = "12.2.3"
 # obscura: AI エージェント向けヘッドレスブラウザ（mac-host-setup と同じ github バックエンド）。
 # 上流に checksums.txt は無いが、GitHub Releases の asset digest（sha256）を lock に固定して検証する。
 "github:h4ckf0r0day/obscura" = { version = "v0.2.7", platforms = { windows-x64 = { asset_pattern = "obscura-x86_64-windows.zip" } } }
+# APM: GitHub Releases の Windows zip（上流に .sha256 あり）を checksum 検証つきで導入する。
+# winget の EXE は Authenticode 未署名だったため、発行元が検証できるこの経路へ移行した。
+"github:microsoft/apm" = { version = "v0.39.1", platforms = { windows-x64 = { asset_pattern = "apm-windows-x86_64.zip" } } }
 
 [settings]
 paranoid            = true

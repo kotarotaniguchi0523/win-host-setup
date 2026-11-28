@@ -63,13 +63,6 @@ properties:
         description: PowerShell 7 (Microsoft Store, Microsoft Corporation)
       settings: { id: 9MZ1SNWT0N5D, source: msstore }
 
-    # --- APM: mise 不可（旧 pypi:apm-cli は既定 Python 3.15 で pyyaml の cp315 wheel が無い） ---
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: apm
-      directives:
-        description: APM - Agent Package Manager CLI (Microsoft Corporation) — Skills 配布に使用（winget-vs-mise.md §6 / §10）
-      settings: { id: Microsoft.APM, source: winget, version: '0.35.0' }
-
     # --- AI CLI: Google Antigravity CLI (`agy`) ---
     # 公式配布は GCS（storage.googleapis.com/antigravity-public）の単体 exe。winget マニフェストは
     # 同じ URL + SHA256 を記録した portable で、実物の Authenticode は CN=Google LLC で Valid（2026-11-28 実測）。
