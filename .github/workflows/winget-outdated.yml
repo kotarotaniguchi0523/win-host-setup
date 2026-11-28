@@ -40,10 +40,10 @@ jobs:
         if: ${{ steps.dsc-diff.outputs.changed == 'true' }}
         shell: pwsh
         env:
-          APP_CLIENT_ID: ${{ vars.RELOCK_APP_CLIENT_ID }}${{ secrets.RELOCK_APP_CLIENT_ID }}
+          APP_CLIENT_ID: ${{ vars.RELOCK_APP_CLIENT_ID || secrets.RELOCK_APP_CLIENT_ID }}
           APP_PRIVATE_KEY: ${{ secrets.RELOCK_APP_PRIVATE_KEY }}
         run: |
-          if [string]::IsNullOrWhiteSpace($env:APP_CLIENT_ID) -or [string]::IsNullOrWhiteSpace($env:APP_PRIVATE_KEY) {
+          if ([string]::IsNullOrWhiteSpace($env:APP_CLIENT_ID) -or [string]::IsNullOrWhiteSpace($env:APP_PRIVATE_KEY)) {
             Write-Host '::error::RELOCK_APP_CLIENT_ID / RELOCK_APP_PRIVATE_KEY が未設定のため App トークンを発行できません。Settings → Environments → relock に GitHub App の Client ID と秘密鍵を設定してください。'
             exit 1
           }
