@@ -58,6 +58,17 @@ jobs:
           else
             echo 'changed=true' >> "$GITHUB_OUTPUT"
           fi
+      - name: App 認証情報の有無を確認（fail fast）
+        if: ${{ steps.lock-diff.outputs.changed == 'true' }}
+        shell: bash
+        env:
+          APP_CLIENT_ID: ${{ vars.RELOCK_APP_CLIENT_ID }}${{ secrets.RELOCK_APP_CLIENT_ID }}
+          APP_PRIVATE_KEY: ${{ secrets.RELOCK_APP_PRIVATE_KEY }}
+        run: |
+          if [ -z "${APP_CLIENT_ID//[[:space:]]/}" ] || [ -z "${APP_PRIVATE_KEY//[[:space:]]/}" ]; then
+            echo '::error::RELOCK_APP_CLIENT_ID / RELOCK_APP_PRIVATE_KEY が未設定のため App トークンを発行できません。Settings → Environments → relock に GitHub App の Client ID と秘密鍵を設定してください。'
+            exit 1
+          fi
       - name: push 用の App トークンを取得
         id: app-token
         if: ${{ steps.lock-diff.outputs.changed == 'true' }}
