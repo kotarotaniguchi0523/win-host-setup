@@ -55,17 +55,19 @@ properties:
         description: Docker Sandboxes / sbx (Docker Inc.) — sandboxes\ のデータは保持
       settings: { id: Docker.sbx, source: winget, version: '0.49.2' }
 
+    # --- Official Store packages (explicit msstore) ---
+    # WSL: カーネルのセキュリティ修正が頻繁なため、Store 自動更新に任せる（AGENTS.md ①）。
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: wsl
       directives:
-        description: WSL (modern, Microsoft)
-      settings: { id: Microsoft.WSL, source: winget, version: '3.0.5.0' }
+        description: WSL (Microsoft Store, Microsoft Corp.)
+      settings: { id: 9P9TQF7MRM4R, source: msstore }
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: ubuntu
       directives:
-        description: Ubuntu (Canonical, Store MSIX)
-      settings: { id: Canonical.Ubuntu, source: winget, version: '2604.1.75.0' }
+        description: Ubuntu (Microsoft Store, Canonical Group Limited)
+      settings: { id: 9PDXGNCFSCZV, source: msstore }
 
     # --- PowerShell: official Microsoft Store package (msstore) ---
     # Store 版（publisher: Microsoft Corporation）が実体で、MSI は 2026-10-15 に削除済み。
