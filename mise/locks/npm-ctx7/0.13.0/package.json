@@ -2,6 +2,6 @@
   "name": "mise-npm-install",
   "private": true,
   "dependencies": {
-    "openclaw": "2026.11.6"
+    "ctx7": "0.13.0"
   }
 }
