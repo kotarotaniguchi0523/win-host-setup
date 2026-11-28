@@ -9,16 +9,16 @@ importers:
   .:
     dependencies:
       t3:
-        specifier: 0.1.11
-        version: 0.1.11
+        specifier: 0.1.12
+        version: 0.1.12
 
 packages:
 
-  t3@0.1.11:
-    resolution: {integrity: sha512-LwGw1MBUrKJfqjTl/75QpAPbD3TBoyyPA8NgNrQh0yb0cQHGzoOBYuHcZa17rRcbLAULGCf9Bn/9ntEYUmxlLw==}
+  t3@0.1.12:
+    resolution: {integrity: sha512-qVERRybGKGgFNbuFyYy51VrvAXTJouUG1akOexjFOntGlTNLZ9b8nlSnx+0V4j7ywBXY4SIycRNcsOjjFjPhIQ==}
     engines: {node: '>=20.11'}
     hasBin: true
 
 snapshots:
 
-  t3@0.1.11: {}
+  t3@0.1.12: {}
