@@ -21,12 +21,6 @@ properties:
         description: Git (The Git Development Community)
       settings: { id: Git.Git, source: winget, version: '2.55.0.5' }
 
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: rustup
-      directives:
-        description: Rustup (Rust Project)
-      settings: { id: Rustlang.Rustup, source: winget, version: '1.29.2' }
-
     # --- Foundation (must be kept) ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: docker-desktop
