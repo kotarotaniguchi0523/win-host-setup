@@ -2,6 +2,8 @@
 
 実施: 2026-10-15 / 対象: Windows ホストのグローバル導入 / 根拠: `AGENTS.md`
 
+> 最終更新: 2026-11-28（curl は OS 標準へ / fd・OpenSSL・Rust を削除 / APM は mise の `github:microsoft/apm` へ / npm installer は aube / msstore は PowerShell・WSL・Ubuntu の 3 件）
+
 ## 1. Rule 1: 公式 Microsoft Store 版を優先
 
 | 対象 | 現状 | 判定 |

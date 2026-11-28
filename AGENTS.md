@@ -8,6 +8,8 @@ Windows ホスト OS へのソフトウェア導入・更新では、**サプラ
    - 開発元自身が公開した正規パッケージであることを確認する。
    - WinGet の `msstore` ソースを明示的に使用する。
    - MSIX・EXE・MSI の形式だけで安全性を判断しない。
+   - **Store に掲載があっても、配布物が Win32/MSI なら msstore にしない**（版を固定できず、MSIX の利点も無い）。
+     実体が MSIX のときだけ msstore を使う。例: Docker Desktop の Store 掲載 `XP8CBJ40XLBWKX` は Win32 配布なので winget pin。
 
 2. **開発用 CLI では mise/aqua の検証能力を比較する。**
    - Cosign、SLSA provenance、GitHub Artifact Attestations などによる真正性検証が**実際に利用できる場合**、mise/aqua を優先候補とする。

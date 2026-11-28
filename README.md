@@ -21,7 +21,7 @@ Windows ホストの**グローバル導入**を宣言ファイルで管理し�
 | **winget** | mise / Git / Docker Desktop / Docker sbx | `winget/host.dsc.yaml`（厳密 pin・自己更新 OFF） |
 | **例外** | T3 Code desktop | `exceptions.tsv`（`verify-host` が Authenticode 署名を確認） |
 
-備考: `curl` は **OS 標準（System32 / Microsoft 署名）** を使う。`fd` / `OpenSSL` / Rust は管理対象外。
+備考: `curl` は **OS 標準（System32 / Microsoft 署名）** を使う。`Docker Desktop` は Store 掲載（`XP8CBJ40XLBWKX`）もあるが、配布物は Win32 インストーラー（MSIX ではない）ため winget pin 側で宣言している。
 
 ## ファイル
 
