@@ -96,10 +96,10 @@ url = "https://github.com/jdx/jactionlint/releases/download/v2.6.0/jactionlint_2
 url_api = "https://api.github.com/repos/jdx/jactionlint/releases/assets/740516065"
 provenance = "github-attestations"
 
-[[tools."go:github.com/sisaku-security/sisakulint/cmd/sisakulint"]]
-version = "0.4.0"
-backend = "go:github.com/sisaku-security/sisakulint/cmd/sisakulint"
-specifiers = ["v0.4.0"]
+[[tools."go:github.com/gh-intel/sisakulint/cmd/sisakulint"]]
+version = "0.4.1"
+backend = "go:github.com/gh-intel/sisakulint/cmd/sisakulint"
+specifiers = ["v0.4.1"]
 
 [[tools.hk]]
 version = "2.14.0"

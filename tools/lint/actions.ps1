@@ -10,15 +10,12 @@
 #   pinact     ... verify that every uses: is pinned to a full commit SHA (tag kept as a comment)
 
 [CmdletBinding()]
-param([switch]$Fix)
+param([switch]$Fix, [string]$SarifPath)
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot '..\lib\common.ps1')
 
 $repo = Get-RepoRoot
 
-# sisakulint v0.3.8 does not yet recognize GitHub's parallel/cache-mode syntax.
-# jactionlint checks workflow syntax; keep all other sisakulint security rules on.
-# The wrapper resolves a ghtkn token when available (see sisakulint.ps1).
 $sisaku = Join-Path $PSScriptRoot 'sisakulint.ps1'
 
 Push-Location $repo
@@ -45,19 +42,10 @@ try {
     # --- sisakulint (extra SAST) ---
     if (-not (Get-Command sisakulint -ErrorAction SilentlyContinue)) { throw 'sisakulint が見つかりません（mise install）' }
     Write-Host '=== sisakulint ===' -ForegroundColor Cyan
-    if ($Fix) {
-        & $sisaku -Fix
-        if ($LASTEXITCODE -ne 0) { $failed = $true }
-    } else {
-        $out = & $sisaku 2>&1 | Out-String
-        $findings = @($out -split "`n" | Where-Object { $_ -match ':\d+:\d+:' })
-        if ($findings.Count -gt 0) {
-            $findings | ForEach-Object { Write-Host $_.Trim() }
-            Write-Warning "sisakulint: $($findings.Count) 件の指摘（-Fix で自動修正できます）"
-            $failed = $true
-        } else {
-            Write-Host '[ok] sisakulint'
-        }
+    & $sisaku -Fix:$Fix -SarifPath $SarifPath
+    if ($LASTEXITCODE -ne 0) {
+        $failed = $true
+        Write-Warning "sisakulint failed with exit code $LASTEXITCODE"
     }
 
     # --- pinact: every uses: must be pinned to a full commit SHA (the tag stays as a comment) ---
