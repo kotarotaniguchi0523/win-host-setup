@@ -39,6 +39,28 @@ foreach ($rel in $files) {
     $changed += $rel
 }
 
+# mise/locks/（aube の依存グラフ）はディレクトリごと同期する。
+# これが漏れると、relock 後もホストが古い依存グラフのままになる。
+$locksSrc = Join-Path $From 'mise/locks'
+$locksDst = Join-Path $repo 'mise/locks'
+if (Test-Path $locksSrc) {
+    $tree = {
+        param($root)
+        @(Get-ChildItem $root -Recurse -File | Sort-Object FullName | ForEach-Object {
+            $_.FullName.Substring($root.Length) + ':' + (Get-FileHash $_.FullName -Algorithm SHA256).Hash
+        }) -join "`n"
+    }
+    $sameLocks = (Test-Path $locksDst) -and ((& $tree $locksDst) -eq (& $tree $locksSrc))
+    if ($sameLocks) {
+        Write-Host '[=] mise/locks'
+    } else {
+        if (Test-Path $locksDst) { Remove-Item $locksDst -Recurse -Force }
+        Copy-Item $locksSrc $locksDst -Recurse -Force
+        Write-Host '[ok] mise/locks を取り込み'
+        $changed += 'mise/locks'
+    }
+}
+
 if ($changed.Count -eq 0) { Write-Host '[i] 取り込む変更はありません'; return }
 
 Write-Host "`n取り込み: $($changed.Count) 件"

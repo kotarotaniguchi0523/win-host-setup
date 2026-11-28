@@ -6,6 +6,7 @@
 #   mise-missing    : every pinned tool is installed (mise ls --missing)
 #   mise-config     : ~/.config/mise/{config.toml,mise.lock} match mise/
 #   mise-pins       : installed versions match every pin (all array elements, e.g. node/python)
+#   mise-self-shim  : ~/.local/share/mise/shims/mise.exe must not exist (recursive shim breaks all shims)
 #   declarations    : source and public agree on the declaration/lock files
 #   skills-files    : every deployed_files entry in skills/apm.lock.yaml exists
 #   skills-skillmd  : every deployed skill directory has SKILL.md with a frontmatter name
@@ -135,6 +136,18 @@ try {
         }
     } catch {
         Add-Check 'mise-pins' 'ng' $_.Exception.Message
+    }
+
+    # --- 3.5 mise self-shim -----------------------------------------------------
+    # `mise install` / `mise reshim` regenerates shims\mise.exe. Since the shims directory comes
+    # before the winget mise.exe in PATH, that shim makes `mise` invoke itself and every shim
+    # fails with "recursive shim invocation detected". tools/apply.ps1 removes it after install.
+    $selfShim = Join-Path $env:LOCALAPPDATA 'mise\shims\mise.exe'
+    if (Test-Path $selfShim) {
+        Add-Check 'mise-self-shim' 'ng' 'shims\mise.exe が存在（mise が再帰して全シムが壊れる）'
+        $actions.Add('shims\mise.exe を削除してから mise install を再実行（apply.ps1 が自動削除）')
+    } else {
+        Add-Check 'mise-self-shim' 'ok' 'なし'
     }
 
     # --- 4. declarations: source and public agree -------------------------------

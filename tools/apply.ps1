@@ -85,6 +85,15 @@ if ($LASTEXITCODE -ne 0) {
     & mise install
 }
 
+# mise は自分自身の shim（shims\mise.exe）を作るが、shims が PATH で winget の実体より前にあるため
+# `mise` が自分を再帰呼び出しして全シムが "recursive shim invocation" で壊れる。
+# install / reshim の直後に必ず削除する（mise 実体は winget 側の mise.exe を使う）。
+$selfShim = Join-Path $env:LOCALAPPDATA 'mise\shims\mise.exe'
+if (Test-Path $selfShim) {
+    Remove-Item $selfShim -Force
+    Write-Host '[ok] 自己再帰を避けるため shims\mise.exe を削除'
+}
+
 Write-Host "`n次の手順:"
 Write-Host "  winget configure winget/host.dsc.yaml"
 Write-Host "  tools/overrides.ps1 -Apply     # Windows 同梱コマンドの上書き（管理者で実行）"
