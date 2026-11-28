@@ -88,7 +88,8 @@ properties:
     # 同じ URL + SHA256 を記録した portable で、実物の Authenticode は CN=Google LLC で Valid（2026-11-28 実測）。
     # mise github バックエンドでも同一バイナリ（zip 内 antigravity.exe）を取れるが、`mise tool` の
     # Security は [none]（署名未検証）でコマンド名も `agy` にならないため winget を採用（AUDIT.md §3）。
-    # バイナリ自身が自己更新するため、実行版が pin より進むことがある（docs/automation.md 例外表）。
+    # バイナリは既定で自己更新するため、User 環境変数 `AGY_CLI_DISABLE_AUTO_UPDATE=1` で上流の更新を止め、
+    # 更新経路を winget（Renovate → PR → DSC）だけに限定する。設定は verify-host の `agy-self-update` が検査する。
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: antigravity-cli
       directives:

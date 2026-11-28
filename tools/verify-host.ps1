@@ -290,6 +290,26 @@ try {
         }
     }
 
+    # --- 7.5 self-update guards -------------------------------------------------
+    # pin は「更新経路がパッケージマネージャだけ」のときだけ意味を持つ。自己更新する CLI は
+    # 環境変数で上流の更新を止め、その設定が残っているかをここで検査する（docs/automation.md 例外表）。
+    $dscText = if (Test-Path $dscPath) { Get-Content $dscPath -Raw -Encoding UTF8 } else { '' }
+    $selfUpdateGuards = @(
+        [pscustomobject]@{ name = 'agy-self-update'; id = 'Google.AntigravityCLI'; env = 'AGY_CLI_DISABLE_AUTO_UPDATE' }
+    )
+    foreach ($guard in $selfUpdateGuards) {
+        if ($dscText -notmatch [regex]::Escape($guard.id)) { continue }
+        $value = [Environment]::GetEnvironmentVariable($guard.env, 'User')
+        if ($value -eq '1') {
+            Add-Check $guard.name 'ok' ("{0}=1" -f $guard.env)
+        } else {
+            if (-not $drift.Contains('selfUpdateGuards')) { $drift.selfUpdateGuards = @() }
+            $drift.selfUpdateGuards += $guard.env
+            Add-Check $guard.name 'ng' ("{0} が未設定（自己更新が有効なまま = pin が効かない）" -f $guard.env)
+            $actions.Add(("[Environment]::SetEnvironmentVariable('{0}','1','User') で自己更新を止める" -f $guard.env))
+        }
+    }
+
     # --- 8. git -----------------------------------------------------------------
     if (-not $SkipNetwork) {
         & git -C (Join-Path $repo 'public') fetch --prune 2>$null | Out-Null
