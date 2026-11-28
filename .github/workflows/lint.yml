@@ -61,10 +61,12 @@ jobs:
       - uses: ./.github/actions/mise-setup
         with:
           cache: true
-          install_args: github:jdx/jactionlint go:github.com/sisaku-security/sisakulint/cmd/sisakulint pinact shellcheck
+          install_args: github:jdx/jactionlint go:github.com/gh-intel/sisakulint/cmd/sisakulint pinact shellcheck
       - name: Lint
         shell: pwsh
-        run: ./tools/lint/actions.ps1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: ./tools/lint/actions.ps1 -SarifPath sisakulint.sarif
       - name: SARIF（sisakulint）
         if: ${{ always() && hashFiles('sisakulint.sarif') != '' }}
         continue-on-error: true

@@ -11,7 +11,7 @@
 # binary) instead, so CI installs no Node.js runtime and no npm packages.
 [tools]
 "github:jdx/jactionlint"                = "v2.6.0"
-"go:github.com/sisaku-security/sisakulint/cmd/sisakulint" = "v0.4.0"
+"go:github.com/gh-intel/sisakulint/cmd/sisakulint" = "v0.4.1"
 hk                                  = { version = "2.14.0", lazy = true }  # local git hooks only (not installed in CI)
 betterleaks                         = "v1.10.1"
 pinact                              = "5.0.2"
