@@ -57,9 +57,7 @@
 |---|---|---|---|
 | mise | jdx.mise | jdx | SHA256 |
 | git | Git.Git | The Git Development Community | SHA256 + Authenticode(OS) |
-| openssl | ShiningLight.OpenSSL.Light | Shining Light Productions | SHA256 |
 | cloudflared | Cloudflare.cloudflared | cloudflare | SHA256 |
-| fd | sharkdp.fd | sharkdp | SHA256 |
 | docker | Docker.DockerDesktop | Docker Inc. | SHA256 |
 | sbx | Docker.sbx | Docker Inc. | SHA256 |
 | antigravity-cli (`agy`) | Google.AntigravityCLI | Google | SHA256（portable / マニフェスト記載値と実物一致）＋ **Authenticode: Valid, CN=Google LLC**（2026-11-28 実測） |
@@ -127,9 +125,7 @@
 |---|---|---|
 | mise | jdx.mise | jdx |
 | git | Git.Git | The Git Development Community |
-| openssl | ShiningLight.OpenSSL.Light | Shining Light Productions |
 | cloudflared | Cloudflare.cloudflared | cloudflare |
-| fd | sharkdp.fd | sharkdp |
 | rustup | Rustlang.Rustup | Rust Project |
 | docker | Docker.DockerDesktop | Docker Inc. |
 | sbx | Docker.sbx | Docker Inc. |

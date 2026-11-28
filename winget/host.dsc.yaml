@@ -19,24 +19,6 @@ properties:
       settings: { id: Git.Git, source: winget, version: '2.55.0.5' }
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: openssl
-      directives:
-        description: OpenSSL Light (Shining Light Productions)
-      settings: { id: ShiningLight.OpenSSL.Light, source: winget, version: '4.0.3' }
-
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: curl
-      directives:
-        description: curl (curl.se) — 手動 zip の古い 8.7.1 を置き換える（CVE 対応のため winget で管理）
-      settings: { id: cURL.cURL, source: winget, version: '8.23.0.5' }
-
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: fd
-      directives:
-        description: fd (sharkdp) — mise は検証 [none] のため winget
-      settings: { id: sharkdp.fd, source: winget, version: '10.5.0' }
-
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: rustup
       directives:
         description: Rustup (Rust Project)
