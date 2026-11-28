@@ -11,14 +11,14 @@
 # binary) instead, so CI installs no Node.js runtime and no npm packages.
 [tools]
 "github:jdx/jactionlint"                = "v2.6.0"
-"go:github.com/sisaku-security/sisakulint/cmd/sisakulint" = "0.3.8"
-hk                                  = { version = "2.13.0", lazy = true }  # local git hooks only (not installed in CI)
+"go:github.com/sisaku-security/sisakulint/cmd/sisakulint" = "v0.4.0"
+hk                                  = { version = "2.14.0", lazy = true }  # local git hooks only (not installed in CI)
 betterleaks                         = "v1.10.1"
 pinact                              = "5.0.2"
 # jactionlint uses shellcheck for the shell scripts inside `run:` blocks
 shellcheck                          = "0.11.0"
 # uv + Python only for tools/pathctl (the PATH CLI is type-checked with ty in CI)
-uv                                  = "0.13.9"
+uv                                  = "0.13.10"
 python                              = "3.15.2"
 
 # --- Host update automation (see docs/automation.md) -------------------------

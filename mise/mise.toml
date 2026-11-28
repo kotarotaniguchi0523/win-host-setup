@@ -2,7 +2,7 @@
 betterleaks            = "v1.10.1"
 node                   = ["26.13.1", "24.22.1"]
 python                 = ["3.15.2", "3.14.8"]
-gh                     = "2.105.0"
+gh                     = "2.106.0"
 # ghtkn: GitHub App user access token provider. Used as the git credential helper
 # (`!ghtkn git-credential`) instead of stored PATs / OAuth tokens.
 "aqua:suzuki-shunsuke/ghtkn" = "0.4.3"
@@ -12,41 +12,41 @@ doppler                = "3.77.1"
 "aqua:k1LoW/mo"        = "1.8.2"
 "github:microsoft/waza" = "v0.42.0"
 rtk                    = "v1.2.1"
-pnpm                   = "12.22.0"
-uv                     = "0.13.9"
+pnpm                   = "12.23.0"
+uv                     = "0.13.10"
 go                     = "1.27.4"
 "aqua:jj-vcs/jj"       = "0.47.1"
 jq                     = "1.8.2"
-"aqua:microsoft/tgrep" = "1.2.8"
+"aqua:microsoft/tgrep" = "1.2.9"
 "ubi:yusukebe/ax"      = "0.1.25"
 dotenvx                = "2.38.2"
 "npm:secretlint"       = "13.0.7"
 "npm:textlint"         = "15.8.0"
-"npm:ctx7"             = "0.12.2"
+"npm:ctx7"             = "0.13.0"
 # agent-desktop: Vercel Labs のデスクトップ操作 CLI。npm は sha512 integrity + SLSA provenance、
 # 実バイナリ（win32-x64 ほか）は同梱で postinstall が link するため allow_builds を許可する。
 "npm:agent-desktop"    = { version = "1.3.1", allow_builds = ["agent-desktop"] }
 nushell                = "0.117.0"
-"npm:agent-browser"    = "0.43.0"
-"npm:openclaw"         = "2026.11.6"
+"npm:agent-browser"    = "0.45.0"
+"npm:openclaw"         = "2026.11.10"
 herdr                  = "v0.9.5"
-pi                     = "v1.6.0"
+pi                     = "v1.6.1"
 # rust-analyzer: winget `Rustlang.rust-analyzer` で管理（aqua 版は Security [none] のため。winget-vs-mise.md §3）
 npm = "12.2.3"
 # SkillSpector: yara-python 4.5.4 は cp314/cp315 の wheel が無い → このツールのみ Python 3.13.16 で構築（インストール済・動作確認待ち）
-"pypi:git+https://github.com/nvidia/skillspector.git" = { version = "v2.13.6", uvx_args = "--python 3.13.16" }
+"pypi:git+https://github.com/nvidia/skillspector.git" = { version = "v2.13.7", uvx_args = "--python 3.13.16" }
 # postinstall で実バイナリ（約 200 MB）を取得するツール。mise は既定で dependency の
 # build script を実行しないので、このツールだけ allow_builds で許可する（他は既定のまま）。
 # allow_builds は installer 非依存で、pnpm なら --allow-build=<pkg>、npm 11.16+ なら
 # --allow-scripts=<pkg>、組み込み aube なら aube.allowBuilds に変換される。
-"npm:@opencode/cli" = { version = "2.3.2", allow_builds = ["@opencode/cli"] }
-"npm:@openai/codex" = "0.171.0"
+"npm:@opencode/cli" = { version = "2.4.2", allow_builds = ["@opencode/cli"] }
+"npm:@openai/codex" = "0.172.0"
 # T3 Code CLI（`t3` = ローカル server + Web UI）。npm は sha512 integrity + SLSA provenance、
 # 実バイナリは optionalDependencies（@t3code/t3-win32-x64）で postinstall 不要。
 # winget の desktop 版は 0.0.45 と遅れ、CLI を PATH に載せる操作もアプリ側（mise 管理外）になるため、
 # デスクトップ版は exceptions.tsv に自己更新の例外として登録し、tools/verify-host.ps1 が署名を確認する。
 # グローバル CLI は mise の npm backend で固定する（下の "npm:t3"）。
-"npm:t3" = "0.1.11"
+"npm:t3" = "0.1.12"
 "go:golang.org/x/tools/gopls" = "v0.24.0"
 "github:init-co-jp/diff-tour" = "v0.7.0"
 # obscura: AI エージェント向けヘッドレスブラウザ（mac-host-setup と同じ github バックエンド）。
