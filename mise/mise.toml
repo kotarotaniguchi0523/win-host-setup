@@ -64,7 +64,9 @@ pin                 = true
 [settings.npm]
 # installer: npm / pnpm / bun / aube（組み込み）/ aube_cli。
 # build script の許可は tool 側の allow_builds で行う（installer 非依存）。
-package_manager = "pnpm"
+# aube（mise 組み込み）は lock に依存グラフ（locks/npm-<pkg>/<ver>）と digest（sha256）を記録し、
+# locked_verify_provenance の下で npm パッケージの provenance（SLSA）を検証できる。mac-host-setup と同じ方式。
+package_manager = "aube"
 
 [settings.pypi]
 registry_url = "https://pypi.flatt.tech/simple/{}/"

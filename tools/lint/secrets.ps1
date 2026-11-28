@@ -20,8 +20,11 @@ try {
     # Note: exclude untracked files such as .agent/ (private backup data).
     #       Targeting only tracked files checks "what goes into the repository".
     if (-not (Get-Command betterleaks -ErrorAction SilentlyContinue)) { throw 'betterleaks が見つかりません（mise install）' }
+    # Generated lock graphs (mise/locks/**) are excluded from detection by this config (see the file's comment)
+    $blConfig = Join-Path $repo '.betterleaks.toml'
+    $blArgs = if (Test-Path $blConfig) { @('-c', $blConfig) } else { @() }
     Write-Host '=== betterleaks (git history) ===' -ForegroundColor Cyan
-    & betterleaks git $repo --no-banner
+    & betterleaks git $repo @blArgs --no-banner
     if ($LASTEXITCODE -ne 0) { $failed = $true }
 
     Write-Host '=== betterleaks (tracked files) ===' -ForegroundColor Cyan
@@ -32,13 +35,13 @@ try {
         foreach ($f in $tracked) {
             $batch += $f; $len += $f.Length + 1
             if ($len -gt 6000) {
-                & betterleaks dir @batch --no-banner
+                & betterleaks dir @batch @blArgs --no-banner
                 if ($LASTEXITCODE -ne 0) { $failed = $true }
                 $batch = @(); $len = 0
             }
         }
         if ($batch.Count -gt 0) {
-            & betterleaks dir @batch --no-banner
+            & betterleaks dir @batch @blArgs --no-banner
             if ($LASTEXITCODE -ne 0) { $failed = $true }
         }
     }
