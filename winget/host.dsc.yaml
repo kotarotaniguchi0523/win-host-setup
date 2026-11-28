@@ -8,8 +8,11 @@ properties:
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: mise
       directives:
+        # 2026.11.14: 組み込み aube が npm.flatt.tech の巨大 packument（npm 26MB / openclaw 24MB）を
+        # HTTP/2 で読み切れるようになり、`mise lock` が npm ツールの依存グラフ + digest を固定できる。
+        # 2026.10.12 では "too_many_data_frames" で relock が失敗する。
         description: mise-en-place (jdx 公式)
-      settings: { id: jdx.mise, source: winget, version: '2026.10.12' }
+      settings: { id: jdx.mise, source: winget, version: '2026.11.14' }
 
     # --- Dev CLI (cannot be validated by mise / Windows-only) ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage
