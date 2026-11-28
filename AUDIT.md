@@ -9,7 +9,7 @@
 | **ngrok** | **msstore** `9MVS1J51GMK6`（3.39.9-msix） | ✅ 移行済み |
 | PowerShell | **msstore** `9MZ1SNWT0N5D`（Store 版を採用。MSI は 2026-10-15 に削除） | ✅ **採用** |
 | Ubuntu | winget `Canonical.Ubuntu`（msstore に `9PDXGNCFSCZV` あり） | ⚠️ **候補** |
-| Docker Desktop | winget `Docker.DockerDesktop`（msstore に `XP8CBJ40XLBWKX` あり） | ⚠️ 候補だが **sbx データ依存のため非推奨** |
+| Docker Desktop | winget `Docker.DockerDesktop`（msstore の `XP8CBJ40XLBWKX` は **Win32 インストーラーの配布**で MSIX ではない） | ❌ 非採用（winget pin を維持） |
 | Python | mise `3.14.8`（msstore は 3.13 のみ） | ✅ mise が正当（Attestation＋固定） |
 | mise / git / openssl / cloudflared / fd | msstore に無し | — |
 | Antigravity CLI (`agy`) | msstore に CLI 無し（`Antigravity Nexus` は別物）／ npm は第三者名義の 0.0.1 のみ | winget（portable）で採用 |
