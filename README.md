@@ -1,274 +1,85 @@
-> このリポジトリは `tools/sanitize.ps1` の生成物です（ユーザー名・パス・ホスト名をプレースホルダ化）。
-> 実環境の値は含みません。
-
 # win-host-setup
 
-**Windows ホストのグローバル導入を [mise](https://mise.jdx.dev/) に統一し、検証可能（サプライチェーン重視）にする**ための設計・実施記録・再現手順。
+Windows ホストの**グローバル導入**を宣言ファイルで管理し、**更新は PR・適用はホスト**で再現可能にするリポジトリ。
+対象は Windows 本体のグローバル導入のみ（プロジェクトローカル、エディタ/ブラウザ拡張、WSL 内部は対象外）。
 
-> 対象は **Windows 本体のグローバル導入のみ**。プロジェクトローカル、エディタ/ブラウザ拡張、WSL 内部は対象外。
+## 基本方針
 
-## このリポジトリの読み方
+判断基準の本体は **[`AGENTS.md`](AGENTS.md)**。要点だけ:
+
+- 選定は **① 公式 Microsoft Store（`msstore`）→ ② mise の実効検証（checksum / attestations / cosign / gpg）→ ③ winget の厳密 pin**。
+- 「機能がある」ではなく **実効性**で判断する（`mise tool <name>` の `Security:` 行）。
+- 版は厳密に固定し、**`mise.lock` と `mise/locks/`（aube の依存グラフ）**で再現する。
+- 自己更新できるものは**自己更新を止め**、宣言だけを更新経路にする。止められないものだけ `exceptions.tsv` に例外登録（署名検証）。
+
+## 現在の構成（2026-11-28）
+
+| 層 | 対象 | 実体 |
+|---|---|---|
+| **mise** | CLI・ランタイム・npm ツール・APM・obscura など | `mise/mise.toml` + `mise.lock` + `mise/locks/` |
+| **msstore** | PowerShell / WSL / Ubuntu | `winget/host.dsc.yaml`（`source: msstore`） |
+| **winget** | mise / Git / Docker Desktop / Docker sbx | `winget/host.dsc.yaml`（厳密 pin・自己更新 OFF） |
+| **例外** | T3 Code desktop | `exceptions.tsv`（`verify-host` が Authenticode 署名を確認） |
+
+備考: `curl` は **OS 標準（System32 / Microsoft 署名）** を使う。`fd` / `OpenSSL` / Rust は管理対象外。
+
+## ファイル
 
 | ファイル | 内容 |
 |---|---|
-| **`AGENTS.md`** | **Package Management Policy（判断基準の本体）** |
-| **`PLAN.md`** | 計画＋実施ログ。**上=未完了 / 下=完了（同一見出しでアーカイブ）** |
-| **`AUDIT.md`** | ポリシー準拠の監査（全ツールの入手方法と `Security:` 行） |
-| **`docs/automation.md`** | **更新の仕組み（remote-complete / local-apply）の全体像** |
-| **`winget-vs-mise.md`** | **全ツールの「mise vs winget」判定**（どちらの検証が強いか） |
-| `inventory.md` / `TODO-inventory.md` | パッケージ棚卸し |
-| `repos.md` / `repos-analysis.md` | リポジトリの分析 |
-| `tools/` | 棚卸し・サニタイズ・復元・PATH 修正のスクリプト |
-| `winget/host.dsc.yaml` | winget の宣言的構成（全バージョン固定） |
-| `mise/mise.toml` / `mise/mise.lock` | mise のグローバル設定と lock（**コピー**。`tools/apply.ps1` で `~/.config/mise/` へ適用）<br>※ リポジトリ内で mise に「プロジェクト設定」として拾われないよう **`mise.toml` の名前**で保存 |
+| `AGENTS.md` | **Package Management Policy（判断基準の本体）** |
+| `PLAN.md` | 計画と実施ログ（上=未完了 / 下=完了） |
+| `AUDIT.md` | ポリシー準拠の監査（入手方法と実効検証） |
+| `docs/automation.md` | **更新の仕組み（Renovate / CI / ホスト適用）** |
+| `winget-vs-mise.md` | 全ツールの「mise vs winget」判定の記録 |
+| `winget/host.dsc.yaml` | winget / msstore の宣言（WinGet Configuration） |
+| `mise/mise.toml` / `mise/mise.lock` / `mise/locks/` | mise の宣言と lock（`tools/apply.ps1` で `~/.config/mise/` へ適用） |
+| `skills/` | APM のマニフェスト・lock・自作 Skill |
+| `tools/` | 適用・検証・同期・サニタイズ・PATH 点検（`pathctl`） |
+| `exceptions.tsv` | 自己更新を止められないアプリの例外（署名者つき） |
 
-## 判断基準（要約）
-
-**① msstore 公式 → ② mise/aqua の“実効検証” → ③ winget（Publisher + SHA256）**
-
-- **「機能の存在」ではなく実効性**で判断する（`mise tool <名>` の `Security:` 行で確認）。
-- ② の「実効検証」= `checksum (sha256)` / `attestations`（SLSA provenance）/ `cosign` / `gpg`。
-- `Security: [none]` の表示でも、`pypi:` は **uv 依存グラフの wheel ハッシュ**、`npm:` は **registry integrity + provenance** で実効検証されている場合がある。
-- mise が検証を持たない場合は **winget（マニフェストの `Installer SHA256`）** が上位。
-- **正確にピン留め**し、`mise.lock` で再現可能にする（`latest` を使わない）。
-
-## 主要な結論（2026-10-15 時点）
-
-- 核は **mise**（winget `jdx.mise`）。Nix は不使用。
-- セキュア設定: `paranoid = true` / `locked = true` / `locked_verify_provenance = true` / `minimum_release_age = "2d"` / `pin = true`。
-- 既定バージョンは **最新**（`node` 26.x / `python` 3.15.x）。**1 つ前の系統も併設**（`24.x` / `3.14.x`）。mise の配列は**先頭が既定**。
-- 依存レーンは **Takumi Guard**（npm/pypi を `npm.flatt.tech` / `pypi.flatt.tech` 経由に）。
-- **winget へ移したもの**: `rust-analyzer`（mise/aqua が `[none]` のため）、`apm`（既定 Python 3.15 で依存 `pyyaml` の cp315 wheel が無く `pypi:` で導入不能のため）。
-- **既知の逸脱**: `herdr`（winget に stable が無く aqua も `[none]`）。
-
-## 自動更新（Renovate + GitHub Actions）
-
-**「Renovate が PR を作り、CI が検証し、relock が lock を追随させる」**体制です。
-
-| ワークフロー | 役割 |
-|---|---|
-| **Renovate App**（Mend hosted / `github.com/apps/renovate`）| 依存更新 PR（すべての対象）。**PAT 不要**（自己ホストの workflow と `RENOVATE_TOKEN` は廃止） |
-| `.github/workflows/relock.yml` | `mise/config.toml` が変わった PR で **`mise lock` を実行し `mise.lock` を同じ PR に積む**（push は relock 用 GitHub App の短命トークン） |
-| `.github/workflows/validate.yml` | push / PR で **`mise install --locked`（ロックのドリフト検出）** ＋ JSON/YAML/TOML の構文検証 ＋ **pin の厳密性（`latest` / 範囲指定 / ブランチ ref を拒否。APM 管理の2件のみ例外）**（PSScriptAnalyzer は hk の pre-push が担当） |
-| `.github/workflows/winget-outdated.yml` | 週次（Windows ランナー）で **`winget` 自身を情報源に `host.dsc.yaml` のピンを更新**し PR を作成 |
-| `.github/workflows/skills.yml` | `skills/**` の変更で **APM のマニフェスト検証・`apm.lock.yaml` ドリフト検出・`apm audit`（セキュリティ監査）** |
-| `.github/workflows/healthcheck.yml` | 週次で **`mise` のドリフト／更新候補・winget の乖離・公開リポジトリの衛生（個人パス混入検査）** を点検 |
-
-### 役割分担（更新 PR とセキュリティ）
-
-- **Renovate**（Mend hosted）が mise / GitHub Actions / Skills (APM) の更新 PR を作ります。
-- **Dependabot** は**セキュリティアラートのみ**を有効にし、更新 PR は作りません。bot の版更新設定 `.github/dependabot.yml` は削除し、セキュリティ更新 PR も停止しています。
-- **脆弱性が見つかったとき**は、Renovate の `vulnerabilityAlerts`（＋`osvVulnerabilityAlerts`）が週次のスケジュール・`minimumReleaseAge`・Dependency Dashboard 承認・automerge 制限をすべて迂回し、**即時に PR を作って即時にマージ**します。
-- **minor / patch** の更新は、**CI が通れば自動でマージ**します。pin / digest と major は手動です（major は Dependency Dashboard で承認してから PR を作ります）。
-- リポジトリ設定 **Actions → Fork pull request workflows → Require approval for first-time contributors who are new to GitHub** は維持します（これが最も緩い設定です）。
-  - `secrets.GITHUB_TOKEN` で push すると作者が `github-actions[bot]` になり、GitHub はこれを「外部コントリビューター」として扱うため、**その PR の workflow が `action_required`（承認待ち）で止まります**（PR #25 で実際に発生し、10 時間 CI が走りませんでした）。
-  - そのため `relock.yml` / `skills-relock.yml` の push だけを **relock 用 GitHub App のインストールトークン**に変えています（既定の `GITHUB_TOKEN` は `contents: read` のまま）。
-
-### Renovate が担当する範囲
-- **`mise/config.toml`**（native な `mise` マネージャ）— 25 ツール前後を継続更新。
-  - **配列の先頭（＝既定バージョン）のみ**更新される（`node` / `python` の fallback 側は手動）。
-  - `pypi:git+…@v2.12.0`（SkillSpector）のような **git 固定は自動更新されない**。
-- **Skills でタグが無いリポジトリ**（`nushell/nu_scripts` / `mizchi/explainer`）は `#main` のまま **APM 管理**にします（Renovate の対象外）。
-  更新は `apm update`（または `tools/skills-apply.ps1 -Lock`）で lock を再解決して行い、`#main` を許すのは `tools/ci/lint-pins.py` の `APM_BRANCH_REF_ALLOW` にある2件だけです。
-- **GitHub Actions**（`pinDigests: true` でコミット SHA 固定）。
-- **winget の DSC は Renovate 非対応**のため、上記 `winget-outdated.yml` が担当（`msstore` は対象外）。
-
-### ポリシーとの整合
-- `minimumReleaseAge: "2 days"` を Renovate 側にも設定し、mise の `minimum_release_age = "2d"` と揃えています。
-- `mise.lock` / `apm.lock.yaml` の再生成は Renovate ではなく **CI（relock.yml / skills-relock.yml）** に寄せ、`allowedUnsafeExecutions` を空にしています（実行権限を Renovate に渡さない）。Mend hosted の Renovate は `mise lock` を unsafe execution として実行できず、`apm` CLI も持たないため、artifact 更新は失敗します。そこで `renovate.json` では mise / APM に **`skipArtifactsUpdate: true`** を設定し、失敗する artifact 更新（`renovate/artifacts` の failure）を止めています。
-
-### relock 用 GitHub App（必須）
-
-`relock.yml` / `skills-relock.yml` は PR ブランチへ push するため、`github-actions[bot]` 以外の identity が必要です。未設定の場合 relock は失敗します（fail-closed）。
-
-1. **Settings → Developer settings → GitHub Apps → New GitHub App**
-   - Permissions: **Contents: Read and write**、**Pull requests: Read and write**
-   - Webhook: 無効
-2. 作成した App を **このリポジトリだけ**にインストール
-3. **Settings → Environments** に `relock` を作成（**protection rule は付けない**＝自動実行を止めない）
-   - Environment secret `RELOCK_APP_PRIVATE_KEY` … 生成した秘密鍵（`.pem` の中身）
-4. **Settings → Secrets and variables → Actions → Variables** に登録
-   - `RELOCK_APP_CLIENT_ID` … App の **Client ID**（`Iv…`。App ID ではない）。同名のEnvironment secretでも指定可能
-
-App のトークンはジョブ内で差分があるときだけ発行します。ロック更新は `contents: write`、winget更新はこれに `pull-requests: write` を加えます。秘密鍵は `relock` Environmentのsecretに置き、このEnvironmentを指定したワークフローでのみ参照します。
-
-### グループごとの PR
-Renovate / CI は **グループごとに 1 PR** を作ります。
-
-| グループ | 担当 | 対象 |
-|---|---|---|
-| **mise tools** | Renovate（`mise` マネージャ） | `mise/mise.toml` の全ツール（配列の先頭＝既定のみ） |
-| **GitHub Actions** | Renovate（`github-actions`） | 各ワークフローの `uses:`（コミット SHA 固定） |
-| **Skills (APM)** | Renovate（`apm` マネージャ） | `skills/apm.yml` の `owner/repo#ref` |
-| **winget (DSC)** | `winget-outdated.yml` | `winget/host.dsc.yaml`（`msstore` は除く） |
-
-`mise.lock` の再生成は `relock.yml`、`apm.lock.yaml` の再生成は `skills-relock.yml`（PR）または `tools/skills-apply.ps1 -Lock`（ローカル）（＋`skills.yml` がドリフト検出）が担当します。
-
-## Skills の管理（APM）
-
-**APM（Agent Package Manager）** でグローバル Skills を管理します。実体は `~/.apm/` に置かれ、このリポジトリが**唯一のソース**です。
-
-| リポジトリ | 実環境 |
-|---|---|
-| `skills/apm.yml` | `~/.apm/apm.yml`（リモート Skill の宣言） |
-| `skills/apm.lock.yaml` | `~/.apm/apm.lock.yaml`（**commit SHA + ファイルごとの sha256**） |
-| `skills/local/<name>/SKILL.md` | `~/.agents/skills/<name>/`（**自作 Skill**） |
+## 日常の操作
 
 ```powershell
-# 実環境へ適用（+ lock 再生成）
-pwsh -File tools/skills-apply.ps1 -Lock
+pwsh -File tools/run-task.ps1 -Task check    # 差分・ドリフトの表示（読み取りのみ）
+pwsh -File tools/run-task.ps1 -Task update   # public 取り込み → mise → skills → winget（管理者）→ verify
+pwsh -File tools/run-task.ps1 -Task verify   # 検証のみ（.agent/update-report.json）
+pwsh -File tools/sync.ps1                    # ホスト → リポジトリ → public へ反映
 ```
 
-- スキルの追加は `skills/apm.yml` の `dependencies.apm` に **`owner/repo#ref`** を書くだけ。**Renovate が自動で更新**します。
-- **自作 Skill** は `skills/local/<name>/SKILL.md` に置きます（APM 管理外として扱われ、Renovate の対象になりません）。
-  - **更新の向き**: 自作 Skill は **ホスト（`~/.agents/skills/`）が正**。ホストで編集 → `tools/sync.ps1`（capture）でリポジトリへ。
-    リポジトリ側を直接編集した場合は、**先に `tools/skills-apply.ps1` を実行してホストへ反映**してから `sync.ps1` を実行してください
-    （順序を誤ると capture がホスト側の古い内容でリポジトリを上書きします）。
-  - リモート Skill（`skills/apm.yml` の `owner/repo#ref`）は **Renovate が正**。
-- `apm audit`（`skills.yml`）が **hidden Unicode / drift / policy 違反**を検査し、**SARIF を Code Scanning へ**上げます。
-- **Waza**（`waza check` / `coverage` / `gate`）でも Skill を評価します（CI に組み込み済み）。
-- `apm audit --external skillspector` を使う場合は `apm experimental enable external-scanners` が必要です（skillspector は重量なため 1 回 240 秒超）。
+- `tools/verify-host.ps1` の結果が **`ng=0`** を保つのが運用の基準。
+- `winget configure` は管理者権限が必要（非管理者では警告してスキップ）。
+- `mise install` は `shims\mise.exe` を作るが、そのままだと全シムが再帰で壊れる。**`tools/apply.ps1` が直後に削除**する。
 
-### ローカルで更新 → Push
+## 更新の流れ（要点）
 
-ホスト側で Skills や設定を変えたら、**1 コマンド**でリポジトリと公開版へ反映できます。
+Renovate が PR → CI（lint / validate / skills）→ relock（mise / APM の lock）→ automerge → ホストは `pull` で追随。
+詳細と運用ルールは **[`docs/automation.md`](docs/automation.md)**。
 
-```powershell
-pwsh -File tools/sync.ps1                  # capture → skills-capture → sanitize → commit → push
-pwsh -File tools/sync.ps1 -NoPush          # push しない（確認用）
-pwsh -File tools/sync.ps1 -Message "..."   # コミットメッセージ指定
-```
-
-1. `tools/capture.ps1` — `~/.config/mise` → `mise/`
-2. `tools/skills-capture.ps1` — `~/.apm` と自作 Skill → `skills/`
-3. `tools/sanitize.ps1` — `public/` を再生成（個人情報を伏せる）
-4. source リポジトリをコミット → public リポジトリをコミットして push
-
-### ホストの更新（GitHub → ホスト）
-
-Renovate が public に入れた更新を、ホストへ取り込んで検証します。
-
-```powershell
-pwsh -File tools/run-task.ps1 -Task check    # 読み取りのみ（差分とドリフトを表示）
-pwsh -File tools/run-task.ps1 -Task update   # pull → mise → skills → winget → verify
-pwsh -File tools/run-task.ps1 -Task verify   # 検証のみ（.agent/update-report.json を出力）
-```
-
-- タスク定義は `mise.toml` の `[tasks.*]`（`mise run update` など）。
-- `MISE_SAFE=1` がユーザー環境変数で設定されているため、`mise run` を直接叩く場合は `$env:MISE_SAFE=0` が必要です。`tools/run-task.ps1` は自動化の入口として、この設定を**自前の実行だけ**解除します。
-- 平日 6:30 の自動実行は `pwsh -File tools/register-task.ps1`（管理者）で登録、`-Unregister` で削除します。
-- 検証結果は `.agent/update-report.json`（ローカル専用・コミットしません）。`exit 1` のときは `nextActions` に従ってください。
-- `winget` の適用は管理者権限が必要です。非管理者で実行した場合は警告を出してスキップします。
-- 失敗時は AI フォールバック: `pwsh -File tools/run-task.ps1 -Task update -AiFallback`（TUI では `/update-host`）。エージェント定義は `.opencode/agents/host-fixer.md`。
-
-### 必要な Secrets
-
-ありません。Renovate App（Mend hosted）は PAT を使わないため、以前使っていた `RENOVATE_TOKEN` は削除しました。
-Dependabot 側はセキュリティアラートだけを有効にしているので、そちらにも認証情報は要りません。
-
-## グローバル PATH の管理（`tools/pathctl`）
-
-Windows のグローバル PATH を点検・修復し、**どのツールがどの入手元で使えるか**（mise / winget / npm / 直置き）を一覧する CLI です。Python 3.15 の**標準ライブラリのみ**で動き、実行時の依存はありません。
-
-```console
-uvx pathctl doctor --format json                # 導入せずに実行（公開後）
-uv run --project tools/pathctl pathctl doctor --format json   # このリポジトリから
-uv tool install --from tools/pathctl pathctl    # グローバルに導入
-```
-
-| コマンド | 内容 |
-|---|---|
-| `pathctl doctor [--strict]` | PATH とツールをまとめて点検（exit 5 は要対応） |
-| `pathctl tools [--without-mise]` | ツールの入手元一覧（`without_mise` = mise が無くても起動できる） |
-| `pathctl path list / check / fix / add / remove` | PATH の一覧・検査・修復（`--apply` で適用、既定は下見） |
-| `pathctl describe --format json` | コマンドごとのフラグ一覧（自己記述） |
-| `pathctl docs list` / `docs show <name>` | 同梱ガイド（**Web Fetch 不要**でエージェントが読める） |
-
-**エージェント向けの設計**（Zenn「AIエージェントに使わせるCLIの設計原則8選」と
-「AI フレンドリーな CLI を開発するテクニック」を踏襲）
-
-- `--format table|json|tsv`。stdout はデータのみ、パイプ時は UTF-8、`--json` は別名
-- **セマンティック終了コード**: `0` 成功 / `1` 一般 / `2` 引数 / `3` 対象なし / `4` 設定・権限 / `5` 検証
-- **アクション可能なエラー**: `error.category` / `message` / `next_step` / `candidates` / `required_args`
-- **noun-verb**: `path <verb>` / `tools` / `docs <verb>` / `doctor` / `describe`
-- **`describe` による自己記述**、**`docs` による同梱ガイド**（Web Fetch をさせない）
-- **冪等 + 下見**: 書き換えは `--apply` のときだけ（`--dry-run` は別名）
-- **管理者権限が要る操作**は「ユーザーに依頼する」ようエラーで案内する（エージェントは昇格できない）
-
-実装は Effective Python（第2版）の項目に沿えています（`defaultdict` / `Counter`、`itertools.chain`、
-ループ不変条件の巻き上げ、例外を絞る、`functools.cache`、`zip(strict=True)`、キーワード専用引数、
-`unittest` でテスト）。Python 3.15 の `lazy import`（PEP 810）で `ctypes` / `winreg` / `json` /
-`unicodedata` を**使うときだけ**解決し、t-strings（PEP 750）と PEP 695 の `type` 文も使っています。
-
-- 詳細は **`tools/pathctl/README.md`** と同梱ガイド（`pathctl docs show agents`）。JSON は `schema: "pathctl/1"` の固定形です。
-- リリースは **`.github/workflows/release.yml`**（`pathctl-v*` タグで GitHub Release を作成、PyPI は信頼済みパブリッシャー設定後に有効化）。
-- マシン PATH の大掃除は **`tools/fix-machine-path.ps1`（管理者）**、日常の点検と微修正は **`pathctl`** という使い分けです。
-
-### グローバル導入の運用メモ
-
-実際に運用して踏んだ落とし穴です。
-
-| 場面 | 必要なこと |
-|---|---|
-| mise にツールを追加した | **`mise lock --global`** を実行する。`locked = true` なので、ロックに無いツールは shim が解決できず失敗します（`is not in the lockfile`）|
-| `npm -g` / `go install` で入れたものを見つけた | mise の `npm:` / `go:` へ移す（`pathctl audit` が WARN で示します）|
-| postinstall（build script）で実体を取得する npm パッケージ | mise は既定で dependency の build script を実行しません。**そのツールだけ** `allow_builds` で明示許可します（例: `"npm:@opencode/cli" = { version = "2.0.29", allow_builds = ["@opencode/cli"] }`）。installer（`[settings.npm] package_manager` = `pnpm` / `npm` / `bun` / `aube`）に依らず同じ書き方で、pnpm なら `--allow-build=`、npm 11.16+ なら `--allow-scripts=` に変換されます。`npm_args` での `--allow-scripts` は **npm 専用**で、pnpm では動きません |
-| 個人パスが Machine PATH に混ざっている | `tools/fix-machine-path.ps1`（管理者）。**User PATH へ移してから** Machine PATH から外します |
-| Windows 同梱コマンドより新しい版を使いたい | 下の「Windows 同梱コマンドの上書き」へ |
-
-> **公開済みのタグは消さない**: GitHub Release を作ったあとにタグを削除しても、同じ名前は作り直せません（`protect release tags` ルールセット）。やり直すときは版を上げます。
-
-### Windows 同梱コマンドの上書き（管理者）
-
-有効な PATH は **Machine PATH → User PATH** の順に連結されるため、ユーザー単位の shim（mise shims、winget Links）では
-`C:\Windows\System32` のコマンドを**上書きできません**。上書きしたいコマンドは、全ユーザー共通のディレクトリ
-`C:\ProgramData\win-host-setup\bin` に**コピー**を置き、Machine PATH の**先頭**に登録します。ディレクトリ名は固定なので、
-パッケージを更新しても PATH の記載は変わりません。
-
-| 上書きするコマンド | 入手元（`winget/host.dsc.yaml`） | 理由 |
-|---|---|---|
-| `curl` | `cURL.cURL` | Windows 同梱の `curl.exe`（System32）は Windows Update 任せで古い版が残りやすい |
-
-```powershell
-pwsh -File tools/overrides.ps1            # プレビュー（現在の PATH と配置予定を表示）
-pwsh -File tools/overrides.ps1 -Apply     # 管理者で適用（コピー + Machine PATH の先頭に登録）
-```
-
-`tools/update-winget-dsc.ps1 -Apply` でパッケージを更新したあとは、同じく `overrides.ps1 -Apply` を実行して
-コピーを差し替えます（バックアップは `.agent/machine-path-backup-*.txt`）。
+- 必須: `relock` Environment の **`RELOCK_APP_CLIENT_ID`**（Variable）と **`RELOCK_APP_PRIVATE_KEY`**（Secret）。
+- ローカルで lock を作り直すときは GitHub API のレート制限を避けるため **`GITHUB_TOKEN`** を渡す。
+- 検証結果は `.agent/update-report.json`（ローカルのみ・コミットしない）。
 
 ## 再現手順
 
 ```powershell
-# 1) 設定を適用（mise config + lock）
-pwsh -File tools/apply.ps1
-
-# 2) winget の宣言的構成を適用
-winget configure winget/host.dsc.yaml
-
-# 3) 管理者で PATH を整える（大掃除 → 同梱コマンドの上書き）
-pwsh -File tools/fix-machine-path.ps1 -Apply
-pwsh -File tools/overrides.ps1 -Apply
-
-# 4) 検証
-mise doctor
+pwsh -File tools/apply.ps1                      # 1) mise config + lock を適用
+winget configure winget/host.dsc.yaml           # 2) winget / msstore を適用（管理者）
+pwsh -File tools/skills-apply.ps1 -Lock         # 3) Skills（APM）を適用
+pwsh -File tools/verify-host.ps1                # 4) 検証
 ```
 
-## サニタイズ（公開用コピーの生成）
+- PATH の大掃除: `tools/fix-machine-path.ps1`（管理者）。日常の点検・微修正: `pathctl`（`tools/pathctl/README.md`）。
+
+## 公開用コピー
 
 ```powershell
-pwsh -File tools/depii.ps1 -Check   # ソース側の PII 検出（0 が目標）
-pwsh -File tools/depii.ps1          # ソース側を in-place で浄化
-pwsh -File tools/sanitize.ps1       # → public/ に個人情報を伏せたコピーを生成（最後の防波堤）
+pwsh -File tools/depii.ps1 -Check   # 個人情報の検出（0 が目標）
+pwsh -File tools/sanitize.ps1       # public/ を生成（最後の防波堤）
 ```
 
-置換内容: `C:\Users\<user>` → `%USERPROFILE%`、ユーザー名・GitHub アカウント名・メール・ホスト名 → プレースホルダ。
-ルールは **`tools/pii-rules.ps1`** に一元化。社内レジストリ（`flatt.tech`）は公開可（ユーザー判断）。
+個人情報はプレースホルダで書き、置換ルールは `tools/pii-rules.ps1` に一元化。`.agent/` はローカルのみ（`.gitignore`）。
 
-### データの置き場所
+## さらに読む
 
-| 置き場所 | 内容 | 公開 |
-|---|---|---|
-| リポジトリ直下 | ドキュメント・設定・CI（**PII はプレースホルダで書く**） | ✅ public へ |
-| **`.agent/`** | 生データ・退避データ・個人メモ（**.gitignore 済み**） | ❌ ローカルのみ |
-| `public/` | `sanitize.ps1` の生成物（独立リポジトリ） | ✅ push 対象 |
+`AGENTS.md`（方針） / `docs/automation.md`（更新） / `AUDIT.md`（監査） / `winget-vs-mise.md`（判定の記録） / `tools/pathctl/README.md`（PATH CLI）
