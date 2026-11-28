@@ -1,5 +1,14 @@
 # winget vs mise 監査（mise 管理 全 28 ツール）
 
+> **現在の状態（2026-11-28 更新）**: この文書は **2026-10-15 時点の判定記録**です。現在の宣言は次が正:
+>
+> - **msstore**: PowerShell / WSL / Ubuntu（実体が MSIX の Store 版）
+> - **winget pin**: mise / Git / Docker Desktop / Docker sbx（Docker は Store 掲載もあるが Win32 配布のため pin）
+> - **mise**: 上記以外の CLI・ランタイム・npm ツール・APM（`github:microsoft/apm`）・obscura など
+> - **例外**: T3 Code desktop（`exceptions.tsv`）
+> - **管理対象外**: curl（OS 標準 `System32\curl.exe`）/ fd / OpenSSL / Rust（2026-11-28 に削除）
+> - npm の installer は **aube**（lock に依存グラフ + digest、provenance 検証）
+
 **目的**: mise 管理下の全ツールについて、**これまでの基準（① msstore 公式 → ② mise/aqua の実効検証 → ③ winget）** を適用し、
 「**winget のほうが検証が強いか**」を 1 件ずつ判定して、切替の可否を明示する。
 
