@@ -79,7 +79,7 @@ Skillsのロック更新は `skills/apm.yml` の変更だけで起動します�
 
 | 項目 | 状態 |
 |---|---|
-| **msstore**（現在 0 件） | 使う場合は Store が自動更新するため比較対象外（ポリシー上信頼済み）。ngrok は 2026-11-24 に削除。 |
+| **msstore**（1 件: PowerShell） | Store が自動更新するため比較対象外（ポリシー上信頼済み）。`winget/host.dsc.yaml` の `9MZ1SNWT0N5D`。ngrok は 2026-11-24 に削除。 |
 | **自己更新アプリ**（T3 Code desktop） | ベンダー配布で自己更新する。DSC に入れると古いマニフェストへダウングレードするため、`exceptions.tsv` に登録し、`verify-host` が存在と Authenticode 署名（T3 Tools Inc）を確認する。CLI は mise `npm:t3`。 |
 | **`#main` の2件**（`nushell/nu_scripts` / `mizchi/explainer`） | 上流にタグが無い。Renovate は追えないので **APM 管理**（`apm update` で lock を再解決）。許可リストは `lint-pins.py` の `APM_BRANCH_REF_ALLOW`。 |
 | **自己更新 CLI**（`t3 update` / `opencode upgrade` / `uv self update` など） | mise の外に実体を作る。`pathctl audit` で検出できるが `verify` には未組み込み。 |
